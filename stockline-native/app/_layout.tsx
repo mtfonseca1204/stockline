@@ -1,12 +1,6 @@
 import { AlertStack } from "@/components/AlertStack";
 import { AppProvider } from "@/context/AppContext";
 import { colors } from "@/constants/theme";
-import { ArchivoBlack_400Regular } from "@expo-google-fonts/archivo-black";
-import {
-  SpaceGrotesk_400Regular,
-  SpaceGrotesk_500Medium,
-  SpaceGrotesk_700Bold,
-} from "@expo-google-fonts/space-grotesk";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -20,10 +14,10 @@ SplashScreen.preventAutoHideAsync().catch(() => undefined);
 
 export default function RootLayout() {
   const [loaded] = useFonts({
-    ArchivoBlack_400Regular,
-    SpaceGrotesk_400Regular,
-    SpaceGrotesk_500Medium,
-    SpaceGrotesk_700Bold,
+    ArchivoBlack_400Regular: require("../assets/fonts/ArchivoBlack_400Regular.ttf"),
+    SpaceGrotesk_400Regular: require("../assets/fonts/SpaceGrotesk_400Regular.ttf"),
+    SpaceGrotesk_500Medium: require("../assets/fonts/SpaceGrotesk_500Medium.ttf"),
+    SpaceGrotesk_700Bold: require("../assets/fonts/SpaceGrotesk_700Bold.ttf"),
   });
 
   useEffect(() => {
