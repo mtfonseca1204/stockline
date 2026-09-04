@@ -1,15 +1,13 @@
 export type AppView =
   | "landing"
-  | "dashboard"
+  | "home"
   | "portfolio"
-  | "credit"
-  | "activity"
   | "borrow"
+  | "activity"
   | "deposit"
   | "withdraw"
-  | "auto-repay"
-  | "risk"
-  | "empty";
+  | "loan"
+  | "stock";
 
 export type WalletProvider = "coinbase" | "metamask" | "walletconnect";
 
@@ -36,6 +34,7 @@ export interface ActivityItem {
   asset: string;
   amount: string;
   status: ActivityStatus;
+  detail?: string;
 }
 
 export interface AlertItem {
@@ -53,6 +52,8 @@ export interface CreditState {
   interestApr: number;
   maxLtv: number;
   liquidationThreshold: number;
+  yieldGeneratedMonth: number;
+  yieldAppliedMonth: number;
 }
 
 export interface AppState {
@@ -67,4 +68,6 @@ export interface AppState {
   alerts: AlertItem[];
   view: AppView;
   previousView: AppView;
+  selectedTicker: string | null;
+  lastYieldPulse: number | null;
 }

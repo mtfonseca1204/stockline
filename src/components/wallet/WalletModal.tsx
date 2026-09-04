@@ -1,15 +1,14 @@
 "use client";
 
 import { Button } from "@/components/ui/Button";
-import { Modal } from "@/components/ui/Modal";
+import { Expandable, Sheet } from "@/components/ui/primitives";
 import { useApp } from "@/context/AppContext";
 import type { WalletProvider } from "@/lib/types";
-import { useState } from "react";
 
-const WALLETS: Array<{ id: WalletProvider; name: string }> = [
-  { id: "coinbase", name: "Coinbase Wallet" },
-  { id: "metamask", name: "MetaMask" },
-  { id: "walletconnect", name: "WalletConnect" },
+const OPTIONS: { id: WalletProvider; label: string; hint: string }[] = [
+  { id: "coinbase", label: "Coinbase Wallet", hint: "Recommended on Base" },
+  { id: "metamask", label: "MetaMask", hint: "Browser extension" },
+  { id: "walletconnect", label: "WalletConnect", hint: "Scan to connect" },
 ];
 
 export function WalletModal({
@@ -20,46 +19,50 @@ export function WalletModal({
   onClose: () => void;
 }) {
   const { connectWallet, enableDemoMode } = useApp();
-  const [loading, setLoading] = useState<WalletProvider | null>(null);
 
-  const connect = async (provider: WalletProvider) => {
-    setLoading(provider);
-    await new Promise((r) => setTimeout(r, 700));
-    connectWallet(provider);
-    setLoading(null);
+  const pick = (id: WalletProvider) => {
+    connectWallet(id);
     onClose();
   };
 
   return (
-    <Modal
-      open={open}
-      onClose={onClose}
-      title="Connect wallet"
-      description="Base-compatible wallet required."
-      size="sm"
-    >
+    <Sheet open={open} onClose={onClose} title="Connect your wallet">
+      <p className="mb-5 text-sm text-[var(--ink-muted)]">
+        Connect a wallet on Base to get started.
+      </p>
       <div className="space-y-2">
-        {WALLETS.map((w) => (
+        {OPTIONS.map((opt) => (
           <button
-            key={w.id}
-            onClick={() => connect(w.id)}
-            disabled={!!loading}
-            className="flex w-full items-center rounded-xl border border-[var(--border)] bg-[var(--bg)] px-4 py-3 text-left text-sm font-medium hover:border-[var(--lime)] disabled:opacity-60"
+            key={opt.id}
+            type="button"
+            onClick={() => pick(opt.id)}
+            className="flex w-full items-center justify-between rounded-xl border border-[var(--border)] bg-[var(--bg)] px-4 py-3.5 text-left transition hover:border-[var(--border-strong)]"
           >
-            {loading === w.id ? "Connecting…" : w.name}
+            <span className="font-semibold text-[var(--ink)]">{opt.label}</span>
+            <span className="text-xs text-[var(--ink-subtle)]">{opt.hint}</span>
           </button>
         ))}
-        <Button
-          variant="soft"
-          className="mt-2 w-full"
-          onClick={() => {
-            enableDemoMode();
-            onClose();
-          }}
-        >
-          Enter Demo Mode
-        </Button>
       </div>
-    </Modal>
+
+      <div className="mt-5">
+        <Expandable label="Why do I need a wallet?">
+          <p>
+            Your wallet is how Stockline interacts with your onchain assets.
+            Stockline never needs your private keys.
+          </p>
+        </Expandable>
+      </div>
+
+      <Button
+        variant="ghost"
+        className="mt-4 w-full"
+        onClick={() => {
+          enableDemoMode();
+          onClose();
+        }}
+      >
+        Continue with demo mode
+      </Button>
+    </Sheet>
   );
 }

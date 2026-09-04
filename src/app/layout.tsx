@@ -1,23 +1,23 @@
 import type { Metadata } from "next";
-import { Archivo_Black, Space_Grotesk } from "next/font/google";
+import { Manrope, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 
-const display = Archivo_Black({
+const display = Manrope({
   variable: "--font-display",
   subsets: ["latin"],
-  weight: "400",
+  weight: ["500", "600", "700", "800"],
 });
 
-const sans = Space_Grotesk({
+const sans = Plus_Jakarta_Sans({
   variable: "--font-sans",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
-  title: "Stockline — Self-repaying credit for tokenized stocks",
+  title: "Stockline — Keep your stocks. Access liquidity.",
   description:
-    "Deposit tokenized stocks on Base, borrow USDC without selling, and let productive assets help repay your loan.",
+    "Access USDC without selling tokenized stocks. Your assets stay invested and can help repay your loan.",
 };
 
 export default function RootLayout({

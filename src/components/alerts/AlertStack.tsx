@@ -9,29 +9,28 @@ export function AlertStack() {
   if (alerts.length === 0) return null;
 
   return (
-    <div className="pointer-events-none fixed bottom-4 right-4 z-50 flex w-[min(100%-2rem,340px)] flex-col gap-2">
-      {alerts.slice(0, 2).map((alert) => (
+    <div className="pointer-events-none fixed inset-x-0 top-16 z-50 mx-auto flex max-w-md flex-col gap-2 px-4">
+      {alerts.map((a) => (
         <div
-          key={alert.id}
+          key={a.id}
           className={cn(
-            "pointer-events-auto animate-slide-up rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4"
+            "pointer-events-auto flex items-start gap-3 rounded-xl border bg-white px-4 py-3 shadow-lg",
+            a.tone === "warning" || a.tone === "critical"
+              ? "border-[var(--warning)]"
+              : "border-[var(--border)]"
           )}
         >
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <p className="text-sm font-semibold">{alert.title}</p>
-              <p className="mt-1 text-xs leading-relaxed text-[var(--ink-muted)]">
-                {alert.message}
-              </p>
-            </div>
-            <button
-              onClick={() => dismissAlert(alert.id)}
-              className="rounded-md p-1 text-[var(--ink-subtle)] hover:bg-[var(--surface-muted)]"
-              aria-label="Dismiss"
-            >
-              <X className="h-3.5 w-3.5" />
-            </button>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-semibold text-[var(--ink)]">{a.title}</p>
+            <p className="mt-0.5 text-xs text-[var(--ink-muted)]">{a.message}</p>
           </div>
+          <button
+            type="button"
+            className="text-[var(--ink-subtle)]"
+            onClick={() => dismissAlert(a.id)}
+          >
+            <X size={16} />
+          </button>
         </div>
       ))}
     </div>

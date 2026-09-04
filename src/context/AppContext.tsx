@@ -10,6 +10,7 @@ import {
 } from "react";
 import {
   availableCredit,
+  availableToWithdraw,
   formatUsd,
   ltv,
   monthlyRepayment,
@@ -32,6 +33,7 @@ interface AppContextValue extends AppState {
   collateral: number;
   debt: number;
   available: number;
+  withdrawable: number;
   currentLtv: number;
   yieldMonthly: number;
   repayMonthly: number;
@@ -41,17 +43,18 @@ interface AppContextValue extends AppState {
   disconnectWallet: () => void;
   setView: (view: AppView) => void;
   goBack: () => void;
+  openStock: (ticker: string) => void;
   enableDemoMode: () => void;
   resetToEmpty: () => void;
-  depositCollateral: (selections: Record<string, number>) => void;
+  depositStocks: () => void;
   borrowUsdc: (amount: number) => void;
-  withdrawCollateral: (amount: number) => void;
+  withdrawStocks: (amount: number) => void;
   setAutoRepay: (enabled: boolean, percent?: number) => void;
   simulateGrowth: (pct?: number) => void;
   simulateYield: (amount?: number) => void;
   pushAlert: (tone: AlertTone, title: string, message: string) => void;
   dismissAlert: (id: string) => void;
-  updateHoldingPrices: (multiplier: number) => void;
+  clearYieldPulse: () => void;
 }
 
 const AppContext = createContext<AppContextValue | null>(null);
@@ -64,6 +67,8 @@ const initialCredit = {
   interestApr: 0.058,
   maxLtv: 0.55,
   liquidationThreshold: 0.55,
+  yieldGeneratedMonth: 0,
+  yieldAppliedMonth: 0,
 };
 
 function makeAlert(
@@ -93,12 +98,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [alerts, setAlerts] = useState<AlertItem[]>([]);
   const [view, setViewState] = useState<AppView>("landing");
   const [previousView, setPreviousView] = useState<AppView>("landing");
+  const [selectedTicker, setSelectedTicker] = useState<string | null>(null);
+  const [lastYieldPulse, setLastYieldPulse] = useState<number | null>(null);
 
   const collateral = portfolioValue(holdings);
   const debt = credit.debt;
   const available = availableCredit(collateral, debt, credit.maxLtv);
+  const withdrawable = availableToWithdraw(collateral, debt, credit.maxLtv);
   const currentLtv = ltv(debt, collateral);
-  const yieldMonthly = monthlyYield(holdings);
+  const yieldMonthly = monthlyYield(holdings) || (hasPosition ? 86 : 0);
   const repayMonthly = credit.autoRepayEnabled
     ? monthlyRepayment(yieldMonthly, credit.autoRepayPercent)
     : 0;
@@ -107,7 +115,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const pushAlert = useCallback(
     (tone: AlertTone, title: string, message: string) => {
-      setAlerts((prev) => [makeAlert(tone, title, message), ...prev].slice(0, 4));
+      setAlerts((prev) => [makeAlert(tone, title, message), ...prev].slice(0, 3));
     },
     []
   );
@@ -115,6 +123,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const dismissAlert = useCallback((id: string) => {
     setAlerts((prev) => prev.filter((a) => a.id !== id));
   }, []);
+
+  const clearYieldPulse = useCallback(() => setLastYieldPulse(null), []);
 
   const setView = useCallback((next: AppView) => {
     setViewState((current) => {
@@ -124,26 +134,30 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const goBack = useCallback(() => {
-    setViewState(previousView === view ? "dashboard" : previousView);
+    setViewState(previousView === view ? "home" : previousView);
   }, [previousView, view]);
+
+  const openStock = useCallback(
+    (ticker: string) => {
+      setSelectedTicker(ticker);
+      setView("stock");
+    },
+    [setView]
+  );
 
   const connectWallet = useCallback(
     (provider: WalletProvider) => {
       setConnected(true);
       setWalletProvider(provider);
       setWalletAddress("0x7a3F9c2E4b81d0A6fC12e88B");
-      if (demoMode || holdings.length > 0) {
-        setViewState("dashboard");
-      } else {
-        setViewState("empty");
-      }
+      setViewState("home");
       pushAlert(
         "healthy",
         "Wallet connected",
-        "You're on Base. Start by depositing tokenized stocks."
+        "You're on Base. Add stocks to see what you can access."
       );
     },
-    [demoMode, holdings.length, pushAlert]
+    [pushAlert]
   );
 
   const disconnectWallet = useCallback(() => {
@@ -160,25 +174,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setWalletAddress("0x7a3F9c2E4b81d0A6fC12e88B");
     setHoldings(DEMO_HOLDINGS.map((h) => ({ ...h })));
     setHasPosition(true);
-    setCredit({
-      ...initialCredit,
-      debt: 4000,
-      originalDebt: 4000,
-      autoRepayEnabled: true,
-      autoRepayPercent: 100,
-    });
+    setCredit({ ...initialCredit });
     setActivities(DEMO_ACTIVITIES.map((a) => ({ ...a })));
-    setViewState("dashboard");
+    setViewState("home");
     setAlerts([
       makeAlert(
         "healthy",
-        "Demo Mode",
-        "Pre-loaded portfolio for presentation. Use demo controls to simulate events."
-      ),
-      makeAlert(
-        "healthy",
-        "Healthy",
-        "Your portfolio remains well collateralized."
+        "Demo ready",
+        "Portfolio loaded with no loan. Borrow, then simulate $100 generated."
       ),
     ]);
   }, []);
@@ -190,61 +193,32 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setCredit({ ...initialCredit });
     setActivities([]);
     setConnected(true);
-    setViewState("empty");
+    setViewState("home");
   }, []);
 
-  const depositCollateral = useCallback(
-    (selections: Record<string, number>) => {
-      setHoldings((prev) => {
-        const next = prev.map((h) => {
-          const addValue = selections[h.ticker] ?? 0;
-          if (addValue <= 0) return h;
-          const addQty = addValue / h.price;
-          return {
-            ...h,
-            quantity: h.quantity + addQty,
-            availableToDeposit: Math.max(0, h.availableToDeposit - addQty),
-          };
-        });
-
-        // If empty portfolio, seed from demo tickers with deposited amounts
-        if (prev.length === 0) {
-          return DEMO_HOLDINGS.map((h) => {
-            const addValue = selections[h.ticker] ?? 0;
-            const addQty = addValue / h.price;
-            return {
-              ...h,
-              quantity: addQty,
-              availableToDeposit: Math.max(0, h.availableToDeposit - addQty),
-            };
-          }).filter((h) => h.quantity > 0);
-        }
-        return next;
-      });
-
-      const deposited = Object.values(selections).reduce((a, b) => a + b, 0);
-      setHasPosition(true);
-      setActivities((prev) => [
-        {
-          id: `dep-${Date.now()}`,
-          date: "Just now",
-          label: `Deposited collateral ${formatUsd(deposited)}`,
-          action: "Deposit",
-          asset: "Stocks",
-          amount: formatUsd(deposited),
-          status: "confirmed",
-        },
-        ...prev,
-      ]);
-      pushAlert(
-        "healthy",
-        "Collateral added",
-        `${formatUsd(deposited)} in tokenized stocks is now securing your credit line.`
-      );
-      setViewState("portfolio");
-    },
-    [pushAlert]
-  );
+  const depositStocks = useCallback(() => {
+    setHoldings(DEMO_HOLDINGS.map((h) => ({ ...h })));
+    setHasPosition(true);
+    setActivities((prev) => [
+      {
+        id: `dep-${Date.now()}`,
+        date: "Just now",
+        label: "Stocks deposited",
+        action: "Deposit",
+        asset: "Stocks",
+        amount: "+$25,480",
+        status: "confirmed",
+        detail: "Your tokenized stocks now back your Stockline account.",
+      },
+      ...prev,
+    ]);
+    pushAlert(
+      "healthy",
+      "Stocks added",
+      "You can now access liquidity without selling."
+    );
+    setViewState("home");
+  }, [pushAlert]);
 
   const borrowUsdc = useCallback(
     (amount: number) => {
@@ -257,26 +231,27 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setActivities((prev) => [
         {
           id: `bor-${Date.now()}`,
-          date: "Just now",
-          label: `Borrowed ${formatUsd(amount)} USDC`,
+          date: "Today",
+          label: "Borrowed",
           action: "Borrow",
           asset: "USDC",
-          amount: formatUsd(amount),
+          amount: `+${formatUsd(amount)} USDC`,
           status: "confirmed",
+          detail: "USDC is available in your wallet. Your stocks stay invested.",
         },
         ...prev,
       ]);
       pushAlert(
         "yield",
-        "Borrow confirmed",
-        `${formatUsd(amount)} USDC is available. Auto-repay can help pay it back over time.`
+        "Borrow complete",
+        `${formatUsd(amount)} USDC is now available.`
       );
-      setViewState("credit");
+      setViewState("loan");
     },
     [pushAlert]
   );
 
-  const withdrawCollateral = useCallback(
+  const withdrawStocks = useCallback(
     (amount: number) => {
       setHoldings((prev) => {
         const total = portfolioValue(prev);
@@ -293,10 +268,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
         {
           id: `wd-${Date.now()}`,
           date: "Just now",
-          label: `Withdrew collateral ${formatUsd(amount)}`,
+          label: "Stocks withdrawn",
           action: "Withdraw",
           asset: "Stocks",
-          amount: formatUsd(amount),
+          amount: `-${formatUsd(amount)}`,
           status: "confirmed",
         },
         ...prev,
@@ -304,9 +279,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
       pushAlert(
         "healthy",
         "Withdrawal complete",
-        `${formatUsd(amount)} collateral released while keeping your loan safely backed.`
+        `${formatUsd(amount)} returned while keeping your loan safely backed.`
       );
-      setViewState("credit");
+      setViewState("portfolio");
     },
     [pushAlert]
   );
@@ -318,78 +293,72 @@ export function AppProvider({ children }: { children: ReactNode }) {
         autoRepayEnabled: enabled,
         autoRepayPercent: percent,
       }));
-      setActivities((prev) => [
-        {
-          id: `ar-${Date.now()}`,
-          date: "Just now",
-          label: enabled
-            ? `Auto-repay set to ${percent}%`
-            : "Auto-repay disabled",
-          action: "Settings",
-          asset: "—",
-          amount: enabled ? `${percent}%` : "Off",
-          status: "confirmed",
-        },
-        ...prev,
-      ]);
       pushAlert(
         "yield",
-        enabled ? "Auto-Repay on" : "Auto-Repay off",
+        enabled ? "Auto-repay on" : "Auto-repay off",
         enabled
-          ? `${percent}% of generated yield will go toward your debt.`
-          : "Yield remains available to you instead of repayment."
+          ? `${percent}% of money generated by your assets goes toward your loan.`
+          : "Generated money stays available to you."
       );
     },
     [pushAlert]
   );
 
-  const updateHoldingPrices = useCallback((multiplier: number) => {
-    setHoldings((prev) =>
-      prev.map((h) => ({
-        ...h,
-        price: Number((h.price * multiplier).toFixed(2)),
-        change24h: Number(((multiplier - 1) * 100).toFixed(1)),
-      }))
-    );
-  }, []);
-
   const simulateGrowth = useCallback(
     (pct = 0.1) => {
-      updateHoldingPrices(1 + pct);
+      setHoldings((prev) =>
+        prev.map((h) => ({
+          ...h,
+          price: Number((h.price * (1 + pct)).toFixed(2)),
+          change24h: Number((pct * 100).toFixed(1)),
+        }))
+      );
       pushAlert(
         "healthy",
-        "Portfolio growth simulated",
-        `Holdings increased by ${(pct * 100).toFixed(0)}%. Available credit and health updated.`
+        "Portfolio updated",
+        `Holdings grew about ${(pct * 100).toFixed(0)}%. Available credit updated.`
       );
     },
-    [pushAlert, updateHoldingPrices]
+    [pushAlert]
   );
 
   const simulateYield = useCallback(
     (amount = 100) => {
+      let applied = 0;
       setCredit((prev) => {
-        const applied = prev.autoRepayEnabled
+        applied = prev.autoRepayEnabled
           ? amount * (prev.autoRepayPercent / 100)
           : 0;
-        const newDebt = Math.max(0, prev.debt - applied);
-        return { ...prev, debt: newDebt };
+        return {
+          ...prev,
+          debt: Math.max(0, prev.debt - applied),
+          yieldGeneratedMonth: prev.yieldGeneratedMonth + amount,
+          yieldAppliedMonth: prev.yieldAppliedMonth + applied,
+        };
       });
+      setLastYieldPulse(applied);
       setActivities((prev) => [
         {
           id: `yld-${Date.now()}`,
           date: "Just now",
-          label: `Yield generated: ${formatUsd(amount, 2)}`,
-          action: "Yield",
-          asset: "Portfolio",
-          amount: formatUsd(amount, 2),
+          label: applied > 0 ? "Applied to loan" : "Money generated",
+          action: "Repay",
+          asset: "USDC",
+          amount: applied > 0 ? `-${formatUsd(applied, 0)} loan` : formatUsd(amount),
           status: "confirmed",
+          detail:
+            applied > 0
+              ? `${formatUsd(amount)} generated → ${formatUsd(applied)} applied to your loan.`
+              : `${formatUsd(amount)} generated by your assets.`,
         },
         ...prev,
       ]);
       pushAlert(
         "yield",
-        "Yield generated",
-        `Your portfolio generated ${formatUsd(amount, 2)} in yield. Auto-repay applied it to your debt.`
+        applied > 0 ? "Loan reduced" : "Money generated",
+        applied > 0
+          ? `${formatUsd(amount)} generated → ${formatUsd(applied)} applied automatically.`
+          : `${formatUsd(amount)} generated by your assets.`
       );
     },
     [pushAlert]
@@ -408,9 +377,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
       alerts,
       view,
       previousView,
+      selectedTicker,
+      lastYieldPulse,
       collateral,
       debt,
       available,
+      withdrawable,
       currentLtv,
       yieldMonthly,
       repayMonthly,
@@ -420,17 +392,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
       disconnectWallet,
       setView,
       goBack,
+      openStock,
       enableDemoMode,
       resetToEmpty,
-      depositCollateral,
+      depositStocks,
       borrowUsdc,
-      withdrawCollateral,
+      withdrawStocks,
       setAutoRepay,
       simulateGrowth,
       simulateYield,
       pushAlert,
       dismissAlert,
-      updateHoldingPrices,
+      clearYieldPulse,
     }),
     [
       connected,
@@ -444,9 +417,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
       alerts,
       view,
       previousView,
+      selectedTicker,
+      lastYieldPulse,
       collateral,
       debt,
       available,
+      withdrawable,
       currentLtv,
       yieldMonthly,
       repayMonthly,
@@ -456,17 +432,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
       disconnectWallet,
       setView,
       goBack,
+      openStock,
       enableDemoMode,
       resetToEmpty,
-      depositCollateral,
+      depositStocks,
       borrowUsdc,
-      withdrawCollateral,
+      withdrawStocks,
       setAutoRepay,
       simulateGrowth,
       simulateYield,
       pushAlert,
       dismissAlert,
-      updateHoldingPrices,
+      clearYieldPulse,
     ]
   );
 

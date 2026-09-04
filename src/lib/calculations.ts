@@ -24,7 +24,18 @@ export function availableCredit(
   debt: number,
   maxLtv = MAX_LTV
 ): number {
-  return Math.max(0, maxLtv * collateral - debt);
+  return Math.max(0, Math.round(maxLtv * collateral - debt));
+}
+
+/** How much portfolio value can be withdrawn while keeping the loan safely backed */
+export function availableToWithdraw(
+  collateral: number,
+  debt: number,
+  maxLtv = MAX_LTV
+): number {
+  if (debt <= 0) return collateral;
+  const minCollateral = debt / maxLtv;
+  return Math.max(0, Math.round(collateral - minCollateral));
 }
 
 export function maxSafeBorrow(

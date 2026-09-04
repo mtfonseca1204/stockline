@@ -14,19 +14,19 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variants: Record<Variant, string> = {
   primary:
-    "bg-[var(--lime)] text-[var(--bg)] hover:bg-[var(--lime-hover)] font-semibold",
+    "bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)] font-semibold shadow-sm",
   secondary:
-    "bg-white/[0.06] text-[var(--ink)] border border-[var(--border)] hover:bg-white/[0.1] backdrop-blur-md",
+    "bg-[var(--bg-elevated)] text-[var(--ink)] border border-[var(--border-strong)] hover:bg-[var(--bg)]",
   ghost:
-    "bg-transparent text-[var(--ink-muted)] hover:bg-white/[0.05] hover:text-[var(--ink)]",
+    "bg-transparent text-[var(--ink-muted)] hover:bg-black/[0.04] hover:text-[var(--ink)]",
   danger: "bg-[var(--danger)] text-white hover:opacity-90",
-  soft: "bg-[var(--lime-soft)] text-[var(--lime)] hover:opacity-90",
+  soft: "bg-[var(--accent-soft)] text-[var(--accent)] hover:opacity-90 font-semibold",
 };
 
 const sizes: Record<Size, string> = {
-  sm: "h-9 px-3 text-sm rounded-xl",
-  md: "h-11 px-4 text-sm rounded-xl",
-  lg: "h-12 px-6 text-base rounded-xl",
+  sm: "h-9 px-3 text-sm rounded-[10px]",
+  md: "h-11 px-4 text-sm rounded-[12px]",
+  lg: "h-12 px-5 text-[15px] rounded-[12px]",
 };
 
 export function Button({
@@ -39,7 +39,7 @@ export function Button({
   return (
     <button
       className={cn(
-        "inline-flex items-center justify-center gap-2 font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]",
+        "inline-flex items-center justify-center gap-2 font-medium transition-all duration-200 disabled:opacity-45 disabled:cursor-not-allowed active:scale-[0.98]",
         variants[variant],
         sizes[size],
         className

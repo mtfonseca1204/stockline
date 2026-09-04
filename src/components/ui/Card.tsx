@@ -6,43 +6,15 @@ import type { ReactNode } from "react";
 export function Card({
   children,
   className,
-  strong,
+  quiet,
 }: {
   children: ReactNode;
   className?: string;
-  strong?: boolean;
+  quiet?: boolean;
 }) {
   return (
-    <div className={cn(strong ? "glass-strong" : "glass", className)}>
+    <div className={cn(quiet ? "surface-quiet" : "surface", "p-5", className)}>
       {children}
     </div>
   );
-}
-
-export function StatRow({
-  label,
-  value,
-  accent,
-}: {
-  label: string;
-  value: string;
-  accent?: boolean;
-}) {
-  return (
-    <div className="flex items-center justify-between py-3 border-b border-[var(--border)] last:border-0">
-      <span className="text-sm text-[var(--ink-muted)]">{label}</span>
-      <span
-        className={cn(
-          "text-sm font-semibold",
-          accent ? "text-[var(--lime)]" : "text-[var(--ink)]"
-        )}
-      >
-        {value}
-      </span>
-    </div>
-  );
-}
-
-export function Divider() {
-  return <div className="h-px w-full bg-[var(--border)]" />;
 }

@@ -1,20 +1,20 @@
 # Audit notes (Stockline)
 
 ## Summary
-Prototype credit UX for tokenized stocks on Base. Web (Next.js) + native (Expo) share one glass/lime design language.
+Prototype credit UX for tokenized stocks on Base. Web (Next.js) is the primary redesigned product; native Expo app remains a parallel prototype.
 
-## Findings addressed
-- Unified dark glass tokens across web + native
-- Confirmation modals for borrow / deposit / withdraw / auto-repay
-- Aggressive display type (Archivo Black) + Space Grotesk UI
-- Animated noise/grain background
-- Native Follow-up dashboard tracks completed actions + debt payoff %
+## Web redesign (current)
+- Four destinations only: Home · Portfolio · Borrow · Activity
+- Light, calm fintech UI with progressive disclosure
+- Onboarding teaches the product without DeFi jargon
+- LTV / liquidation / rates behind Details expandables
+- Demo: stocks first (no debt) → borrow → +$100 auto-applied → debt drops
 
 ## Remaining (prototype)
 - Wallet connect is simulated (no real chain calls)
 - No real oracles / liquidations / signatures
-- Secrets: ensure `.env*` stays gitignored before any mainnet keys
-- Do not commit `node_modules`, `.next`, `.expo`
+- Secrets: ensure `.env*` stays gitignored
+- Native app not yet aligned to this IA
 
 ## Security posture
 Safe for demo/hackathon. Not production-ready for real funds.

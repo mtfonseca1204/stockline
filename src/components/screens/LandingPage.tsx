@@ -1,52 +1,49 @@
 "use client";
 
 import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
-import { useApp } from "@/context/AppContext";
+import { motion } from "framer-motion";
 
-export function LandingPage({ onConnect }: { onConnect: () => void }) {
-  const { enableDemoMode } = useApp();
-
+export function LandingPage({
+  onConnect,
+  onDemo,
+}: {
+  onConnect: () => void;
+  onDemo: () => void;
+}) {
   return (
-    <div className="page min-h-[calc(100vh-3.5rem)] justify-center animate-fade-in">
-      <div>
-        <p className="mb-3 text-sm font-semibold text-[var(--lime)]">
-          Credit on Base
-        </p>
-        <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl sm:leading-[1.1]">
-          Borrow against stocks.
+    <div className="page animate-fade-up !pb-10">
+      <div className="pt-10">
+        <p className="mb-6 text-sm font-semibold text-[var(--ink)]">Stockline</p>
+        <h1 className="display text-[2.15rem] text-[var(--ink)] sm:text-[2.4rem]">
+          Keep your stocks.
           <br />
-          Keep them invested.
+          Access liquidity.
         </h1>
-        <p className="mt-4 text-[var(--ink-muted)] leading-relaxed">
-          Deposit tokenized stocks, borrow USDC, and let yield help repay your
-          loan.
+        <p className="mt-4 max-w-sm text-[15px] leading-relaxed text-[var(--ink-muted)]">
+          Your assets stay invested while helping repay your loan.
         </p>
       </div>
 
-      <Card className="p-6 space-y-3">
-        <p className="text-sm text-[var(--ink-muted)]">Net worth</p>
-        <p className="text-4xl font-semibold tracking-tight">$25,480</p>
-        <div className="flex justify-between text-sm pt-1">
-          <span className="text-[var(--ink-muted)]">Available</span>
-          <span className="font-semibold text-[var(--lime)]">$10,014</span>
-        </div>
-        <div className="flex justify-between text-sm">
-          <span className="text-[var(--ink-muted)]">Debt</span>
-          <span className="font-semibold">$4,000</span>
-        </div>
-      </Card>
+      <motion.div
+        className="surface mt-4 flex flex-col items-center gap-2 px-6 py-8 text-sm text-[var(--ink-muted)]"
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.15 }}
+      >
+        <span className="font-medium text-[var(--ink)]">Stocks</span>
+        <span>↓</span>
+        <span className="font-semibold text-[var(--accent)]">Cash without selling</span>
+        <span>↓</span>
+        <span className="font-medium text-[var(--ink)]">Assets help repay</span>
+      </motion.div>
 
-      <div className="space-y-3">
+      <div className="mt-auto space-y-3 pt-8">
         <Button size="lg" className="w-full" onClick={onConnect}>
-          Start borrowing
+          Get started
         </Button>
-        <button
-          onClick={enableDemoMode}
-          className="w-full text-center text-sm font-medium text-[var(--ink-muted)] hover:text-[var(--ink)]"
-        >
-          Enter Demo Mode
-        </button>
+        <Button size="lg" variant="secondary" className="w-full" onClick={onDemo}>
+          Enter demo mode
+        </Button>
       </div>
     </div>
   );

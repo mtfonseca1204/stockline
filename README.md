@@ -1,34 +1,32 @@
 # Stockline
 
-Self-repaying credit for tokenized stocks on Base.
+Keep your stocks. Access liquidity. Let your assets help repay the loan.
 
 ## Apps
 
 | Path | Stack |
 |------|--------|
-| `/` (root) | Web — Next.js |
-| `stockline-native/` | Native — Expo / React Native |
+| `/` (root) | Web — Next.js (primary UX) |
+| `stockline-native/` | Native — Expo |
 
-Shared: dark **glass** UI, lime `#B8F000`, Archivo Black + Space Grotesk, animated noise, confirm popups for actions.
+## Web UX (redesign)
 
-## Native Follow-up
-Home dashboard includes a **Follow-up** panel:
-- Debt payoff progress
-- Live feed of completed actions (borrow, deposit, yield…)
-- Highlight when something just completed
+Four destinations only: **Home · Portfolio · Borrow · Activity**
+
+Calm light UI, progressive disclosure, Aave-inspired lending clarity with Stockline’s own identity. Technical metrics (LTV, liquidation, etc.) stay behind “Details”.
+
+### Demo
+
+1. Enter demo mode (portfolio loaded, **no debt**)
+2. Borrow ~$4,000
+3. Use demo bar **+$100 → repay**
+4. Watch debt drop ($4,000 → $3,900)
 
 ## Run
 
 ```bash
-# Web
 npm install
 npm run dev
-
-# Native
-cd stockline-native
-npm install
-npm start
 ```
 
-## Demo
-Landing → **Enter Demo Mode** → use **+$100 yield** / **+10%** and watch Follow-up update.
+Native: `cd stockline-native && npm install && npm start`
