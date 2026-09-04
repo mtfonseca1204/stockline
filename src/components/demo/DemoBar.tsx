@@ -5,7 +5,7 @@ import { useApp } from "@/context/AppContext";
 import { formatUsd } from "@/lib/calculations";
 
 /** Compact presenter controls — doesn’t dominate the UI */
-export function DemoBar() {
+export function DemoBar({ onReplayOnboarding }: { onReplayOnboarding?: () => void }) {
   const {
     demoMode,
     debt,
@@ -40,6 +40,11 @@ export function DemoBar() {
         <Button size="sm" variant="ghost" onClick={enableDemoMode}>
           Reload
         </Button>
+        {onReplayOnboarding ? (
+          <Button size="sm" variant="ghost" onClick={onReplayOnboarding}>
+            Onboarding
+          </Button>
+        ) : null}
         <span className="ml-auto px-1 text-[11px] text-[var(--ink-subtle)]">
           Loan {formatUsd(debt)}
         </span>

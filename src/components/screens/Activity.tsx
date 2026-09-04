@@ -1,7 +1,9 @@
 "use client";
 
+import { StockLogo } from "@/components/brand/StockLogo";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { ResultPopup, type ResultStatus } from "@/components/ui/ResultPopup";
 import { useApp } from "@/context/AppContext";
 import { formatUsd } from "@/lib/calculations";
 import { useMemo, useState } from "react";
@@ -76,7 +78,7 @@ export function Activity() {
                   key={a.id}
                   type="button"
                   onClick={() => setSelected(a.id)}
-                  className={`flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left hover:bg-[var(--bg)] ${
+                  className={`interactive-row flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left ${
                     i > 0 ? "border-t border-[var(--border)]" : ""
                   }`}
                 >
@@ -110,17 +112,21 @@ export function Deposit() {
 
       <Card className="space-y-3">
         {[
-          ["AAPL", "$8,240"],
-          ["NVDA", "$7,890"],
-          ["META", "$5,420"],
-          ["MSFT", "$3,930"],
-        ].map(([t, v]) => (
-          <div key={t} className="flex justify-between text-sm">
-            <span className="font-semibold text-[var(--ink)]">{t}</span>
-            <span className="text-[var(--ink-muted)]">{v}</span>
+          ["AAPL", "Apple", "$8,240"],
+          ["NVDA", "NVIDIA", "$7,890"],
+          ["META", "Meta", "$5,420"],
+          ["MSFT", "Microsoft", "$3,930"],
+        ].map(([t, name, v]) => (
+          <div key={t} className="flex items-center gap-3 text-sm">
+            <StockLogo ticker={t} size={36} />
+            <div className="min-w-0 flex-1">
+              <p className="font-semibold text-[var(--ink)]">{t}</p>
+              <p className="text-xs text-[var(--ink-muted)]">{name}</p>
+            </div>
+            <span className="font-medium text-[var(--ink-muted)]">{v}</span>
           </div>
         ))}
-        <div className="border-t border-[var(--border)] pt-3 flex justify-between font-semibold">
+        <div className="flex justify-between border-t border-[var(--border)] pt-3 font-semibold">
           <span>Total</span>
           <span>$25,480</span>
         </div>
@@ -143,8 +149,33 @@ export function Deposit() {
 export function Withdraw() {
   const { withdrawable, withdrawStocks, setView, debt } = useApp();
   const [amount, setAmount] = useState(Math.min(7210, withdrawable));
+  const [busy, setBusy] = useState(false);
+  const [resultOpen, setResultOpen] = useState(false);
+  const [resultStatus, setResultStatus] = useState<ResultStatus>("success");
 
   const safe = amount > 0 && amount <= withdrawable + 0.01;
+
+  const submit = () => {
+    if (!safe) {
+      setResultStatus("fail");
+      setResultOpen(true);
+      return;
+    }
+    setBusy(true);
+    window.setTimeout(() => {
+      // Soft fail if amount somehow exceeds after delay
+      if (amount > withdrawable + 0.01) {
+        setBusy(false);
+        setResultStatus("fail");
+        setResultOpen(true);
+        return;
+      }
+      withdrawStocks(amount, { navigate: false });
+      setBusy(false);
+      setResultStatus("success");
+      setResultOpen(true);
+    }, 1200);
+  };
 
   return (
     <div className="page animate-fade-up">
@@ -163,7 +194,7 @@ export function Withdraw() {
           className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg)] px-3 py-3 text-lg font-semibold outline-none focus:border-[var(--accent)]"
         />
         {safe ? (
-          <p className="text-sm text-[var(--accent)]">
+          <p className="text-sm text-[var(--success)]">
             You can withdraw this amount.
           </p>
         ) : (
@@ -179,14 +210,47 @@ export function Withdraw() {
       <Button
         size="lg"
         className="w-full"
-        disabled={!safe}
-        onClick={() => withdrawStocks(amount)}
+        disabled={!safe || busy}
+        onClick={submit}
       >
-        Withdraw
+        {busy ? "Withdrawing…" : "Withdraw"}
       </Button>
-      <Button variant="ghost" className="w-full" onClick={() => setView("portfolio")}>
+      <Button
+        variant="ghost"
+        className="w-full"
+        disabled={busy}
+        onClick={() => setView("portfolio")}
+      >
         Cancel
       </Button>
+
+      <ResultPopup
+        open={resultOpen}
+        status={resultStatus}
+        title={
+          resultStatus === "success" ? "Withdraw approved" : "Withdraw failed"
+        }
+        message={
+          resultStatus === "success"
+            ? `${formatUsd(amount)} in stocks was returned to your wallet.`
+            : debt > 0
+              ? "Your remaining stocks wouldn’t provide enough backing for your current loan."
+              : "We couldn’t complete this withdrawal. Check the amount and try again."
+        }
+        primaryLabel={
+          resultStatus === "success" ? "View portfolio" : "Try again"
+        }
+        onPrimary={() => {
+          setResultOpen(false);
+          if (resultStatus === "success") setView("portfolio");
+        }}
+        secondaryLabel={resultStatus === "success" ? "Back to home" : "Cancel"}
+        onSecondary={() => {
+          setResultOpen(false);
+          setView(resultStatus === "success" ? "home" : "portfolio");
+        }}
+      />
     </div>
   );
 }
+

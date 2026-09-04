@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/cn";
+import { motion, useReducedMotion } from "framer-motion";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
 type Variant = "primary" | "secondary" | "ghost" | "danger" | "soft";
@@ -14,13 +15,14 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variants: Record<Variant, string> = {
   primary:
-    "bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)] font-semibold shadow-sm",
+    "btn-primary-glow bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)] font-semibold shadow-sm",
   secondary:
-    "bg-[var(--bg-elevated)] text-[var(--ink)] border border-[var(--border-strong)] hover:bg-[var(--bg)]",
+    "btn-secondary-lift bg-[var(--bg-elevated)] text-[var(--ink)] border border-[var(--border-strong)] hover:bg-[var(--bg)]",
   ghost:
-    "bg-transparent text-[var(--ink-muted)] hover:bg-black/[0.04] hover:text-[var(--ink)]",
-  danger: "bg-[var(--danger)] text-white hover:opacity-90",
-  soft: "bg-[var(--accent-soft)] text-[var(--accent)] hover:opacity-90 font-semibold",
+    "bg-transparent text-[var(--ink-muted)] hover:bg-black/[0.05] hover:text-[var(--ink)] shadow-none",
+  danger:
+    "bg-[var(--danger)] text-white hover:brightness-110 font-semibold shadow-sm",
+  soft: "bg-[var(--accent-soft)] text-[var(--brand-ink)] hover:brightness-95 font-semibold border border-[rgba(124,255,43,0.35)]",
 };
 
 const sizes: Record<Size, string> = {
@@ -34,19 +36,50 @@ export function Button({
   size = "md",
   className,
   children,
+  disabled,
+  type = "button",
   ...props
 }: ButtonProps) {
+  const reduce = useReducedMotion();
+  const {
+    onDrag,
+    onDragStart,
+    onDragEnd,
+    onAnimationStart,
+    onAnimationEnd,
+    ...rest
+  } = props;
+
   return (
-    <button
+    <motion.button
+      type={type}
+      disabled={disabled}
+      whileHover={
+        disabled || reduce
+          ? undefined
+          : variant === "ghost"
+            ? { scale: 1.02 }
+            : { y: -2, scale: 1.02 }
+      }
+      whileTap={
+        reduce
+          ? undefined
+          : disabled
+            ? { x: [0, -3, 3, -2, 2, 0], transition: { duration: 0.35 } }
+            : { scale: 0.96, y: 1 }
+      }
+      transition={{ type: "spring", stiffness: 520, damping: 28 }}
       className={cn(
-        "inline-flex items-center justify-center gap-2 font-medium transition-all duration-200 disabled:opacity-45 disabled:cursor-not-allowed active:scale-[0.98]",
+        "btn-cta inline-flex items-center justify-center gap-2 font-medium",
         variants[variant],
         sizes[size],
         className
       )}
-      {...props}
+      {...rest}
     >
-      {children}
-    </button>
+      <span className="relative z-[1] inline-flex items-center gap-2">
+        {children}
+      </span>
+    </motion.button>
   );
 }

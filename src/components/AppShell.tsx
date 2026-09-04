@@ -17,7 +17,7 @@ import { useState } from "react";
 export function AppShell() {
   const { view, enableDemoMode } = useApp();
   const [walletOpen, setWalletOpen] = useState(false);
-  const { ready, needs, clear } = useNeedsOnboarding();
+  const { ready, needs, clear, reset } = useNeedsOnboarding();
 
   const openWallet = () => setWalletOpen(true);
 
@@ -39,7 +39,11 @@ export function AppShell() {
       <TopBar onConnect={openWallet} />
       <main className="flex-1">
         {view === "landing" && (
-          <LandingPage onConnect={openWallet} onDemo={enableDemoMode} />
+          <LandingPage
+            onConnect={openWallet}
+            onDemo={enableDemoMode}
+            onReplayOnboarding={reset}
+          />
         )}
         {view === "home" && <Home />}
         {view === "portfolio" && <Portfolio />}
@@ -51,7 +55,7 @@ export function AppShell() {
         {view === "stock" && <StockDetail />}
       </main>
       {view !== "landing" ? <BottomNav /> : null}
-      <DemoBar />
+      <DemoBar onReplayOnboarding={reset} />
       <WalletModal open={walletOpen} onClose={() => setWalletOpen(false)} />
       <AlertStack />
     </div>

@@ -58,7 +58,7 @@ export const DEMO_ACTIVITIES: ActivityItem[] = [
     asset: "Stocks",
     amount: "+$25,480",
     status: "confirmed",
-    detail: "Tokenized stocks added to your Stockline account.",
+    detail: "Tokenized stocks added to your Kora account.",
   },
 ];
 

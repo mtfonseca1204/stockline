@@ -47,8 +47,8 @@ interface AppContextValue extends AppState {
   enableDemoMode: () => void;
   resetToEmpty: () => void;
   depositStocks: () => void;
-  borrowUsdc: (amount: number) => void;
-  withdrawStocks: (amount: number) => void;
+  borrowUsdc: (amount: number, opts?: { navigate?: boolean }) => void;
+  withdrawStocks: (amount: number, opts?: { navigate?: boolean }) => void;
   setAutoRepay: (enabled: boolean, percent?: number) => void;
   simulateGrowth: (pct?: number) => void;
   simulateYield: (amount?: number) => void;
@@ -208,7 +208,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         asset: "Stocks",
         amount: "+$25,480",
         status: "confirmed",
-        detail: "Your tokenized stocks now back your Stockline account.",
+        detail: "Your tokenized stocks now back your Kora account.",
       },
       ...prev,
     ]);
@@ -221,7 +221,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [pushAlert]);
 
   const borrowUsdc = useCallback(
-    (amount: number) => {
+    (amount: number, opts?: { navigate?: boolean }) => {
       setCredit((prev) => ({
         ...prev,
         debt: prev.debt + amount,
@@ -246,13 +246,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
         "Borrow complete",
         `${formatUsd(amount)} USDC is now available.`
       );
-      setViewState("loan");
+      if (opts?.navigate !== false) setViewState("loan");
     },
     [pushAlert]
   );
 
   const withdrawStocks = useCallback(
-    (amount: number) => {
+    (amount: number, opts?: { navigate?: boolean }) => {
       setHoldings((prev) => {
         const total = portfolioValue(prev);
         if (total <= 0) return prev;
@@ -281,7 +281,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         "Withdrawal complete",
         `${formatUsd(amount)} returned while keeping your loan safely backed.`
       );
-      setViewState("portfolio");
+      if (opts?.navigate !== false) setViewState("portfolio");
     },
     [pushAlert]
   );

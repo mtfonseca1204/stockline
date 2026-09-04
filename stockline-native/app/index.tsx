@@ -59,7 +59,7 @@ export default function LandingScreen() {
           <View style={styles.mark}>
             <Text style={styles.markText}>S</Text>
           </View>
-          <Text style={styles.logo}>Stockline</Text>
+          <Text style={styles.logo}>Kora</Text>
         </View>
         <Badge label="Base" tone="lime" />
       </View>

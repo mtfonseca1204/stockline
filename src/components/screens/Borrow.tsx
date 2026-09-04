@@ -6,13 +6,14 @@ import {
   Expandable,
   StatusPill,
 } from "@/components/ui/primitives";
+import { ResultPopup, type ResultStatus } from "@/components/ui/ResultPopup";
 import { useApp } from "@/context/AppContext";
 import { formatPct, formatUsd } from "@/lib/calculations";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, Loader2 } from "lucide-react";
 import { useMemo, useState } from "react";
 
-type Step = "amount" | "review" | "tx" | "done";
+type Step = "amount" | "review" | "tx";
 
 export function Borrow() {
   const {
@@ -30,6 +31,8 @@ export function Borrow() {
   const [step, setStep] = useState<Step>("amount");
   const [amount, setAmount] = useState(Math.min(4000, Math.floor(available)));
   const [txPhase, setTxPhase] = useState(0);
+  const [resultOpen, setResultOpen] = useState(false);
+  const [resultStatus, setResultStatus] = useState<ResultStatus>("success");
 
   const afterDebt = debt + amount;
   const afterLtv = collateral > 0 ? afterDebt / collateral : 0;
@@ -44,8 +47,14 @@ export function Borrow() {
     window.setTimeout(() => setTxPhase(1), 900);
     window.setTimeout(() => setTxPhase(2), 1800);
     window.setTimeout(() => {
-      borrowUsdc(amount);
-      setStep("done");
+      if (amount <= 0 || amount > available + 0.01) {
+        setResultStatus("fail");
+        setResultOpen(true);
+        return;
+      }
+      borrowUsdc(amount, { navigate: false });
+      setResultStatus("success");
+      setResultOpen(true);
     }, 2600);
   };
 
@@ -55,6 +64,33 @@ export function Borrow() {
         .filter((v, i, arr) => v > 0 && v <= available && arr.indexOf(v) === i)
         .slice(0, 4),
     [available]
+  );
+
+  const resultPopup = (
+    <ResultPopup
+      open={resultOpen}
+      status={resultStatus}
+      title={
+        resultStatus === "success" ? "Borrow approved" : "Borrow failed"
+      }
+      message={
+        resultStatus === "success"
+          ? `${formatUsd(amount)} USDC is now available in your wallet.`
+          : "We couldn’t complete this borrow. Check your available credit and try again."
+      }
+      primaryLabel={resultStatus === "success" ? "View loan" : "Try again"}
+      onPrimary={() => {
+        setResultOpen(false);
+        if (resultStatus === "success") setView("loan");
+        else setStep("amount");
+      }}
+      secondaryLabel={resultStatus === "success" ? "Back to home" : "Cancel"}
+      onSecondary={() => {
+        setResultOpen(false);
+        if (resultStatus === "success") setView("home");
+        else setStep("amount");
+      }}
+    />
   );
 
   if (!hasPosition || collateral <= 0) {
@@ -70,27 +106,6 @@ export function Borrow() {
             Add stocks
           </Button>
         </Card>
-      </div>
-    );
-  }
-
-  if (step === "done") {
-    return (
-      <div className="page animate-fade-up text-center">
-        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--accent-soft)] text-[var(--accent)]">
-          <Check size={28} />
-        </div>
-        <h1 className="text-2xl text-[var(--ink)]">Borrow complete</h1>
-        <p className="mt-3 text-[15px] text-[var(--ink-muted)]">
-          {formatUsd(amount)} USDC is now available.
-        </p>
-        <Button
-          size="lg"
-          className="mt-8 w-full"
-          onClick={() => setView("loan")}
-        >
-          View loan
-        </Button>
       </div>
     );
   }
@@ -112,16 +127,21 @@ export function Borrow() {
               <div key={label} className="flex items-center gap-3">
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--bg)]">
                   {done ? (
-                    <Check size={16} className="text-[var(--accent)]" />
+                    <Check size={16} className="text-[var(--brand-ink)]" />
                   ) : active ? (
-                    <Loader2 size={16} className="animate-spin text-[var(--accent)]" />
+                    <Loader2
+                      size={16}
+                      className="animate-spin text-[var(--brand-ink)]"
+                    />
                   ) : (
                     <span className="h-2 w-2 rounded-full bg-[var(--border-strong)]" />
                   )}
                 </div>
                 <span
                   className={`text-sm font-medium ${
-                    active || done ? "text-[var(--ink)]" : "text-[var(--ink-subtle)]"
+                    active || done
+                      ? "text-[var(--ink)]"
+                      : "text-[var(--ink-subtle)]"
                   }`}
                 >
                   {label}
@@ -130,6 +150,7 @@ export function Borrow() {
             );
           })}
         </Card>
+        {resultPopup}
       </div>
     );
   }
@@ -139,7 +160,10 @@ export function Borrow() {
       <div className="page animate-fade-up">
         <h1 className="text-2xl text-[var(--ink)]">Review your loan</h1>
         <Card className="mt-2 space-y-4">
-          <ReviewRow label="You're borrowing" value={`${formatUsd(amount)} USDC`} />
+          <ReviewRow
+            label="You're borrowing"
+            value={`${formatUsd(amount)} USDC`}
+          />
           <ReviewRow label="Your stocks remain" value={formatUsd(collateral)} />
           <ReviewRow
             label="Auto-repay"
@@ -158,8 +182,14 @@ export function Borrow() {
             label="Liquidation threshold"
             value={formatPct(credit.liquidationThreshold)}
           />
-          <DetailRow label="Interest rate" value={formatPct(credit.interestApr)} />
-          <DetailRow label="Stocks backing loan" value={formatUsd(collateral)} />
+          <DetailRow
+            label="Interest rate"
+            value={formatPct(credit.interestApr)}
+          />
+          <DetailRow
+            label="Stocks backing loan"
+            value={formatUsd(collateral)}
+          />
           <DetailRow label="Debt after" value={formatUsd(afterDebt)} />
         </Expandable>
 
@@ -175,6 +205,7 @@ export function Borrow() {
             Edit
           </Button>
         </div>
+        {resultPopup}
       </div>
     );
   }
@@ -205,7 +236,7 @@ export function Borrow() {
           Available:{" "}
           <button
             type="button"
-            className="font-semibold text-[var(--accent)]"
+            className="font-semibold text-[var(--brand-ink)] underline decoration-[var(--brand)] decoration-2 underline-offset-2"
             onClick={() => setAmount(Math.floor(available))}
           >
             {formatUsd(available)}
@@ -217,7 +248,8 @@ export function Borrow() {
               key={p}
               type="button"
               onClick={() => setAmount(p)}
-              className="rounded-full border border-[var(--border)] px-3 py-1.5 text-xs font-medium text-[var(--ink-muted)] hover:border-[var(--border-strong)]"
+              data-selected={amount === p}
+              className="chip rounded-full border border-[var(--border)] px-3 py-1.5 text-xs font-medium text-[var(--ink-muted)]"
             >
               {formatUsd(p)}
             </button>
@@ -226,7 +258,9 @@ export function Borrow() {
       </Card>
 
       <Card quiet className="space-y-3">
-        <p className="text-sm font-semibold text-[var(--ink)]">After borrowing</p>
+        <p className="text-sm font-semibold text-[var(--ink)]">
+          After borrowing
+        </p>
         <ReviewRow label="Portfolio value" value={formatUsd(collateral)} />
         <ReviewRow label="Loan" value={formatUsd(afterDebt)} />
         <div className="flex items-center justify-between">
@@ -257,13 +291,19 @@ export function Borrow() {
       </Button>
 
       {debt > 0 ? (
-        <Button variant="ghost" className="w-full" onClick={() => setView("loan")}>
+        <Button
+          variant="ghost"
+          className="w-full"
+          onClick={() => setView("loan")}
+        >
           View current loan
         </Button>
       ) : null}
 
-      {/* silence unused */}
-      <span className="sr-only">{health.status} {formatPct(currentLtv)}</span>
+      <span className="sr-only">
+        {health.status} {formatPct(currentLtv)}
+      </span>
+      {resultPopup}
     </div>
   );
 }

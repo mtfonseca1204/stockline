@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/Button";
 import { Sheet } from "@/components/ui/primitives";
 import { useApp } from "@/context/AppContext";
 import { formatUsd } from "@/lib/calculations";
-import { cn } from "@/lib/cn";
+import { motion, useReducedMotion } from "framer-motion";
 import { useEffect, useState } from "react";
 
 const OPTIONS = [
@@ -34,6 +34,7 @@ export function AutoRepaySheet({
 }) {
   const { credit, yieldMonthly, setAutoRepay } = useApp();
   const [pct, setPct] = useState(credit.autoRepayPercent || 100);
+  const reduce = useReducedMotion();
 
   useEffect(() => {
     if (open) setPct(credit.autoRepayPercent || 100);
@@ -50,29 +51,40 @@ export function AutoRepaySheet({
     >
       <div className="space-y-2">
         {OPTIONS.map((opt) => (
-          <button
+          <motion.button
             key={opt.value}
             type="button"
             onClick={() => setPct(opt.value)}
-            className={cn(
-              "w-full rounded-xl border px-4 py-3 text-left transition",
-              pct === opt.value
-                ? "border-[var(--accent)] bg-[var(--accent-soft)]"
-                : "border-[var(--border)] bg-[var(--bg)]"
-            )}
+            data-selected={pct === opt.value}
+            whileHover={reduce ? undefined : { y: -2, scale: 1.01 }}
+            whileTap={reduce ? undefined : { scale: 0.98 }}
+            animate={{
+              borderColor:
+                pct === opt.value ? "var(--brand)" : "var(--border)",
+              backgroundColor:
+                pct === opt.value ? "var(--accent-soft)" : "var(--bg)",
+              scale: pct === opt.value ? 1.01 : 1,
+            }}
+            transition={{ type: "spring", stiffness: 420, damping: 28 }}
+            className="w-full rounded-xl border px-4 py-3 text-left"
           >
             <p className="font-semibold text-[var(--ink)]">{opt.title}</p>
             <p className="text-sm text-[var(--ink-muted)]">{opt.desc}</p>
-          </button>
+          </motion.button>
         ))}
       </div>
 
-      <div className="mt-4 space-y-1 rounded-xl bg-[var(--bg)] px-4 py-3 text-sm text-[var(--ink-muted)]">
+      <motion.div
+        key={applied}
+        initial={reduce ? false : { opacity: 0.5, y: 4 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mt-4 space-y-1 rounded-xl bg-[var(--bg)] px-4 py-3 text-sm text-[var(--ink-muted)]"
+      >
         <p>{formatUsd(monthly)} monthly generated (est.)</p>
         <p className="font-semibold text-[var(--ink)]">
           {formatUsd(applied)} estimated monthly repayment
         </p>
-      </div>
+      </motion.div>
 
       <p className="mt-3 text-xs text-[var(--ink-subtle)]">
         Amounts are estimates and may change.

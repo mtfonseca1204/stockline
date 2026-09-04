@@ -15,7 +15,7 @@ const sans = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Stockline — Keep your stocks. Access liquidity.",
+  title: "Kora — Keep your stocks. Access liquidity.",
   description:
     "Access USDC without selling tokenized stocks. Your assets stay invested and can help repay your loan.",
 };

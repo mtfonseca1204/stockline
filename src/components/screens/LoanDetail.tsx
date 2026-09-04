@@ -93,7 +93,7 @@ export function LoanDetail() {
           </p>
           <button
             type="button"
-            className="text-sm font-medium text-[var(--accent)]"
+            className="text-sm font-medium text-[var(--brand-ink)] underline decoration-[var(--brand)] decoration-2 underline-offset-4"
             onClick={() => setAutoOpen(true)}
           >
             Edit

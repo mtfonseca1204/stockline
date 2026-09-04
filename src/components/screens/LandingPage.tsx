@@ -6,14 +6,15 @@ import { motion } from "framer-motion";
 export function LandingPage({
   onConnect,
   onDemo,
+  onReplayOnboarding,
 }: {
   onConnect: () => void;
   onDemo: () => void;
+  onReplayOnboarding?: () => void;
 }) {
   return (
     <div className="page animate-fade-up !pb-10">
       <div className="pt-10">
-        <p className="mb-6 text-sm font-semibold text-[var(--ink)]">Stockline</p>
         <h1 className="display text-[2.15rem] text-[var(--ink)] sm:text-[2.4rem]">
           Keep your stocks.
           <br />
@@ -32,7 +33,9 @@ export function LandingPage({
       >
         <span className="font-medium text-[var(--ink)]">Stocks</span>
         <span>↓</span>
-        <span className="font-semibold text-[var(--accent)]">Cash without selling</span>
+        <span className="rounded-md bg-[var(--brand)] px-2 py-0.5 font-semibold text-[var(--brand-ink)]">
+          Cash without selling
+        </span>
         <span>↓</span>
         <span className="font-medium text-[var(--ink)]">Assets help repay</span>
       </motion.div>
@@ -44,6 +47,11 @@ export function LandingPage({
         <Button size="lg" variant="secondary" className="w-full" onClick={onDemo}>
           Enter demo mode
         </Button>
+        {onReplayOnboarding ? (
+          <Button variant="ghost" className="w-full" onClick={onReplayOnboarding}>
+            Replay onboarding
+          </Button>
+        ) : null}
       </div>
     </div>
   );

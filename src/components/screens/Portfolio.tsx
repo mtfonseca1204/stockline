@@ -1,5 +1,6 @@
 "use client";
 
+import { StockLogo } from "@/components/brand/StockLogo";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Expandable } from "@/components/ui/primitives";
@@ -51,13 +52,11 @@ export function Portfolio() {
               key={h.ticker}
               type="button"
               onClick={() => openStock(h.ticker)}
-              className={`flex w-full items-center gap-3 px-4 py-3.5 text-left transition hover:bg-[var(--bg)] ${
+              className={`interactive-row flex w-full items-center gap-3 px-4 py-3.5 text-left ${
                 i > 0 ? "border-t border-[var(--border)]" : ""
               }`}
             >
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--bg)] text-xs font-bold text-[var(--ink)]">
-                {h.ticker.slice(0, 2)}
-              </div>
+              <StockLogo ticker={h.ticker} size={40} />
               <div className="min-w-0 flex-1">
                 <p className="font-semibold text-[var(--ink)]">{h.ticker}</p>
                 <p className="truncate text-xs text-[var(--ink-muted)]">{h.name}</p>
@@ -108,15 +107,20 @@ export function StockDetail() {
         <ChevronLeft size={16} /> Portfolio
       </button>
 
+      <div className="flex items-center gap-3">
+        <StockLogo ticker={h.ticker} size={48} />
+        <div>
+          <h1 className="text-2xl text-[var(--ink)]">{h.ticker}</h1>
+          <p className="text-sm text-[var(--ink-muted)]">{h.name}</p>
+        </div>
+      </div>
       <div>
-        <h1 className="text-2xl text-[var(--ink)]">{h.ticker}</h1>
-        <p className="text-sm text-[var(--ink-muted)]">{h.name}</p>
-        <p className="mt-3 text-3xl font-semibold text-[var(--ink)]">
+        <p className="mt-1 text-3xl font-semibold text-[var(--ink)]">
           {formatUsd(value)}
         </p>
         <p
           className={`mt-1 text-sm font-medium ${
-            h.change24h >= 0 ? "text-[var(--accent)]" : "text-[var(--danger)]"
+            h.change24h >= 0 ? "text-[var(--success)]" : "text-[var(--danger)]"
           }`}
         >
           {h.change24h >= 0 ? "+" : ""}

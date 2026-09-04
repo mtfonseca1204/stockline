@@ -23,7 +23,7 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
           <View style={styles.mark}>
             <Text style={styles.markText}>S</Text>
           </View>
-          <Text style={styles.brand}>Stockline</Text>
+          <Text style={styles.brand}>Kora</Text>
         </View>
         <Pressable onPress={finish} hitSlop={12}>
           <Text style={styles.skip}>Skip</Text>

@@ -1,11 +1,13 @@
 "use client";
 
+import { BrandLogo } from "@/components/brand/BrandLogo";
 import { Button } from "@/components/ui/Button";
 import { useApp } from "@/context/AppContext";
 import { AnimatePresence, motion } from "framer-motion";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 
-const KEY = "stockline-onboarded-v2";
+const KEY = "kora-onboarded-v2";
 
 export function useNeedsOnboarding() {
   const [ready, setReady] = useState(false);
@@ -29,116 +31,56 @@ export function useNeedsOnboarding() {
     setNeeds(false);
   };
 
-  return { ready, needs, clear };
+  const reset = () => {
+    try {
+      localStorage.removeItem(KEY);
+    } catch {
+      /* ignore */
+    }
+    setNeeds(true);
+  };
+
+  return { ready, needs, clear, reset };
 }
 
 const steps = [
   {
     id: 0,
     headline: "Your stocks can do more than sit in your portfolio.",
-    body: "Stockline lets you access liquidity without selling your tokenized stocks.",
-    visual: "intro",
+    body: "Kora lets you access liquidity without selling your tokenized stocks.",
+    image: "/onboarding/intro.png",
+    alt: "Person unlocking liquidity from their stocks",
   },
   {
     id: 1,
     headline: "Keep your stocks",
-    body: "You deposit eligible tokenized stocks into Stockline. They remain yours while backing your credit.",
-    visual: "keep",
+    body: "You deposit eligible tokenized stocks into Kora. They remain yours while backing your credit.",
+    image: "/onboarding/keep.png",
+    alt: "Person securing stocks that still belong to them",
   },
   {
     id: 2,
     headline: "Access cash without selling",
     body: "Use your stocks to access USDC while keeping your market exposure.",
-    visual: "access",
+    image: "/onboarding/access.png",
+    alt: "Person accessing cash while stocks stay invested",
+    example: true,
   },
   {
     id: 3,
     headline: "Your assets can help repay the loan",
-    body: "When your productive assets generate money, Stockline can automatically direct it toward your outstanding balance.",
-    visual: "repay",
+    body: "When your productive assets generate money, Kora can automatically direct it toward your outstanding balance.",
+    image: "/onboarding/repay.png",
+    alt: "People watching their loan shrink as assets generate value",
   },
   {
     id: 4,
     headline: "You're always in control",
     body: "You choose how much to borrow, how much goes toward repayment, and when to repay.",
-    visual: "control",
+    image: "/onboarding/control.png",
+    alt: "Person adjusting borrow, auto-repay, and withdraw controls",
   },
 ] as const;
-
-function Visual({ kind }: { kind: (typeof steps)[number]["visual"] }) {
-  if (kind === "intro") {
-    return (
-      <div className="flex flex-col items-center gap-3 py-6 text-sm font-medium text-[var(--ink-muted)]">
-        <div className="rounded-xl border border-[var(--border)] bg-white px-5 py-3 text-[var(--ink)]">
-          Stocks
-        </div>
-        <motion.div
-          animate={{ y: [0, 4, 0] }}
-          transition={{ repeat: Infinity, duration: 1.4 }}
-        >
-          ↓
-        </motion.div>
-        <div className="rounded-xl border border-[var(--accent)] bg-[var(--accent-soft)] px-5 py-3 font-semibold text-[var(--accent)]">
-          Liquidity
-        </div>
-      </div>
-    );
-  }
-  if (kind === "keep") {
-    return (
-      <div className="flex flex-col items-center gap-3 py-6 text-sm">
-        <div className="rounded-xl border border-[var(--border)] bg-white px-4 py-3 text-[var(--ink)]">
-          Your portfolio
-        </div>
-        <span className="text-[var(--ink-subtle)]">↓</span>
-        <div className="rounded-xl border border-dashed border-[var(--border-strong)] bg-[var(--bg)] px-4 py-3 text-[var(--ink-muted)]">
-          Locked as backing · still yours
-        </div>
-      </div>
-    );
-  }
-  if (kind === "access") {
-    return (
-      <div className="flex flex-col items-center gap-2 py-4 text-center">
-        <p className="text-2xl font-semibold text-[var(--ink)]">$10,000</p>
-        <p className="text-sm text-[var(--ink-muted)]">in stocks</p>
-        <span className="text-[var(--ink-subtle)]">↓</span>
-        <p className="text-xl font-semibold text-[var(--accent)]">
-          Up to $5,500 available
-        </p>
-      </div>
-    );
-  }
-  if (kind === "repay") {
-    return (
-      <div className="flow-arrow py-4">
-        <span className="rounded-lg bg-white px-3 py-1.5 border border-[var(--border)]">
-          Generated
-        </span>
-        <span>↓</span>
-        <span className="rounded-lg bg-white px-3 py-1.5 border border-[var(--border)]">
-          Applied to loan
-        </span>
-        <span>↓</span>
-        <span className="rounded-lg border border-[var(--accent)] bg-[var(--accent-soft)] px-3 py-1.5 font-semibold text-[var(--accent)]">
-          Lower debt
-        </span>
-      </div>
-    );
-  }
-  return (
-    <div className="grid grid-cols-3 gap-2 py-6 text-center text-xs font-semibold">
-      {["Borrow", "Auto-repay", "Withdraw"].map((label) => (
-        <div
-          key={label}
-          className="rounded-xl border border-[var(--border)] bg-white px-2 py-4 text-[var(--ink)]"
-        >
-          {label}
-        </div>
-      ))}
-    </div>
-  );
-}
 
 export function Onboarding({
   onDone,
@@ -155,9 +97,9 @@ export function Onboarding({
   return (
     <div className="mx-auto flex min-h-screen max-w-md flex-col justify-between px-5 py-8">
       <div>
-        <p className="mb-8 text-sm font-semibold tracking-tight text-[var(--ink)]">
-          Stockline
-        </p>
+        <div className="mb-6">
+          <BrandLogo size="sm" className="max-h-6" />
+        </div>
         <AnimatePresence mode="wait">
           <motion.div
             key={current.id}
@@ -167,13 +109,40 @@ export function Onboarding({
             transition={{ duration: 0.28 }}
             className="space-y-4"
           >
+            <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--accent-soft)]">
+              <Image
+                src={current.image}
+                alt={current.alt}
+                fill
+                sizes="(max-width: 448px) 100vw, 448px"
+                className="object-cover"
+                priority={step === 0}
+              />
+            </div>
+
             <h1 className="display text-[1.75rem] text-[var(--ink)] sm:text-[2rem]">
               {current.headline}
             </h1>
             <p className="text-[15px] leading-relaxed text-[var(--ink-muted)]">
               {current.body}
             </p>
-            <div className="surface-quiet mt-2 px-4">{Visual({ kind: current.visual })}</div>
+
+            {"example" in current && current.example ? (
+              <div className="surface-quiet flex flex-col items-center gap-1 px-4 py-4 text-center">
+                <p className="text-2xl font-semibold text-[var(--ink)]">
+                  $10,000
+                </p>
+                <p className="text-sm text-[var(--ink-muted)]">in stocks</p>
+                <span className="text-[var(--ink-subtle)]">↓</span>
+                <p className="text-lg font-semibold text-[var(--ink)]">
+                  Up to{" "}
+                  <span className="rounded-md bg-[var(--brand)] px-1.5 text-[var(--brand-ink)]">
+                    $5,500
+                  </span>{" "}
+                  available
+                </p>
+              </div>
+            ) : null}
           </motion.div>
         </AnimatePresence>
 
@@ -190,8 +159,8 @@ export function Onboarding({
           {steps.map((s) => (
             <div
               key={s.id}
-              className={`h-1 flex-1 rounded-full ${
-                s.id <= step ? "bg-[var(--accent)]" : "bg-[var(--border)]"
+              className={`h-1 flex-1 rounded-full transition-colors ${
+                s.id <= step ? "bg-[var(--brand)]" : "bg-[var(--border)]"
               }`}
             />
           ))}
@@ -199,11 +168,7 @@ export function Onboarding({
 
         {step === 0 ? (
           <>
-            <Button
-              size="lg"
-              className="w-full"
-              onClick={() => setStep(1)}
-            >
+            <Button size="lg" className="w-full" onClick={() => setStep(1)}>
               Get started
             </Button>
             <Button

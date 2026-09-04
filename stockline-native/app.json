@@ -1,15 +1,15 @@
 {
   "expo": {
-    "name": "Stockline",
-    "slug": "stockline",
+    "name": "Kora",
+    "slug": "Kora",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "stockline",
+    "scheme": "Kora",
     "userInterfaceStyle": "dark",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.stockline.app"
+      "bundleIdentifier": "com.Kora.app"
     },
     "android": {
       "adaptiveIcon": {
@@ -18,7 +18,7 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "package": "com.stockline.app"
+      "package": "com.Kora.app"
     },
     "web": {
       "bundler": "metro",

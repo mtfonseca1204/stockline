@@ -44,7 +44,7 @@ export function Home() {
     return (
       <div className="page animate-fade-up">
         <div>
-          <p className="text-sm text-[var(--ink-muted)]">Your Stockline account</p>
+          <p className="text-sm text-[var(--ink-muted)]">Your Kora account</p>
           <h1 className="mt-1 text-2xl text-[var(--ink)]">No active credit</h1>
         </div>
 
@@ -67,7 +67,7 @@ export function Home() {
             "Let your assets help repay",
           ].map((label, i) => (
             <li key={label} className="flex items-start gap-3">
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--accent-soft)] text-xs font-bold text-[var(--accent)]">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--accent-soft)] text-xs font-bold text-[var(--brand-ink)]">
                 {i + 1}
               </span>
               <span className="pt-1 text-sm font-medium text-[var(--ink)]">
@@ -191,7 +191,7 @@ export function Home() {
             </p>
             <button
               type="button"
-              className="mt-2 text-sm font-medium text-[var(--accent)]"
+              className="mt-2 text-sm font-medium text-[var(--brand-ink)] underline decoration-[var(--brand)] decoration-2 underline-offset-4"
               onClick={() => setAutoOpen(true)}
             >
               Manage

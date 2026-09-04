@@ -1,7 +1,8 @@
 "use client";
 
+import { WalletIcon } from "@/components/brand/WalletIcons";
 import { Button } from "@/components/ui/Button";
-import { Expandable, Sheet } from "@/components/ui/primitives";
+import { ChoiceRow, Expandable, Sheet } from "@/components/ui/primitives";
 import { useApp } from "@/context/AppContext";
 import type { WalletProvider } from "@/lib/types";
 
@@ -32,23 +33,21 @@ export function WalletModal({
       </p>
       <div className="space-y-2">
         {OPTIONS.map((opt) => (
-          <button
+          <ChoiceRow
             key={opt.id}
-            type="button"
+            title={opt.label}
+            right={opt.hint}
+            leading={<WalletIcon id={opt.id} size={32} />}
             onClick={() => pick(opt.id)}
-            className="flex w-full items-center justify-between rounded-xl border border-[var(--border)] bg-[var(--bg)] px-4 py-3.5 text-left transition hover:border-[var(--border-strong)]"
-          >
-            <span className="font-semibold text-[var(--ink)]">{opt.label}</span>
-            <span className="text-xs text-[var(--ink-subtle)]">{opt.hint}</span>
-          </button>
+          />
         ))}
       </div>
 
       <div className="mt-5">
         <Expandable label="Why do I need a wallet?">
           <p>
-            Your wallet is how Stockline interacts with your onchain assets.
-            Stockline never needs your private keys.
+            Your wallet is how Kora interacts with your onchain assets. Kora
+            never needs your private keys.
           </p>
         </Expandable>
       </div>
