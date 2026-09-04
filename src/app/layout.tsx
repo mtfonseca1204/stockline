@@ -18,6 +18,9 @@ export const metadata: Metadata = {
   title: "Kora — Keep your stocks. Access liquidity.",
   description:
     "Access USDC without selling tokenized stocks. Your assets stay invested and can help repay your loan.",
+  icons: {
+    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+  },
 };
 
 export default function RootLayout({
