@@ -1,26 +1,13 @@
 # Kora
 
-Keep your stocks. Access liquidity. Let your assets help repay the loan.
+Deposit tokenized stocks. Borrow USDC. Keep your exposure. Use gains to reduce debt.
 
-## Apps
+## Core loop
 
-| Path | Stack |
-|------|--------|
-| `/` (root) | Web — Next.js (primary UX) |
-| `stockline-native/` | Native — Expo (legacy folder name) |
-
-## Web UX
-
-Four destinations: **Home · Portfolio · Borrow · Activity**
-
-Calm light UI, progressive disclosure, brand lime `#7CFF2B` + ink `#1E1E1E`.
-
-### Demo
-
-1. Enter demo mode (portfolio **$25,480**, no debt)
-2. Borrow ~$4,000
-3. Use demo bar **+$100 → repay**
-4. Watch debt drop ($4,000 → $3,900)
+1. Add collateral  
+2. Borrow USDC (up to 50% of collateral)  
+3. Stocks appreciate  
+4. Repay loan with gains  
 
 ## Run
 
@@ -28,3 +15,5 @@ Calm light UI, progressive disclosure, brand lime `#7CFF2B` + ink `#1E1E1E`.
 npm install
 npm run dev
 ```
+
+Web app uses Base-inspired blue accents with the Kora lime logo mark preserved.

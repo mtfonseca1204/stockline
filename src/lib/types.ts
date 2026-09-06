@@ -7,7 +7,8 @@ export type AppView =
   | "deposit"
   | "withdraw"
   | "loan"
-  | "stock";
+  | "stock"
+  | "repay";
 
 export type WalletProvider = "coinbase" | "metamask" | "walletconnect";
 
@@ -18,12 +19,16 @@ export type AlertTone = "healthy" | "yield" | "warning" | "critical";
 export interface Holding {
   ticker: string;
   name: string;
-  quantity: number;
-  price: number;
-  change24h: number;
-  yieldApr: number;
-  collateralFactor: number;
-  availableToDeposit: number;
+  /** USD value currently deposited as collateral */
+  value: number;
+  /** USD value at deposit time — used for gains */
+  costBasis: number;
+}
+
+export interface WalletAsset {
+  ticker: string;
+  name: string;
+  available: number;
 }
 
 export interface ActivityItem {
@@ -47,27 +52,20 @@ export interface AlertItem {
 export interface CreditState {
   debt: number;
   originalDebt: number;
-  autoRepayEnabled: boolean;
-  autoRepayPercent: number;
-  interestApr: number;
+  /** Borrow power as fraction of collateral (MVP: 50%) */
   maxLtv: number;
-  liquidationThreshold: number;
-  yieldGeneratedMonth: number;
-  yieldAppliedMonth: number;
 }
 
 export interface AppState {
   connected: boolean;
   walletAddress: string | null;
   walletProvider: WalletProvider | null;
-  demoMode: boolean;
-  hasPosition: boolean;
   holdings: Holding[];
+  walletAssets: WalletAsset[];
   credit: CreditState;
   activities: ActivityItem[];
   alerts: AlertItem[];
   view: AppView;
   previousView: AppView;
   selectedTicker: string | null;
-  lastYieldPulse: number | null;
 }

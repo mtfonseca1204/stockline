@@ -8,61 +8,55 @@ import { formatUsd } from "@/lib/calculations";
 import { Check, ChevronLeft, Loader2 } from "lucide-react";
 import { useMemo, useState } from "react";
 
-type Step = "amount" | "review" | "tx" | "success";
+type Step = "amount" | "tx" | "success";
 
-export function Borrow() {
-  const {
-    available,
-    collateral,
-    debt,
-    holdings,
-    borrowUsdc,
-    setView,
-  } = useApp();
-
+export function Repay() {
+  const { debt, gains, holdings, repayFromGains, setView } = useApp();
   const [step, setStep] = useState<Step>("amount");
   const [amount, setAmount] = useState(
-    Math.min(200, Math.max(0, Math.floor(available)))
+    Math.min(debt, gains, Math.max(0, Math.floor(Math.min(debt, gains))))
   );
   const [txPhase, setTxPhase] = useState(0);
+  const [beforeDebt, setBeforeDebt] = useState(debt);
 
-  const canContinue = amount > 0 && amount <= available + 0.01;
-  const afterAvailable = Math.max(0, available - amount);
-  const primaryHolding = holdings[0];
+  const maxRepay = Math.min(debt, gains);
+  const after = Math.max(0, debt - amount);
+  const primary = holdings.find((h) => h.value - h.costBasis > 0) ?? holdings[0];
 
   const presets = useMemo(
     () =>
-      [25, 50, 75, 100]
+      [25, 50, 100]
         .map((p) => ({
           label: p === 100 ? "MAX" : `${p}%`,
-          value: Math.floor((available * p) / 100),
+          value: Math.floor((maxRepay * p) / 100),
         }))
         .filter((p, i, arr) => p.value > 0 && arr.findIndex((x) => x.value === p.value) === i),
-    [available]
+    [maxRepay]
   );
 
-  const runTx = () => {
+  const run = () => {
+    setBeforeDebt(debt);
     setStep("tx");
     setTxPhase(0);
     window.setTimeout(() => setTxPhase(1), 700);
-    window.setTimeout(() => setTxPhase(2), 1400);
     window.setTimeout(() => {
-      borrowUsdc(amount);
+      repayFromGains(amount);
       setStep("success");
-    }, 2200);
+    }, 1600);
   };
 
-  if (collateral <= 0) {
+  if (debt <= 0 || gains <= 0) {
     return (
       <div className="page animate-fade-up">
-        <h1 className="text-2xl text-[var(--ink)]">Borrow</h1>
+        <h1 className="text-2xl text-[var(--ink)]">Repay your loan</h1>
         <Card className="space-y-3">
-          <p className="font-semibold text-[var(--ink)]">No collateral yet</p>
           <p className="text-sm text-[var(--ink-muted)]">
-            Add tokenized stocks before you can borrow USDC.
+            {debt <= 0
+              ? "You don’t have an active loan."
+              : "No stock gains available to apply yet."}
           </p>
-          <Button className="w-full" onClick={() => setView("deposit")}>
-            Add Collateral
+          <Button className="w-full" onClick={() => setView("home")}>
+            Back to Home
           </Button>
         </Card>
       </div>
@@ -76,13 +70,13 @@ export function Borrow() {
         <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--accent-soft)] text-[var(--accent)]">
           <Check size={28} />
         </div>
-        <h1 className="text-2xl text-[var(--ink)]">USDC borrowed successfully!</h1>
+        <h1 className="text-2xl text-[var(--ink)]">Loan repayment successful!</h1>
         <p className="mt-3 text-[15px] text-[var(--ink-muted)]">
-          {formatUsd(amount)} USDC is now available to you.
+          You used {formatUsd(amount)} of your stock gains to repay your loan.
         </p>
         <Card className="mt-6 space-y-3 text-left">
-          <Row label="Collateral" value={formatUsd(collateral)} />
-          <Row label="Borrowed" value={formatUsd(debt)} />
+          <Row label="Previous loan" value={formatUsd(beforeDebt)} />
+          <Row label="New loan" value={formatUsd(Math.max(0, beforeDebt - amount))} />
         </Card>
         <Button
           size="lg"
@@ -91,18 +85,15 @@ export function Borrow() {
         >
           Back to Home
         </Button>
-        <Button variant="ghost" className="w-full" onClick={() => setView("loan")}>
-          View Loan
-        </Button>
       </div>
     );
   }
 
   if (step === "tx") {
-    const phases = ["Preparing loan", "Borrowing USDC", "Confirming transaction"];
+    const phases = ["Preparing repayment", "Applying gains", "Updating loan"];
     return (
       <div className="page animate-fade-up">
-        <h1 className="text-2xl text-[var(--ink)]">Borrowing</h1>
+        <h1 className="text-2xl text-[var(--ink)]">Repaying</h1>
         <Card className="mt-4 space-y-4">
           {phases.map((label, i) => {
             const done = txPhase > i;
@@ -138,33 +129,6 @@ export function Borrow() {
     );
   }
 
-  if (step === "review") {
-    return (
-      <div className="page animate-fade-up">
-        <h1 className="text-2xl text-[var(--ink)]">Review your loan</h1>
-        <Card className="mt-2 space-y-4">
-          <Row label="You are borrowing" value={`${formatUsd(amount)} USDC`} />
-          <Row
-            label="Your collateral"
-            value={`${formatUsd(collateral)}${
-              primaryHolding ? ` ${primaryHolding.ticker}` : ""
-            }`}
-          />
-          <Row label="Available after borrowing" value={formatUsd(afterAvailable)} />
-          <p className="text-sm leading-relaxed text-[var(--ink-muted)]">
-            Your stocks remain deposited while your loan is active.
-          </p>
-        </Card>
-        <Button size="lg" className="w-full" onClick={runTx}>
-          Borrow {formatUsd(amount)}
-        </Button>
-        <Button variant="ghost" className="w-full" onClick={() => setStep("amount")}>
-          Back
-        </Button>
-      </div>
-    );
-  }
-
   return (
     <div className="page animate-fade-up">
       <button
@@ -175,9 +139,16 @@ export function Borrow() {
         <ChevronLeft size={16} /> Home
       </button>
 
-      <h1 className="text-2xl text-[var(--ink)]">
-        How much would you like to borrow?
-      </h1>
+      <h1 className="text-2xl text-[var(--ink)]">Repay your loan</h1>
+
+      <Card className="space-y-2">
+        <Row label="Current loan" value={formatUsd(debt)} />
+        <Row label="Available gains" value={formatUsd(gains)} />
+        <p className="pt-2 text-sm leading-relaxed text-[var(--ink-muted)]">
+          Your {primary?.name ?? "stock"} collateral has increased in value. You
+          can use the gained value to reduce your outstanding loan.
+        </p>
+      </Card>
 
       <Card className="space-y-4">
         <div className="flex items-baseline gap-2">
@@ -185,23 +156,12 @@ export function Borrow() {
           <input
             type="number"
             min={0}
-            max={available}
+            max={maxRepay}
             value={amount || ""}
             onChange={(e) => setAmount(Number(e.target.value) || 0)}
             className="w-full bg-transparent text-4xl font-semibold outline-none"
           />
-          <span className="text-sm font-medium text-[var(--ink-muted)]">USDC</span>
         </div>
-        <p className="text-sm text-[var(--ink-muted)]">
-          Available to Borrow:{" "}
-          <button
-            type="button"
-            className="font-semibold text-[var(--accent)]"
-            onClick={() => setAmount(Math.floor(available))}
-          >
-            {formatUsd(available)}
-          </button>
-        </p>
         <div className="flex flex-wrap gap-2">
           {presets.map((p) => (
             <button
@@ -218,17 +178,18 @@ export function Borrow() {
       </Card>
 
       <Card quiet className="space-y-3">
-        <Row label="Collateral" value={formatUsd(collateral)} />
-        <Row label="You are borrowing" value={`${formatUsd(amount)} USDC`} />
+        <Row label="Loan before" value={formatUsd(debt)} />
+        <Row label="Repayment" value={formatUsd(amount)} />
+        <Row label="Loan after" value={formatUsd(after)} />
       </Card>
 
       <Button
         size="lg"
         className="w-full"
-        disabled={!canContinue}
-        onClick={() => setStep("review")}
+        disabled={amount <= 0 || amount > maxRepay}
+        onClick={run}
       >
-        Continue
+        Repay {formatUsd(amount)}
       </Button>
     </div>
   );
@@ -236,11 +197,9 @@ export function Borrow() {
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-start justify-between gap-3">
-      <span className="text-sm text-[var(--ink-muted)]">{label}</span>
-      <span className="text-right text-sm font-semibold text-[var(--ink)]">
-        {value}
-      </span>
+    <div className="flex justify-between gap-3 text-sm">
+      <span className="text-[var(--ink-muted)]">{label}</span>
+      <span className="font-semibold text-[var(--ink)]">{value}</span>
     </div>
   );
 }

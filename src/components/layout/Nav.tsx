@@ -26,7 +26,7 @@ const TABS: {
 ];
 
 export function TopBar({ onConnect }: { onConnect: () => void }) {
-  const { connected, walletAddress, disconnectWallet, demoMode } = useApp();
+  const { connected, walletAddress, disconnectWallet } = useApp();
   const reduce = useReducedMotion();
 
   return (
@@ -41,7 +41,7 @@ export function TopBar({ onConnect }: { onConnect: () => void }) {
             whileTap={reduce ? undefined : { scale: 0.96 }}
             className="pressable rounded-full border border-[var(--border)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--ink-muted)] hover:border-[var(--border-strong)] hover:text-[var(--ink)]"
           >
-            {demoMode ? "Demo" : shortAddress(walletAddress)}
+            {shortAddress(walletAddress)}
           </motion.button>
         ) : (
           <motion.button
@@ -65,10 +65,13 @@ export function BottomNav() {
   if (!connected) return null;
 
   const active =
-    view === "loan" || view === "deposit" || view === "withdraw" || view === "stock"
-      ? view === "stock" || view === "deposit" || view === "withdraw"
+    view === "loan" ||
+    view === "deposit" ||
+    view === "repay" ||
+    view === "stock"
+      ? view === "stock" || view === "deposit"
         ? "portfolio"
-        : view === "loan"
+        : view === "loan" || view === "repay"
           ? "borrow"
           : "home"
       : view;
@@ -89,7 +92,7 @@ export function BottomNav() {
               whileTap={reduce ? undefined : { scale: 0.9 }}
               className={cn(
                 "nav-tab flex min-w-[4.5rem] flex-col items-center gap-0.5 px-3 py-2.5 text-[11px] font-medium",
-                isActive ? "text-[var(--brand-ink)]" : "text-[var(--ink-subtle)]"
+                isActive ? "text-[var(--accent)]" : "text-[var(--ink-subtle)]"
               )}
             >
               <span className="nav-tab-icon inline-flex">
@@ -99,7 +102,7 @@ export function BottomNav() {
               {isActive ? (
                 <motion.span
                   layoutId="nav-dot"
-                  className="mt-0.5 h-1 w-1 rounded-full bg-[var(--brand)]"
+                  className="mt-0.5 h-1 w-1 rounded-full bg-[var(--accent)]"
                   transition={{ type: "spring", stiffness: 480, damping: 32 }}
                 />
               ) : (

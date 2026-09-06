@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/cn";
 
-/** Angular icons tuned to Kora’s geometric lime mark language */
+/** Angular icons tuned to Kora’s geometric mark language */
 type IconProps = {
   active?: boolean;
   className?: string;

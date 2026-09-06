@@ -33,7 +33,7 @@ export function LandingPage({
       >
         <span className="font-medium text-[var(--ink)]">Stocks</span>
         <span>↓</span>
-        <span className="rounded-md bg-[var(--brand)] px-2 py-0.5 font-semibold text-[var(--brand-ink)]">
+        <span className="rounded-md bg-[var(--accent-soft)] px-2 py-0.5 font-semibold text-[var(--accent)]">
           Cash without selling
         </span>
         <span>↓</span>
@@ -45,7 +45,7 @@ export function LandingPage({
           Get started
         </Button>
         <Button size="lg" variant="secondary" className="w-full" onClick={onDemo}>
-          Enter demo mode
+          Open app
         </Button>
         {onReplayOnboarding ? (
           <Button variant="ghost" className="w-full" onClick={onReplayOnboarding}>

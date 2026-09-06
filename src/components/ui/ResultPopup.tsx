@@ -1,10 +1,9 @@
 "use client";
 
-import { BrandMark } from "@/components/brand/BrandLogo";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { X } from "lucide-react";
+import { Check, X } from "lucide-react";
 
 export type ResultStatus = "success" | "fail";
 
@@ -78,7 +77,7 @@ export function ResultPopup({
                 className={cn(
                   "mb-4 flex h-16 w-16 items-center justify-center rounded-full",
                   ok
-                    ? "bg-[var(--brand)] text-[var(--brand-ink)]"
+                    ? "bg-[var(--accent-soft)] text-[var(--accent)]"
                     : "bg-[var(--danger-soft)] text-[var(--danger)]"
                 )}
                 initial={reduce ? false : { scale: 0, rotate: -20 }}
@@ -91,7 +90,7 @@ export function ResultPopup({
                 }}
               >
                 {ok ? (
-                  <BrandMark size={28} />
+                  <Check size={32} strokeWidth={2.6} />
                 ) : (
                   <motion.span
                     initial={reduce ? false : { rotate: -90, opacity: 0 }}
@@ -107,7 +106,7 @@ export function ResultPopup({
                 <motion.div
                   className={cn(
                     "pointer-events-none absolute top-6 h-16 w-16 rounded-full",
-                    ok ? "bg-[var(--brand)]" : "bg-[var(--danger)]"
+                    ok ? "bg-[var(--accent)]" : "bg-[var(--danger)]"
                   )}
                   initial={{ scale: 0.6, opacity: 0.28 }}
                   animate={{ scale: 2.2, opacity: 0 }}

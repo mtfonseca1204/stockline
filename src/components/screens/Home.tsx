@@ -1,246 +1,181 @@
 "use client";
 
-import { AutoRepaySheet } from "@/components/sheets/AutoRepaySheet";
+import { StockLogo } from "@/components/brand/StockLogo";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import {
-  Expandable,
-  ProgressBar,
-  StatusPill,
-} from "@/components/ui/primitives";
 import { useApp } from "@/context/AppContext";
-import { formatPct, formatUsd } from "@/lib/calculations";
-import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { formatUsd } from "@/lib/calculations";
 
 export function Home() {
   const {
-    hasPosition,
     collateral,
     debt,
     available,
-    health,
-    credit,
-    yieldMonthly,
-    currentLtv,
+    gains,
+    holdings,
     setView,
-    lastYieldPulse,
-    clearYieldPulse,
+    simulateAppreciation,
   } = useApp();
-  const [autoOpen, setAutoOpen] = useState(false);
-  const [flash, setFlash] = useState(false);
 
-  useEffect(() => {
-    if (lastYieldPulse == null) return;
-    setFlash(true);
-    const t = setTimeout(() => {
-      setFlash(false);
-      clearYieldPulse();
-    }, 1400);
-    return () => clearTimeout(t);
-  }, [lastYieldPulse, clearYieldPulse]);
+  const empty = collateral <= 0;
 
-  if (!hasPosition || collateral <= 0) {
+  // STATE 1 — empty
+  if (empty) {
     return (
       <div className="page animate-fade-up">
         <div>
-          <p className="text-sm text-[var(--ink-muted)]">Your Kora account</p>
-          <h1 className="mt-1 text-2xl text-[var(--ink)]">No active credit</h1>
+          <p className="text-sm text-[var(--ink-muted)]">Your Portfolio</p>
+          <p className="mt-2 text-4xl font-semibold tracking-tight text-[var(--ink)]">
+            $0.00
+          </p>
+          <p className="mt-2 text-sm leading-relaxed text-[var(--ink-muted)]">
+            Get started by adding tokenized stocks as collateral.
+          </p>
         </div>
 
         <Card className="space-y-3">
-          <h2 className="text-lg text-[var(--ink)]">
-            Turn your stocks into liquidity
-          </h2>
+          <h2 className="text-lg text-[var(--ink)]">Add Collateral</h2>
           <p className="text-sm leading-relaxed text-[var(--ink-muted)]">
-            Deposit tokenized stocks to see how much you could access.
+            Add your tokenized stocks to unlock borrowing power.
           </p>
-          <Button size="lg" className="w-full" onClick={() => setView("deposit")}>
-            Add stocks
+          <Button
+            size="lg"
+            className="w-full"
+            onClick={() => setView("deposit")}
+          >
+            Add Collateral
           </Button>
         </Card>
-
-        <ol className="space-y-4 px-1 pt-2">
-          {[
-            "Add stocks",
-            "Access liquidity",
-            "Let your assets help repay",
-          ].map((label, i) => (
-            <li key={label} className="flex items-start gap-3">
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--accent-soft)] text-xs font-bold text-[var(--brand-ink)]">
-                {i + 1}
-              </span>
-              <span className="pt-1 text-sm font-medium text-[var(--ink)]">
-                {label}
-              </span>
-            </li>
-          ))}
-        </ol>
       </div>
     );
   }
 
-  const repaid = Math.max(0, credit.originalDebt - debt);
-  const progress =
-    credit.originalDebt > 0 ? (repaid / credit.originalDebt) * 100 : 0;
-  const needsAttention = health.status !== "Healthy";
+  // STATE 4 — appreciation with active loan
+  const showRepayCard = debt > 0 && gains > 0;
+  // STATE 2 — collateral, no loan
+  const showBorrowCard = debt <= 0;
+  // STATE 3 — active loan, no gains yet
+  const showLoanSummary = debt > 0 && !showRepayCard;
 
   return (
     <div className="page animate-fade-up">
       <div>
-        <p className="text-sm text-[var(--ink-muted)]">Your finances</p>
+        <p className="text-sm text-[var(--ink-muted)]">Your Portfolio</p>
         <p className="mt-2 text-4xl font-semibold tracking-tight text-[var(--ink)]">
           {formatUsd(collateral)}
         </p>
-        <p className="mt-1 text-sm text-[var(--ink-muted)]">Portfolio value</p>
       </div>
-
-      {needsAttention ? (
-        <Card className="space-y-3 border-[var(--warning)] bg-[var(--warning-soft)]">
-          <h2 className="text-base text-[var(--ink)]">
-            Your portfolio needs attention
-          </h2>
-          <p className="text-sm text-[var(--ink-muted)]">
-            Your stocks have fallen in value. Your available credit has been
-            reduced to keep your loan safe.
-          </p>
-          <div className="flex gap-2">
-            <Button className="flex-1" onClick={() => setView("deposit")}>
-              Add stocks
-            </Button>
-            <Button
-              variant="secondary"
-              className="flex-1"
-              onClick={() => setView("loan")}
-            >
-              Repay
-            </Button>
-          </div>
-        </Card>
-      ) : null}
 
       <div className="grid grid-cols-3 gap-2">
+        <Metric label="Collateral" value={formatUsd(collateral)} />
+        <Metric label="Borrowed" value={formatUsd(debt)} />
         <Metric label="Available" value={formatUsd(available)} />
-        <Metric
-          label="Borrowed"
-          value={formatUsd(debt)}
-          flash={flash}
-        />
-        <div className="surface-quiet flex flex-col gap-1 p-3">
-          <span className="text-[11px] text-[var(--ink-subtle)]">Health</span>
-          <StatusPill status={health.status} />
-        </div>
       </div>
 
-      <Card className="space-y-3">
-        <div>
-          <p className="text-sm text-[var(--ink-muted)]">Available to borrow</p>
-          <p className="mt-1 text-3xl font-semibold text-[var(--ink)]">
-            {formatUsd(available)}
+      {showRepayCard ? (
+        <Card className="space-y-3 ring-1 ring-[var(--accent)]">
+          <h2 className="text-lg text-[var(--ink)]">
+            Your stocks have gained value
+          </h2>
+          <p className="text-sm text-[var(--ink-muted)]">
+            Your collateral has increased by{" "}
+            <span className="font-semibold text-[var(--accent)]">
+              +{formatUsd(gains)}
+            </span>
+            . You can use part of this value to repay your loan.
           </p>
-          <p className="mt-2 text-sm text-[var(--ink-muted)]">
-            You can access up to this amount based on your current portfolio.
-          </p>
-        </div>
-        <Button
-          size="lg"
-          className="w-full"
-          onClick={() => setView("borrow")}
-          disabled={available < 1}
-        >
-          Borrow USDC
-        </Button>
-        <Expandable label="How is this calculated?">
-          <Row k="Portfolio value" v={formatUsd(collateral)} />
-          <Row k="Current loan" v={formatUsd(debt)} />
-          <Row k="Safety buffer" v={formatPct(Math.max(0, credit.maxLtv - currentLtv))} />
-        </Expandable>
-      </Card>
-
-      {debt > 0 ? (
-        <Card className={`space-y-3 ${flash ? "animate-debt-flash" : ""}`}>
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-sm text-[var(--ink-muted)]">Your loan</p>
-              <motion.p
-                key={debt}
-                initial={{ scale: 1.04 }}
-                animate={{ scale: 1 }}
-                className="mt-1 text-2xl font-semibold text-[var(--ink)]"
-              >
-                {formatUsd(debt)}
-              </motion.p>
-              <p className="text-xs text-[var(--ink-subtle)]">remaining</p>
-            </div>
-            <Button variant="ghost" size="sm" onClick={() => setView("loan")}>
-              Manage
-            </Button>
-          </div>
-          <ProgressBar value={progress} />
-          <div className="rounded-xl bg-[var(--bg)] px-3 py-3 text-sm">
-            <p className="font-semibold text-[var(--ink)]">
-              Auto-repay {credit.autoRepayEnabled ? "ON" : "OFF"}
-            </p>
-            <p className="mt-1 text-[var(--ink-muted)]">
-              {formatUsd(credit.yieldGeneratedMonth || yieldMonthly)} generated
-              this month
-            </p>
-            <p className="text-[var(--ink-muted)]">
-              {formatUsd(credit.yieldAppliedMonth || (credit.autoRepayEnabled ? repayHint(yieldMonthly, credit.autoRepayPercent) : 0))}{" "}
-              applied to your loan
-            </p>
-            <button
-              type="button"
-              className="mt-2 text-sm font-medium text-[var(--brand-ink)] underline decoration-[var(--brand)] decoration-2 underline-offset-4"
-              onClick={() => setAutoOpen(true)}
-            >
-              Manage
-            </button>
-          </div>
+          <Button size="lg" className="w-full" onClick={() => setView("repay")}>
+            Repay your loan
+          </Button>
         </Card>
       ) : null}
 
-      <Button
-        variant="secondary"
-        className="w-full"
-        onClick={() => setView("portfolio")}
-      >
-        Manage portfolio
-      </Button>
+      {showBorrowCard ? (
+        <Card className="space-y-3">
+          <h2 className="text-lg text-[var(--ink)]">Borrow USDC</h2>
+          <p className="text-sm text-[var(--ink-muted)]">
+            Available to borrow:{" "}
+            <span className="font-semibold text-[var(--ink)]">
+              {formatUsd(available)}
+            </span>
+          </p>
+          <p className="text-sm text-[var(--ink-muted)]">
+            Access liquidity without selling your stocks.
+          </p>
+          <Button
+            size="lg"
+            className="w-full"
+            disabled={available < 1}
+            onClick={() => setView("borrow")}
+          >
+            Borrow
+          </Button>
+        </Card>
+      ) : null}
 
-      <AutoRepaySheet open={autoOpen} onClose={() => setAutoOpen(false)} />
+      {showLoanSummary ? (
+        <Card className="space-y-3">
+          <h2 className="text-lg text-[var(--ink)]">Your loan</h2>
+          <p className="text-3xl font-semibold text-[var(--ink)]">
+            {formatUsd(debt)}
+          </p>
+          <p className="text-sm text-[var(--ink-muted)]">
+            Your stocks remain deposited while your loan is active.
+          </p>
+          <div className="flex gap-2">
+            <Button
+              className="flex-1"
+              variant="secondary"
+              onClick={() => setView("borrow")}
+              disabled={available < 1}
+            >
+              Borrow more
+            </Button>
+            <Button
+              className="flex-1"
+              variant="ghost"
+              onClick={() => simulateAppreciation(200)}
+            >
+              Stocks rose +$200
+            </Button>
+          </div>
+          <p className="text-xs text-[var(--ink-subtle)]">
+            Simulate appreciation to unlock repayment with gains.
+          </p>
+        </Card>
+      ) : null}
+
+      <button
+        type="button"
+        onClick={() => setView("portfolio")}
+        className="text-sm font-medium text-[var(--accent)]"
+      >
+        View portfolio
+      </button>
+
+      {holdings.length > 0 ? (
+        <div className="flex flex-wrap gap-2 pt-1">
+          {holdings.map((h) => (
+            <div
+              key={h.ticker}
+              className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-white px-2.5 py-1.5 text-xs"
+            >
+              <StockLogo ticker={h.ticker} size={20} />
+              <span className="font-semibold text-[var(--ink)]">{h.ticker}</span>
+              <span className="text-[var(--ink-muted)]">{formatUsd(h.value)}</span>
+            </div>
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }
 
-function repayHint(monthly: number, pct: number) {
-  return Math.round(monthly * (pct / 100));
-}
-
-function Metric({
-  label,
-  value,
-  flash,
-}: {
-  label: string;
-  value: string;
-  flash?: boolean;
-}) {
+function Metric({ label, value }: { label: string; value: string }) {
   return (
-    <div
-      className={`surface-quiet flex flex-col gap-1 p-3 ${flash ? "animate-debt-flash" : ""}`}
-    >
+    <div className="surface-quiet flex flex-col gap-1 p-3">
       <span className="text-[11px] text-[var(--ink-subtle)]">{label}</span>
       <span className="text-sm font-semibold text-[var(--ink)]">{value}</span>
-    </div>
-  );
-}
-
-function Row({ k, v }: { k: string; v: string }) {
-  return (
-    <div className="flex justify-between gap-3">
-      <span>{k}</span>
-      <span className="font-medium text-[var(--ink)]">{v}</span>
     </div>
   );
 }

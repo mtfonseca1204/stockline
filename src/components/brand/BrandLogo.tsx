@@ -17,7 +17,7 @@ const WORDMARK: Record<NonNullable<LogoProps["size"]>, number> = {
   lg: 104,
 };
 
-/** Full Kora wordmark (lime K + dark “ora”) — keep compact in chrome */
+/** Full Kora wordmark (blue K + dark “ora”) — keep compact in chrome */
 export function BrandLogo({ className, width, size = "sm" }: LogoProps) {
   const w = width ?? WORDMARK[size];
   const height = Math.round((w * 137) / 391);
@@ -34,7 +34,7 @@ export function BrandLogo({ className, width, size = "sm" }: LogoProps) {
   );
 }
 
-/** Lime K mark only — for favicon-style / compact spots */
+/** Blue K mark only — for favicon-style / compact spots */
 export function BrandMark({
   className,
   size = 18,

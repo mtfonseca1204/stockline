@@ -10,22 +10,19 @@ import {
 } from "react";
 import {
   availableCredit,
-  availableToWithdraw,
+  BORROW_RATIO,
   formatUsd,
-  ltv,
-  monthlyRepayment,
-  monthlyYield,
-  portfolioHealth,
   portfolioValue,
-  projectedPayoffMonths,
+  unrealizedGains,
 } from "@/lib/calculations";
-import { DEMO_ACTIVITIES, DEMO_HOLDINGS } from "@/lib/mock-data";
+import { WALLET_ASSETS } from "@/lib/mock-data";
 import type {
   AlertItem,
   AlertTone,
   AppState,
   AppView,
   Holding,
+  WalletAsset,
   WalletProvider,
 } from "@/lib/types";
 
@@ -33,28 +30,20 @@ interface AppContextValue extends AppState {
   collateral: number;
   debt: number;
   available: number;
-  withdrawable: number;
-  currentLtv: number;
-  yieldMonthly: number;
-  repayMonthly: number;
-  payoffMonths: number | null;
-  health: ReturnType<typeof portfolioHealth>;
+  gains: number;
   connectWallet: (provider: WalletProvider) => void;
   disconnectWallet: () => void;
   setView: (view: AppView) => void;
   goBack: () => void;
   openStock: (ticker: string) => void;
-  enableDemoMode: () => void;
-  resetToEmpty: () => void;
-  depositStocks: () => void;
-  borrowUsdc: (amount: number, opts?: { navigate?: boolean }) => void;
-  withdrawStocks: (amount: number, opts?: { navigate?: boolean }) => void;
-  setAutoRepay: (enabled: boolean, percent?: number) => void;
-  simulateGrowth: (pct?: number) => void;
-  simulateYield: (amount?: number) => void;
+  /** Quiet start — connected empty account (no demo chrome) */
+  startApp: () => void;
+  depositCollateral: (ticker: string, amount: number) => void;
+  borrowUsdc: (amount: number) => void;
+  repayFromGains: (amount: number) => void;
+  simulateAppreciation: (amount?: number) => void;
   pushAlert: (tone: AlertTone, title: string, message: string) => void;
   dismissAlert: (id: string) => void;
-  clearYieldPulse: () => void;
 }
 
 const AppContext = createContext<AppContextValue | null>(null);
@@ -62,13 +51,7 @@ const AppContext = createContext<AppContextValue | null>(null);
 const initialCredit = {
   debt: 0,
   originalDebt: 0,
-  autoRepayEnabled: true,
-  autoRepayPercent: 100,
-  interestApr: 0.058,
-  maxLtv: 0.55,
-  liquidationThreshold: 0.55,
-  yieldGeneratedMonth: 0,
-  yieldAppliedMonth: 0,
+  maxLtv: BORROW_RATIO,
 };
 
 function makeAlert(
@@ -84,38 +67,33 @@ function makeAlert(
   };
 }
 
+function cloneWallet(): WalletAsset[] {
+  return WALLET_ASSETS.map((a) => ({ ...a }));
+}
+
 export function AppProvider({ children }: { children: ReactNode }) {
   const [connected, setConnected] = useState(false);
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
   const [walletProvider, setWalletProvider] = useState<WalletProvider | null>(
     null
   );
-  const [demoMode, setDemoMode] = useState(false);
-  const [hasPosition, setHasPosition] = useState(false);
   const [holdings, setHoldings] = useState<Holding[]>([]);
+  const [walletAssets, setWalletAssets] = useState<WalletAsset[]>(cloneWallet);
   const [credit, setCredit] = useState(initialCredit);
   const [activities, setActivities] = useState<AppState["activities"]>([]);
   const [alerts, setAlerts] = useState<AlertItem[]>([]);
   const [view, setViewState] = useState<AppView>("landing");
   const [previousView, setPreviousView] = useState<AppView>("landing");
   const [selectedTicker, setSelectedTicker] = useState<string | null>(null);
-  const [lastYieldPulse, setLastYieldPulse] = useState<number | null>(null);
 
   const collateral = portfolioValue(holdings);
   const debt = credit.debt;
   const available = availableCredit(collateral, debt, credit.maxLtv);
-  const withdrawable = availableToWithdraw(collateral, debt, credit.maxLtv);
-  const currentLtv = ltv(debt, collateral);
-  const yieldMonthly = monthlyYield(holdings) || (hasPosition ? 86 : 0);
-  const repayMonthly = credit.autoRepayEnabled
-    ? monthlyRepayment(yieldMonthly, credit.autoRepayPercent)
-    : 0;
-  const payoffMonths = projectedPayoffMonths(debt, repayMonthly);
-  const health = portfolioHealth(holdings, debt);
+  const gains = unrealizedGains(holdings);
 
   const pushAlert = useCallback(
     (tone: AlertTone, title: string, message: string) => {
-      setAlerts((prev) => [makeAlert(tone, title, message), ...prev].slice(0, 3));
+      setAlerts((prev) => [makeAlert(tone, title, message), ...prev].slice(0, 2));
     },
     []
   );
@@ -123,8 +101,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const dismissAlert = useCallback((id: string) => {
     setAlerts((prev) => prev.filter((a) => a.id !== id));
   }, []);
-
-  const clearYieldPulse = useCallback(() => setLastYieldPulse(null), []);
 
   const setView = useCallback((next: AppView) => {
     setViewState((current) => {
@@ -145,223 +121,190 @@ export function AppProvider({ children }: { children: ReactNode }) {
     [setView]
   );
 
+  const enterApp = useCallback((provider: WalletProvider = "coinbase") => {
+    setConnected(true);
+    setWalletProvider(provider);
+    setWalletAddress("0x7a3F9c2E4b81d0A6fC12e88B");
+    setHoldings([]);
+    setWalletAssets(cloneWallet());
+    setCredit({ ...initialCredit });
+    setActivities([]);
+    setAlerts([]);
+    setViewState("home");
+  }, []);
+
   const connectWallet = useCallback(
     (provider: WalletProvider) => {
-      setConnected(true);
-      setWalletProvider(provider);
-      setWalletAddress("0x7a3F9c2E4b81d0A6fC12e88B");
-      setViewState("home");
-      pushAlert(
-        "healthy",
-        "Wallet connected",
-        "You're on Base. Add stocks to see what you can access."
-      );
+      enterApp(provider);
     },
-    [pushAlert]
+    [enterApp]
   );
+
+  const startApp = useCallback(() => {
+    enterApp("coinbase");
+  }, [enterApp]);
 
   const disconnectWallet = useCallback(() => {
     setConnected(false);
     setWalletAddress(null);
     setWalletProvider(null);
+    setHoldings([]);
+    setWalletAssets(cloneWallet());
+    setCredit({ ...initialCredit });
+    setActivities([]);
     setViewState("landing");
   }, []);
 
-  const enableDemoMode = useCallback(() => {
-    setDemoMode(true);
-    setConnected(true);
-    setWalletProvider("coinbase");
-    setWalletAddress("0x7a3F9c2E4b81d0A6fC12e88B");
-    setHoldings(DEMO_HOLDINGS.map((h) => ({ ...h })));
-    setHasPosition(true);
-    setCredit({ ...initialCredit });
-    setActivities(DEMO_ACTIVITIES.map((a) => ({ ...a })));
-    setViewState("home");
-    setAlerts([
-      makeAlert(
-        "healthy",
-        "Demo ready",
-        "Portfolio loaded with no loan. Borrow, then simulate $100 generated."
-      ),
-    ]);
-  }, []);
+  const depositCollateral = useCallback(
+    (ticker: string, amount: number) => {
+      const asset = walletAssets.find((a) => a.ticker === ticker);
+      if (!asset || amount <= 0 || amount > asset.available + 0.01) return;
 
-  const resetToEmpty = useCallback(() => {
-    setDemoMode(false);
-    setHoldings([]);
-    setHasPosition(false);
-    setCredit({ ...initialCredit });
-    setActivities([]);
-    setConnected(true);
-    setViewState("home");
-  }, []);
+      setWalletAssets((prev) =>
+        prev.map((a) =>
+          a.ticker === ticker
+            ? { ...a, available: Math.max(0, Math.round(a.available - amount)) }
+            : a
+        )
+      );
 
-  const depositStocks = useCallback(() => {
-    setHoldings(DEMO_HOLDINGS.map((h) => ({ ...h })));
-    setHasPosition(true);
+      setHoldings((prev) => {
+        const existing = prev.find((h) => h.ticker === ticker);
+        if (existing) {
+          return prev.map((h) =>
+            h.ticker === ticker
+              ? {
+                  ...h,
+                  value: h.value + amount,
+                  costBasis: h.costBasis + amount,
+                }
+              : h
+          );
+        }
+        return [
+          ...prev,
+          {
+            ticker,
+            name: asset.name,
+            value: amount,
+            costBasis: amount,
+          },
+        ];
+      });
+
+      setActivities((prev) => [
+        {
+          id: `dep-${Date.now()}`,
+          date: "Today",
+          label: "Collateral added",
+          action: "Deposit",
+          asset: ticker,
+          amount: `+${formatUsd(amount)} ${ticker}`,
+          status: "confirmed",
+          detail: `${formatUsd(amount)} ${asset.name} deposited as collateral.`,
+        },
+        ...prev,
+      ]);
+    },
+    [walletAssets]
+  );
+
+  const borrowUsdc = useCallback((amount: number) => {
+    setCredit((prev) => ({
+      ...prev,
+      debt: prev.debt + amount,
+      originalDebt: prev.originalDebt === 0 ? amount : prev.originalDebt,
+    }));
     setActivities((prev) => [
       {
-        id: `dep-${Date.now()}`,
-        date: "Just now",
-        label: "Stocks deposited",
-        action: "Deposit",
-        asset: "Stocks",
-        amount: "+$25,480",
+        id: `bor-${Date.now()}`,
+        date: "Today",
+        label: "Borrowed",
+        action: "Borrow",
+        asset: "USDC",
+        amount: `+${formatUsd(amount)} USDC`,
         status: "confirmed",
-        detail: "Your tokenized stocks now back your Kora account.",
+        detail: `${formatUsd(amount)} USDC borrowed against your collateral.`,
       },
       ...prev,
     ]);
-    pushAlert(
-      "healthy",
-      "Stocks added",
-      "You can now access liquidity without selling."
-    );
-    setViewState("home");
-  }, [pushAlert]);
+  }, []);
 
-  const borrowUsdc = useCallback(
-    (amount: number, opts?: { navigate?: boolean }) => {
-      setCredit((prev) => ({
-        ...prev,
-        debt: prev.debt + amount,
-        originalDebt: prev.originalDebt === 0 ? amount : prev.originalDebt,
-      }));
-      setHasPosition(true);
-      setActivities((prev) => [
-        {
-          id: `bor-${Date.now()}`,
-          date: "Today",
-          label: "Borrowed",
-          action: "Borrow",
-          asset: "USDC",
-          amount: `+${formatUsd(amount)} USDC`,
-          status: "confirmed",
-          detail: "USDC is available in your wallet. Your stocks stay invested.",
-        },
-        ...prev,
-      ]);
-      pushAlert(
-        "yield",
-        "Borrow complete",
-        `${formatUsd(amount)} USDC is now available.`
-      );
-      if (opts?.navigate !== false) setViewState("loan");
-    },
-    [pushAlert]
-  );
+  const repayFromGains = useCallback(
+    (amount: number) => {
+      const apply = Math.min(amount, debt, gains);
+      if (apply <= 0) return;
 
-  const withdrawStocks = useCallback(
-    (amount: number, opts?: { navigate?: boolean }) => {
+      // Reduce cost basis upward toward current value as gains are "used"
+      // and reduce debt. We keep collateral value the same (stocks stay deposited)
+      // but lock in gains by raising costBasis so gains decrease.
       setHoldings((prev) => {
-        const total = portfolioValue(prev);
-        if (total <= 0) return prev;
-        const ratio = amount / total;
-        return prev
-          .map((h) => ({
-            ...h,
-            quantity: h.quantity * (1 - ratio),
-          }))
-          .filter((h) => h.quantity * h.price >= 1);
+        const totalGains = unrealizedGains(prev);
+        if (totalGains <= 0) return prev;
+        return prev.map((h) => {
+          const hGain = Math.max(0, h.value - h.costBasis);
+          const share = hGain / totalGains;
+          const used = apply * share;
+          return { ...h, costBasis: Math.min(h.value, h.costBasis + used) };
+        });
       });
-      setActivities((prev) => [
-        {
-          id: `wd-${Date.now()}`,
-          date: "Just now",
-          label: "Stocks withdrawn",
-          action: "Withdraw",
-          asset: "Stocks",
-          amount: `-${formatUsd(amount)}`,
-          status: "confirmed",
-        },
-        ...prev,
-      ]);
-      pushAlert(
-        "healthy",
-        "Withdrawal complete",
-        `${formatUsd(amount)} returned while keeping your loan safely backed.`
-      );
-      if (opts?.navigate !== false) setViewState("portfolio");
-    },
-    [pushAlert]
-  );
 
-  const setAutoRepay = useCallback(
-    (enabled: boolean, percent = 100) => {
       setCredit((prev) => ({
         ...prev,
-        autoRepayEnabled: enabled,
-        autoRepayPercent: percent,
+        debt: Math.max(0, prev.debt - apply),
       }));
-      pushAlert(
-        "yield",
-        enabled ? "Auto-repay on" : "Auto-repay off",
-        enabled
-          ? `${percent}% of money generated by your assets goes toward your loan.`
-          : "Generated money stays available to you."
-      );
-    },
-    [pushAlert]
-  );
 
-  const simulateGrowth = useCallback(
-    (pct = 0.1) => {
-      setHoldings((prev) =>
-        prev.map((h) => ({
-          ...h,
-          price: Number((h.price * (1 + pct)).toFixed(2)),
-          change24h: Number((pct * 100).toFixed(1)),
-        }))
-      );
-      pushAlert(
-        "healthy",
-        "Portfolio updated",
-        `Holdings grew about ${(pct * 100).toFixed(0)}%. Available credit updated.`
-      );
-    },
-    [pushAlert]
-  );
-
-  const simulateYield = useCallback(
-    (amount = 100) => {
-      let applied = 0;
-      setCredit((prev) => {
-        applied = prev.autoRepayEnabled
-          ? amount * (prev.autoRepayPercent / 100)
-          : 0;
-        return {
-          ...prev,
-          debt: Math.max(0, prev.debt - applied),
-          yieldGeneratedMonth: prev.yieldGeneratedMonth + amount,
-          yieldAppliedMonth: prev.yieldAppliedMonth + applied,
-        };
-      });
-      setLastYieldPulse(applied);
       setActivities((prev) => [
         {
-          id: `yld-${Date.now()}`,
-          date: "Just now",
-          label: applied > 0 ? "Applied to loan" : "Money generated",
+          id: `rep-${Date.now()}`,
+          date: "Today",
+          label: "Loan repayment",
           action: "Repay",
           asset: "USDC",
-          amount: applied > 0 ? `-${formatUsd(applied, 0)} loan` : formatUsd(amount),
+          amount: `-${formatUsd(apply)} USDC`,
           status: "confirmed",
-          detail:
-            applied > 0
-              ? `${formatUsd(amount)} generated → ${formatUsd(applied)} applied to your loan.`
-              : `${formatUsd(amount)} generated by your assets.`,
+          detail: `Used ${formatUsd(apply)} of stock gains to reduce your loan.`,
+        },
+        ...prev,
+      ]);
+    },
+    [debt, gains]
+  );
+
+  const simulateAppreciation = useCallback(
+    (amount = 200) => {
+      if (holdings.length === 0) return;
+      // Prefer NVDA, else grow the largest holding
+      setHoldings((prev) => {
+        const target =
+          prev.find((h) => h.ticker === "NVDA") ??
+          [...prev].sort((a, b) => b.value - a.value)[0];
+        return prev.map((h) =>
+          h.ticker === target.ticker
+            ? { ...h, value: h.value + amount }
+            : h
+        );
+      });
+      setActivities((prev) => [
+        {
+          id: `apr-${Date.now()}`,
+          date: "Today",
+          label: "Collateral increased",
+          action: "Market",
+          asset: "Stocks",
+          amount: `+${formatUsd(amount)}`,
+          status: "confirmed",
+          detail: `Your deposited stocks gained ${formatUsd(amount)} in value.`,
         },
         ...prev,
       ]);
       pushAlert(
-        "yield",
-        applied > 0 ? "Loan reduced" : "Money generated",
-        applied > 0
-          ? `${formatUsd(amount)} generated → ${formatUsd(applied)} applied automatically.`
-          : `${formatUsd(amount)} generated by your assets.`
+        "healthy",
+        "Your stocks gained value",
+        `Collateral increased by ${formatUsd(amount)}.`
       );
     },
-    [pushAlert]
+    [holdings.length, pushAlert]
   );
 
   const value = useMemo<AppContextValue>(
@@ -369,81 +312,59 @@ export function AppProvider({ children }: { children: ReactNode }) {
       connected,
       walletAddress,
       walletProvider,
-      demoMode,
-      hasPosition,
       holdings,
+      walletAssets,
       credit,
       activities,
       alerts,
       view,
       previousView,
       selectedTicker,
-      lastYieldPulse,
       collateral,
       debt,
       available,
-      withdrawable,
-      currentLtv,
-      yieldMonthly,
-      repayMonthly,
-      payoffMonths,
-      health,
+      gains,
       connectWallet,
       disconnectWallet,
       setView,
       goBack,
       openStock,
-      enableDemoMode,
-      resetToEmpty,
-      depositStocks,
+      startApp,
+      depositCollateral,
       borrowUsdc,
-      withdrawStocks,
-      setAutoRepay,
-      simulateGrowth,
-      simulateYield,
+      repayFromGains,
+      simulateAppreciation,
       pushAlert,
       dismissAlert,
-      clearYieldPulse,
     }),
     [
       connected,
       walletAddress,
       walletProvider,
-      demoMode,
-      hasPosition,
       holdings,
+      walletAssets,
       credit,
       activities,
       alerts,
       view,
       previousView,
       selectedTicker,
-      lastYieldPulse,
       collateral,
       debt,
       available,
-      withdrawable,
-      currentLtv,
-      yieldMonthly,
-      repayMonthly,
-      payoffMonths,
-      health,
+      gains,
       connectWallet,
       disconnectWallet,
       setView,
       goBack,
       openStock,
-      enableDemoMode,
-      resetToEmpty,
-      depositStocks,
+      startApp,
+      depositCollateral,
       borrowUsdc,
-      withdrawStocks,
-      setAutoRepay,
-      simulateGrowth,
-      simulateYield,
+      repayFromGains,
+      simulateAppreciation,
       pushAlert,
       dismissAlert,
-      clearYieldPulse,
     ]
   );
 

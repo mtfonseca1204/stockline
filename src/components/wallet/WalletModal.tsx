@@ -19,7 +19,7 @@ export function WalletModal({
   open: boolean;
   onClose: () => void;
 }) {
-  const { connectWallet, enableDemoMode } = useApp();
+  const { connectWallet, startApp } = useApp();
 
   const pick = (id: WalletProvider) => {
     connectWallet(id);
@@ -56,11 +56,11 @@ export function WalletModal({
         variant="ghost"
         className="mt-4 w-full"
         onClick={() => {
-          enableDemoMode();
+          startApp();
           onClose();
         }}
       >
-        Continue with demo mode
+        Continue without wallet
       </Button>
     </Sheet>
   );

@@ -108,7 +108,7 @@ export function ProgressBar({
       )}
     >
       <motion.div
-        className="h-full rounded-full bg-[var(--brand)]"
+        className="h-full rounded-full bg-[var(--accent)]"
         initial={false}
         animate={{ width: `${pct}%` }}
         transition={{ type: "spring", stiffness: 120, damping: 20 }}

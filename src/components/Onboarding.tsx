@@ -7,7 +7,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
-const KEY = "kora-onboarded-v2";
+const KEY = "kora-onboarded-v3";
 
 export function useNeedsOnboarding() {
   const [ready, setReady] = useState(false);
@@ -48,21 +48,21 @@ const steps = [
     id: 0,
     headline: "Your stocks can do more than sit in your portfolio.",
     body: "Kora lets you access liquidity without selling your tokenized stocks.",
-    image: "/onboarding/intro.png",
+    image: "/onboarding/intro-blue.png",
     alt: "Person unlocking liquidity from their stocks",
   },
   {
     id: 1,
     headline: "Keep your stocks",
     body: "You deposit eligible tokenized stocks into Kora. They remain yours while backing your credit.",
-    image: "/onboarding/keep.png",
+    image: "/onboarding/keep-blue.png",
     alt: "Person securing stocks that still belong to them",
   },
   {
     id: 2,
     headline: "Access cash without selling",
     body: "Use your stocks to access USDC while keeping your market exposure.",
-    image: "/onboarding/access.png",
+    image: "/onboarding/access-blue.png",
     alt: "Person accessing cash while stocks stay invested",
     example: true,
   },
@@ -70,14 +70,14 @@ const steps = [
     id: 3,
     headline: "Your assets can help repay the loan",
     body: "When your productive assets generate money, Kora can automatically direct it toward your outstanding balance.",
-    image: "/onboarding/repay.png",
+    image: "/onboarding/repay-blue.png",
     alt: "People watching their loan shrink as assets generate value",
   },
   {
     id: 4,
     headline: "You're always in control",
     body: "You choose how much to borrow, how much goes toward repayment, and when to repay.",
-    image: "/onboarding/control.png",
+    image: "/onboarding/control-blue.png",
     alt: "Person adjusting borrow, auto-repay, and withdraw controls",
   },
 ] as const;
@@ -89,7 +89,7 @@ export function Onboarding({
   onDone: () => void;
   onConnect: () => void;
 }) {
-  const { enableDemoMode } = useApp();
+  const { startApp } = useApp();
   const [step, setStep] = useState(0);
   const [showHow, setShowHow] = useState(false);
   const current = steps[step];
@@ -136,7 +136,7 @@ export function Onboarding({
                 <span className="text-[var(--ink-subtle)]">↓</span>
                 <p className="text-lg font-semibold text-[var(--ink)]">
                   Up to{" "}
-                  <span className="rounded-md bg-[var(--brand)] px-1.5 text-[var(--brand-ink)]">
+                  <span className="font-semibold text-[var(--accent)]">
                     $5,500
                   </span>{" "}
                   available
@@ -160,7 +160,7 @@ export function Onboarding({
             <div
               key={s.id}
               className={`h-1 flex-1 rounded-full transition-colors ${
-                s.id <= step ? "bg-[var(--brand)]" : "bg-[var(--border)]"
+                s.id <= step ? "bg-[var(--accent)]" : "bg-[var(--border)]"
               }`}
             />
           ))}
@@ -200,10 +200,10 @@ export function Onboarding({
               className="w-full"
               onClick={() => {
                 onDone();
-                enableDemoMode();
+                startApp();
               }}
             >
-              Try demo mode
+              Try the app
             </Button>
           </>
         )}

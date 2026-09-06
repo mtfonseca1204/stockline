@@ -22,7 +22,7 @@ const variants: Record<Variant, string> = {
     "bg-transparent text-[var(--ink-muted)] hover:bg-black/[0.05] hover:text-[var(--ink)] shadow-none",
   danger:
     "bg-[var(--danger)] text-white hover:brightness-110 font-semibold shadow-sm",
-  soft: "bg-[var(--accent-soft)] text-[var(--brand-ink)] hover:brightness-95 font-semibold border border-[rgba(124,255,43,0.35)]",
+  soft: "bg-[var(--accent-soft)] text-[var(--accent)] hover:brightness-95 font-semibold border border-[rgba(0,82,255,0.22)]",
 };
 
 const sizes: Record<Size, string> = {
