@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   description:
     "Access USDC without selling tokenized stocks. Your assets stay invested and can help repay your loan.",
   icons: {
-    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+    icon: [{ url: "/favicon.svg?v=blue", type: "image/svg+xml" }],
   },
 };
 
