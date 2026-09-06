@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/Button";
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 export function LandingPage({
   onConnect,
@@ -26,18 +27,22 @@ export function LandingPage({
       </div>
 
       <motion.div
-        className="surface mt-4 flex flex-col items-center gap-2 px-6 py-8 text-sm text-[var(--ink-muted)]"
+        className="surface mt-4 overflow-hidden p-2 sm:p-3"
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.15 }}
       >
-        <span className="font-medium text-[var(--ink)]">Stocks</span>
-        <span>↓</span>
-        <span className="rounded-md bg-[var(--accent-soft)] px-2 py-0.5 font-semibold text-[var(--accent)]">
-          Cash without selling
-        </span>
-        <span>↓</span>
-        <span className="font-medium text-[var(--ink)]">Assets help repay</span>
+        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[calc(var(--radius)-4px)] bg-white">
+          <Image
+            src="/landing/product-loop.png"
+            alt="Stocks become cash without selling, then assets help repay your loan"
+            fill
+            sizes="(max-width: 448px) 100vw, 448px"
+            className="object-contain object-center"
+            priority
+            unoptimized
+          />
+        </div>
       </motion.div>
 
       <div className="mt-auto space-y-3 pt-8">
