@@ -252,3 +252,31 @@ test("only NVDAc is selectable for the initial market", async ({ page }) => {
     page.getByRole("link", { name: "Buy NVDAc on Uniswap", exact: false }),
   ).toBeVisible();
 });
+
+
+test("deposit simulation uses the confirmed approval block when latest RPC state lags", async ({page}) => {
+  const {toFunctionSelector} = await import('viem');
+  const selector = toFunctionSelector('supplyCollateral((address,address,address,address,uint256),uint256,address,bytes)');
+  let pinnedCalls = 0;
+  await page.route('http://127.0.0.1:8545/', async route => {
+    const body = route.request().postDataJSON();
+    const calls = Array.isArray(body) ? body : [body];
+    for (const call of calls) {
+      if (['eth_call','eth_estimateGas'].includes(call.method) && call.params?.[0]?.data?.startsWith(selector)) {
+        if (!call.params[1] || call.params[1] === 'latest') {
+          await route.fulfill({json:{jsonrpc:'2.0',id:call.id,error:{code:-32000,message:'RPC latest state has not observed approval'}}});
+          return;
+        }
+        pinnedCalls++;
+      }
+    }
+    await route.continue();
+  });
+  await page.getByRole('button',{name:'Add Collateral',exact:true}).click();
+  await page.getByRole('button',{name:'Select NVDAc market',exact:true}).click();
+  await page.getByLabel('Amount').fill('1');
+  await page.getByRole('button',{name:'Review',exact:true}).click();
+  await page.getByRole('button',{name:'Confirm transaction'}).click();
+  await expect(page.getByRole('heading',{name:'Transaction confirmed'})).toBeVisible();
+  expect(pinnedCalls).toBeGreaterThanOrEqual(2);
+});

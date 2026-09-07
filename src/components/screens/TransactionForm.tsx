@@ -53,6 +53,7 @@ export function TransactionForm({ action }: { action: FormAction }) {
     "review",
     "approval-signature",
     "approval-pending",
+    "approval-confirmed",
     "signature",
     "pending",
   ].includes(app.tx.phase);
@@ -448,7 +449,12 @@ export function TransactionForm({ action }: { action: FormAction }) {
           className="surface flex items-center gap-3 p-4 text-sm"
         >
           <Loader2 size={20} className="animate-spin text-[var(--accent)]" />
-          {app.tx.phase.replaceAll("-", " ")}. Waiting for wallet or receipt.
+          {app.tx.phase === "approval-signature" && "Step 1: approve token access in your wallet. This does not deposit or repay yet."}
+          {app.tx.phase === "approval-pending" && "Step 1: waiting for token approval. Then confirm the operation in your wallet."}
+          {app.tx.phase === "approval-confirmed" && "Approval confirmed. Preparing the operation; your tokens have not been deposited or repaid yet."}
+          {app.tx.phase === "signature" && "Confirm the operation in your wallet. Token approval alone does not complete it."}
+          {app.tx.phase === "pending" && "Operation submitted. Waiting for onchain confirmation."}
+          {app.tx.phase === "review" && "Checking the operation and token allowance."}
         </p>
       )}
       {app.tx.hash && <p className="break-all text-xs">{app.tx.hash}</p>}

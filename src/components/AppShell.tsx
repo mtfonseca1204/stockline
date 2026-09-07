@@ -1,5 +1,6 @@
 "use client";
 
+import { MarketSessionNotice } from "@/components/MarketSessionNotice";
 import { AlertStack } from "@/components/alerts/AlertStack";
 import { BottomNav, TopBar } from "@/components/layout/Nav";
 import { Onboarding, useNeedsOnboarding } from "@/components/Onboarding";
@@ -30,6 +31,7 @@ export function AppShell() {
   if (needs) {
     return (
       <div className="min-h-screen bg-[var(--bg)]">
+        <MarketSessionNotice />
         <Onboarding onDone={clear} onConnect={openWallet} />
         <WalletModal open={walletOpen} onClose={() => setWalletOpen(false)} />
       </div>
@@ -39,6 +41,7 @@ export function AppShell() {
   return (
     <div className="flex min-h-screen flex-col bg-[var(--bg)]">
       <TopBar onConnect={openWallet} />
+      <MarketSessionNotice />
       <main className="flex-1 pb-28">
         {view === "landing" && (
           <LandingPage

@@ -83,6 +83,7 @@ export type TxState = {
     | "review"
     | "approval-signature"
     | "approval-pending"
+    | "approval-confirmed"
     | "signature"
     | "pending"
     | "confirmed"

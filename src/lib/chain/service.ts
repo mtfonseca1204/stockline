@@ -241,6 +241,7 @@ export async function execute(
     )
       throw new Error("Wallet or network changed. Review the operation again.");
   };
+  let approvalBlock: bigint | undefined;
   const send = async (
     to: Address,
     abi: Abi,
@@ -251,11 +252,12 @@ export async function execute(
     checkContext();
     const wallet = await getWalletClient(config);
     const data = encodeFunctionData({ abi, functionName: fn, args });
-    await publicClient.call({ account: owner, to, data });
+    await publicClient.call({ account: owner, to, data, blockNumber: approvalBlock });
     const estimate = await publicClient.estimateGas({
       account: owner,
       to,
       data,
+      blockNumber: approvalBlock,
     });
     checkContext();
     update({ phase: approval ? "approval-signature" : "signature" });
@@ -278,20 +280,24 @@ export async function execute(
     update({ phase: approval ? "approval-pending" : "pending", hash });
     const receipt = await publicClient.waitForTransactionReceipt({
       hash,
-      onReplaced: (r) =>
+      onReplaced: (r) => {
+        savePending(storageKey, { ...pending, hash: r.transaction.hash });
         update({
-          phase: "pending",
+          phase: approval ? "approval-pending" : "pending",
           hash: r.transaction.hash,
           message: r.reason,
-        }),
+        });
+      },
     });
-    clearPending(storageKey);
-    if (receipt.status !== "success")
+    if (receipt.status !== "success") {
+      clearPending(storageKey);
       throw new Error(`Transaction reverted: ${receipt.transactionHash}`);
+    }
     // A cancellation has a successful receipt but did not execute our calldata.
     const transaction = await publicClient.getTransaction({
       hash: receipt.transactionHash,
     });
+    clearPending(storageKey);
     if (
       transaction.to?.toLowerCase() !== to.toLowerCase() ||
       transaction.input !== data
@@ -299,6 +305,10 @@ export async function execute(
       throw new Error(
         "Transaction was cancelled or replaced with a different operation.",
       );
+    if (approval) {
+      approvalBlock = receipt.blockNumber;
+      update({ phase: "approval-confirmed", hash: receipt.transactionHash });
+    }
     checkContext();
     return receipt.transactionHash;
   };
