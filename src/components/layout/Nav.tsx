@@ -67,9 +67,10 @@ export function BottomNav() {
   const active =
     view === "loan" ||
     view === "deposit" ||
+    view === "withdraw" ||
     view === "repay" ||
     view === "stock"
-      ? view === "stock" || view === "deposit"
+      ? view === "stock" || view === "deposit" || view === "withdraw"
         ? "portfolio"
         : view === "loan" || view === "repay"
           ? "borrow"

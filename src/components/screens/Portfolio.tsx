@@ -4,7 +4,7 @@ import { networkName, environmentLabel } from "@/lib/chain/config";
 import { StockLogo } from "@/components/brand/StockLogo";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { Expandable } from "@/components/ui/primitives";
+import { Expandable, EnvPill, InlineAlert } from "@/components/ui/primitives";
 import { useApp } from "@/context/AppContext";
 import { display } from "@/lib/chain/amounts";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -15,7 +15,7 @@ export function Portfolio() {
   return (
     <div className="page animate-fade-up">
       <div>
-        <h1 className="text-2xl text-[var(--ink)]">Your stocks</h1>
+        <h1 className="display text-2xl text-[var(--ink)]">Your stocks</h1>
         <p className="mt-2 text-sm text-[var(--ink-muted)]">
           Your tokenized stocks and collateral positions.
         </p>
@@ -62,7 +62,6 @@ export function Portfolio() {
         <ComingSoonMarkets />
       </div>
       <Button
-        variant="soft"
         className="w-full"
         onClick={() => app.setView("deposit")}
       >
@@ -87,9 +86,9 @@ export function NetworkNotice() {
         </p>
       )}
       {app.error && (
-        <p role="alert">Unable to read your positions. Please refresh.</p>
+        <InlineAlert>Unable to read your positions. Please refresh.</InlineAlert>
       )}
-      <p className="text-xs text-[var(--ink-subtle)]">{environmentLabel}</p>
+      <EnvPill>{environmentLabel}</EnvPill>
     </>
   );
 }

@@ -131,8 +131,8 @@ export function Onboarding({
 
         {step === 0 && showHow ? (
           <p className="mt-4 text-sm leading-relaxed text-[var(--ink-muted)]">
-            Deposit stocks → access USDC → optionally let money your assets
-            generate reduce your loan. You stay invested the whole time.
+            Deposit stocks → access USDC → repay with USDC or sell part of
+            your collateral. You stay invested the whole time.
           </p>
         ) : null}
       </div>

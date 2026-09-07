@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useApp } from "@/context/AppContext";
 import { Card } from "@/components/ui/Card";
+import { InlineAlert } from "@/components/ui/primitives";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 export function Activity() {
   const { history, historyError } = useApp();
@@ -33,9 +34,9 @@ export function Activity() {
     );
   return (
     <div className="page animate-fade-up">
-      <h1 className="text-2xl">Activity</h1>
+      <h1 className="display text-2xl text-[var(--ink)]">Activity</h1>
       {historyError && (
-        <p role="alert">History unavailable. Please try again.</p>
+        <InlineAlert>History unavailable. Please try again.</InlineAlert>
       )}
       {!history.length && !historyError && (
         <Card className="text-center">
@@ -59,7 +60,7 @@ export function Activity() {
               </p>
             </div>
             <p className="text-right text-sm">{a.detail}</p>
-            <ChevronRight size={16} />
+            <ChevronRight size={16} className="text-[var(--ink-subtle)]" />
           </button>
         ))}
       </div>

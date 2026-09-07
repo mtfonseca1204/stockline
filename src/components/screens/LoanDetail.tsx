@@ -12,7 +12,7 @@ export function LoanDetail() {
   );
   return (
     <div className="page animate-fade-up">
-      <h1 className="text-2xl">Your loans</h1>
+      <h1 className="display text-2xl text-[var(--ink)]">Your loan</h1>
       <NetworkNotice />
       {!loans.length && (
         <Card className="space-y-3">

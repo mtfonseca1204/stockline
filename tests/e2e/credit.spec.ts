@@ -84,7 +84,7 @@ for (const ticker of ["NVDAc"]) {
     await expect(
       page.getByRole("heading", { name: "Transaction confirmed" }),
     ).toBeVisible();
-    await page.getByRole("button", { name: "Back to portfolio" }).click();
+    await page.getByRole("button", { name: "Back to Home" }).click();
     await page
       .getByRole("button", { name: "Borrow", exact: true })
       .first()
@@ -98,17 +98,17 @@ for (const ticker of ["NVDAc"]) {
     await expect(
       page.getByRole("heading", { name: "Transaction confirmed" }),
     ).toBeVisible();
-    await page.getByRole("button", { name: "Back to portfolio" }).click();
-    await page.getByRole("button", { name: "Repay", exact: true }).click();
+    await page.getByRole("button", { name: "Back to Home" }).click();
+    await page.getByRole("button", { name: "Repay your loan", exact: true }).click();
     await page
       .getByRole("button", { name: `Select ${ticker} market`, exact: true })
       .click();
-    await page.getByLabel("Sell collateral to repay").check();
+    await page.getByRole("button", { name: "Sell collateral to repay" }).click();
     await page
-      .getByRole("button", { name: "Authorize adapter", exact: true })
+      .getByRole("button", { name: "Allow sale repayment", exact: true })
       .click();
     await expect(
-      page.getByRole("button", { name: "Authorize adapter", exact: true }),
+      page.getByRole("button", { name: "Allow sale repayment", exact: true }),
     ).toBeEnabled();
     await page.getByLabel("Amount").fill("0.5");
     await page.getByRole("button", { name: "Review", exact: true }).click();
@@ -116,18 +116,18 @@ for (const ticker of ["NVDAc"]) {
     await expect(
       page.getByRole("heading", { name: "Transaction confirmed" }),
     ).toBeVisible();
-    await page.getByRole("button", { name: "Back to portfolio" }).click();
-    await page.getByRole("button", { name: "Repay", exact: true }).click();
+    await page.getByRole("button", { name: "Back to Home" }).click();
+    await page.getByRole("button", { name: "Repay your loan", exact: true }).click();
     await page
       .getByRole("button", { name: `Select ${ticker} market`, exact: true })
       .click();
-    await page.getByLabel("Repay all debt").check();
+    await page.getByRole("button", { name: "Repay all debt" }).click();
     await page.getByRole("button", { name: "Review", exact: true }).click();
     await page.getByRole("button", { name: "Confirm transaction" }).click();
     await expect(
       page.getByRole("heading", { name: "Transaction confirmed" }),
     ).toBeVisible();
-    await page.getByRole("button", { name: "Back to portfolio" }).click();
+    await page.getByRole("button", { name: "Back to Home" }).click();
     await page.getByRole("button", { name: "Withdraw", exact: true }).click();
     await page
       .getByRole("button", { name: `Select ${ticker} market`, exact: true })
@@ -138,7 +138,7 @@ for (const ticker of ["NVDAc"]) {
     await expect(
       page.getByRole("heading", { name: "Transaction confirmed" }),
     ).toBeVisible();
-    await page.getByRole("button", { name: "Back to portfolio" }).click();
+    await page.getByRole("button", { name: "Back to Home" }).click();
     await page.reload();
     await page.getByRole("button", { name: "Open app", exact: true }).click();
     await page.getByRole("button", { name: "Activity", exact: true }).click();
