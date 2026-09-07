@@ -33,18 +33,18 @@ export function LoanDetail() {
             <h2 className="text-lg">{p.market.ticker}</h2>
           </div>
           <p className="text-3xl font-semibold">
-            {display(p.snapshot!.debtAssetsRaw / 10000n, 2)} USDC
+            {display(p.snapshot!.debtAssetsRaw)} USDC
           </p>
           <p className="text-sm">{display(p.snapshot?.collateralRaw, p.market.collateralDecimals)} {p.market.ticker}<br /><StockValue position={p} amount={p.snapshot?.collateralRaw} /></p>
           <Row
             label="Borrow APR"
-            value={`${display(p.snapshot!.borrowAprWad / 100000000000000n, 2)}%`}
+            value={`${display(p.snapshot!.borrowAprWad, 16, 2)}%`}
           />
           <Row
             label="Health"
             value={
               p.snapshot?.oracleValid
-                ? display(p.snapshot.healthFactorWad / 10000000000000000n, 2)
+                ? display(p.snapshot.healthFactorWad, 18, 2)
                 : "Unavailable"
             }
           />

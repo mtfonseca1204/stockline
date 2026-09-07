@@ -17,7 +17,7 @@ export function display(
   places = decimals === 6 || decimals === 2 ? 2 : 3,
 ) {
   if (raw == null) return "Unavailable";
-  const precision = Math.min(decimals, places);
+  const precision = Math.min(decimals, places, decimals === 6 ? 2 : 3);
   const truncated = raw / 10n ** BigInt(decimals - precision);
   if (raw > 0n && truncated === 0n) return `<${formatUnits(1n, precision)}`;
   return formatUnits(truncated, precision);

@@ -1,4 +1,10 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type Page } from "@playwright/test";
+async function assertFinancialPrecision(page: Page) {
+  const text = await page.locator("main").innerText();
+  expect(text).not.toMatch(/\b\d+\.\d{4,}\b/);
+  expect(text).not.toMatch(/\d+\.\d{3,}\s*USDC/);
+  expect(text).not.toMatch(/\$\d+\.\d{3,}/);
+}
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
     localStorage.setItem("kora-onboarded-v3", "1");
@@ -80,11 +86,14 @@ for (const ticker of ["NVDAc"]) {
       .click();
     await page.getByLabel("Amount").fill("10");
     await page.getByRole("button", { name: "Review", exact: true }).click();
+    await assertFinancialPrecision(page);
     await page.getByRole("button", { name: "Confirm transaction" }).click();
     await expect(
       page.getByRole("heading", { name: "Transaction confirmed" }),
     ).toBeVisible();
+    await assertFinancialPrecision(page);
     await page.getByRole("button", { name: "Back to Home" }).click();
+    await assertFinancialPrecision(page);
     await page
       .getByRole("button", { name: "Borrow", exact: true })
       .first()
@@ -92,13 +101,19 @@ for (const ticker of ["NVDAc"]) {
     await page
       .getByRole("button", { name: `Select ${ticker} market`, exact: true })
       .click();
+    await page.getByLabel("Amount").fill("100.12");
+    await page.getByLabel("Amount").press("3");
+    await expect(page.getByLabel("Amount")).toHaveValue("100.12");
     await page.getByLabel("Amount").fill("100");
     await page.getByRole("button", { name: "Review", exact: true }).click();
+    await assertFinancialPrecision(page);
     await page.getByRole("button", { name: "Confirm transaction" }).click();
     await expect(
       page.getByRole("heading", { name: "Transaction confirmed" }),
     ).toBeVisible();
+    await assertFinancialPrecision(page);
     await page.getByRole("button", { name: "Back to Home" }).click();
+    await assertFinancialPrecision(page);
     await page.getByRole("button", { name: "Repay your loan", exact: true }).click();
     await page
       .getByRole("button", { name: `Select ${ticker} market`, exact: true })
@@ -112,33 +127,42 @@ for (const ticker of ["NVDAc"]) {
     ).toBeEnabled();
     await page.getByLabel("Amount").fill("0.5");
     await page.getByRole("button", { name: "Review", exact: true }).click();
+    await assertFinancialPrecision(page);
     await page.getByRole("button", { name: "Confirm transaction" }).click();
     await expect(
       page.getByRole("heading", { name: "Transaction confirmed" }),
     ).toBeVisible();
+    await assertFinancialPrecision(page);
     await page.getByRole("button", { name: "Back to Home" }).click();
+    await assertFinancialPrecision(page);
     await page.getByRole("button", { name: "Repay your loan", exact: true }).click();
     await page
       .getByRole("button", { name: `Select ${ticker} market`, exact: true })
       .click();
     await page.getByRole("button", { name: "Repay all debt" }).click();
     await page.getByRole("button", { name: "Review", exact: true }).click();
+    await assertFinancialPrecision(page);
     await page.getByRole("button", { name: "Confirm transaction" }).click();
     await expect(
       page.getByRole("heading", { name: "Transaction confirmed" }),
     ).toBeVisible();
+    await assertFinancialPrecision(page);
     await page.getByRole("button", { name: "Back to Home" }).click();
+    await assertFinancialPrecision(page);
     await page.getByRole("button", { name: "Withdraw", exact: true }).click();
     await page
       .getByRole("button", { name: `Select ${ticker} market`, exact: true })
       .click();
     await page.getByRole("button", { name: "MAX", exact: true }).click();
     await page.getByRole("button", { name: "Review", exact: true }).click();
+    await assertFinancialPrecision(page);
     await page.getByRole("button", { name: "Confirm transaction" }).click();
     await expect(
       page.getByRole("heading", { name: "Transaction confirmed" }),
     ).toBeVisible();
+    await assertFinancialPrecision(page);
     await page.getByRole("button", { name: "Back to Home" }).click();
+    await assertFinancialPrecision(page);
     await page.reload();
     await page.getByRole("button", { name: "Open app", exact: true }).click();
     await page.getByRole("button", { name: "Activity", exact: true }).click();

@@ -24,7 +24,7 @@ export function Home() {
     0n,
   );
   const usd = (raw: bigint) =>
-    ready ? `$${display(raw / 10000n, 2)}` : "Unavailable";
+    ready ? `$${display(raw)}` : "Unavailable";
   return (
     <div className="page animate-fade-up">
       <div>

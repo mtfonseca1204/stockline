@@ -34,3 +34,16 @@ test("stock USD reference uses feed and token decimals without a multiplier", ()
   assert.equal(referenceUsd(1n, 8, null), null);
   assert.equal(referenceUsd(null, 8, { answer: 1n, decimals: 8 }), null);
 });
+
+test("precision ceilings hold for stocks, stablecoins, rates and debt dust", () => {
+  assert.equal(display(123456789n, 8, 8), "1.234");
+  assert.equal(display(1234567n, 6, 6), "1.23");
+  assert.equal(display(9999n, 6), "<0.01");
+  assert.equal(display(10000n, 6), "0.01");
+  assert.equal(display(9999999999999999n, 16, 2), "0.99");
+  assert.equal(display(1234567890123456789n, 18, 2), "1.23");
+  for (let decimals = 0; decimals <= 18; decimals++) {
+    const formatted = display(123456789123456789n, decimals, 18);
+    assert.ok((formatted.split(".")[1]?.length ?? 0) <= (decimals === 6 ? 2 : 3));
+  }
+});

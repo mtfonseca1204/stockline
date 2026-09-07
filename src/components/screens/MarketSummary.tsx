@@ -11,7 +11,7 @@ export function MarketSummary() {
       <p>
         Borrow APR:{" "}
         <span className="font-semibold text-[var(--ink)]">
-          {s ? display(s.borrowAprWad / 100000000000000n, 2) : "Unavailable"}%
+          {s ? display(s.borrowAprWad, 16, 2) : "Unavailable"}%
         </span>
       </p>
       <p>
