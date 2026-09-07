@@ -35,6 +35,21 @@ export const coreAbi = coreJson as Abi;
 export const adapterAbi = adapterJson as Abi;
 const lensAbi = lensJson as Abi;
 const swapAbi = swapJson as Abi;
+const feedAbi = parseAbi([
+  "function decimals() view returns (uint8)",
+  "function latestRoundData() view returns (uint80,int256,uint256,uint256,uint80)",
+]);
+async function readReferencePrice(market: MarketConfig, blockNumber: bigint) {
+  try {
+    const [decimals, round, block] = await Promise.all([
+      publicClient.readContract({address:market.feed,abi:feedAbi,functionName:"decimals",blockNumber}),
+      publicClient.readContract({address:market.feed,abi:feedAbi,functionName:"latestRoundData",blockNumber}),
+      publicClient.getBlock({blockNumber}),
+    ]);
+    if (round[1] <= 0n || round[3] === 0n || round[3] > block.timestamp || round[4] < round[0]) return null;
+    return {answer:round[1],decimals,updatedAt:round[3]};
+  } catch { return null; }
+}
 export function requireDeployment() {
   if (!deployment)
     throw new Error(
@@ -73,7 +88,7 @@ export async function readPositions(owner: Address): Promise<MarketPosition[]> {
   return Promise.all(
     d.markets.map(async (market) => {
       try {
-        const [snapshot, walletCollateral, walletUsdc] = await Promise.all([
+        const [snapshot, walletCollateral, walletUsdc, referencePrice] = await Promise.all([
           publicClient.readContract({
             address: d.lens,
             abi: lensAbi,
@@ -100,8 +115,10 @@ export async function readPositions(owner: Address): Promise<MarketPosition[]> {
             args: [owner],
             blockNumber,
           }),
+          readReferencePrice(market, blockNumber),
         ]);
         return {
+          referencePrice,
           market,
           snapshot: snapshot as Snapshot,
           walletCollateral,

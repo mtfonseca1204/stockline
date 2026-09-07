@@ -1,4 +1,5 @@
 "use client";
+import { StockValue } from "./StockValue";
 import { useApp } from "@/context/AppContext";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -34,6 +35,7 @@ export function LoanDetail() {
           <p className="text-3xl font-semibold">
             {display(p.snapshot!.debtAssetsRaw / 10000n, 2)} USDC
           </p>
+          <p className="text-sm">{display(p.snapshot?.collateralRaw, p.market.collateralDecimals)} {p.market.ticker}<br /><StockValue position={p} amount={p.snapshot?.collateralRaw} /></p>
           <Row
             label="Borrow APR"
             value={`${display(p.snapshot!.borrowAprWad / 100000000000000n, 2)}%`}

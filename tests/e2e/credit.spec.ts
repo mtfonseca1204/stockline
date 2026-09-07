@@ -217,9 +217,14 @@ test("original portfolio layout and stock selection at mobile and desktop widths
       fullPage: true,
     });
     await expect(page.getByText(/Wallet balance:/)).toBeVisible();
+    await expect(page.getByText(/last published price/).first()).toBeVisible();
+    await page.getByLabel("Amount").fill("1.234");
+    await expect(page.getByLabel("Amount")).toHaveValue("1.234");
+    await page.getByLabel("Amount").press("5");
+    await expect(page.getByLabel("Amount")).toHaveValue("1.234");
     for (const label of ["25%", "50%", "75%", "MAX"]) {
       await page.getByRole("button", { name: label, exact: true }).click();
-      await expect(page.getByLabel("Amount")).toHaveValue(/^\d+(\.\d+)?$/);
+      await expect(page.getByLabel("Amount")).toHaveValue(/^\d+(\.\d{1,3})?$/);
     }
     expect(
       await page.evaluate(

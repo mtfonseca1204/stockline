@@ -1,4 +1,5 @@
 "use client";
+import { StockValue } from "./StockValue";
 import { ComingSoonMarkets } from "./ComingSoonMarkets";
 import { networkName, environmentLabel } from "@/lib/chain/config";
 import { StockLogo } from "@/components/brand/StockLogo";
@@ -48,9 +49,7 @@ export function Portfolio() {
             )}
             <div className="text-right">
               <p className="font-semibold">
-                {p.snapshot?.oracleValid
-                  ? `$${display(p.snapshot.collateralValueUsdcRaw / 10000n, 2)}`
-                  : "Unavailable"}
+                <StockValue prominent position={p} amount={p.snapshot?.collateralRaw} />
               </p>
               <p className="text-xs text-[var(--ink-subtle)]">
                 collateral value
@@ -114,9 +113,7 @@ export function StockDetail() {
         </div>
       </div>
       <p className="text-3xl font-semibold">
-        {p?.snapshot?.oracleValid
-          ? `$${display(p.snapshot.collateralValueUsdcRaw / 10000n, 2)}`
-          : "Value unavailable"}
+        <StockValue prominent position={p} amount={p?.snapshot?.collateralRaw} />
       </p>
       <Card className="space-y-4">
         <Row

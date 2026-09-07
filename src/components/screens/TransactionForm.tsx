@@ -1,4 +1,6 @@
 "use client";
+import { formatUnits } from "viem";
+import { StockValue } from "./StockValue";
 import { useState } from "react";
 import { stockBuyLink } from "@/lib/chain/buy-link";
 import { inputLimit, percentageAmount } from "@/lib/chain/input-limits";
@@ -16,7 +18,7 @@ import {
   environmentLabel,
   localEnabled,
 } from "@/lib/chain/config";
-import { display, errorMessage, parseAmount } from "@/lib/chain/amounts";
+import { display, inputDisplay, errorMessage, parseAmount } from "@/lib/chain/amounts";
 import { quoteSale } from "@/lib/chain/service";
 import type { Action, Quote } from "@/lib/chain/types";
 const names = {
@@ -54,6 +56,9 @@ export function TransactionForm({ action }: { action: FormAction }) {
   const s = position?.snapshot;
   const tokenInput = action === "deposit" || action === "withdraw" || sell;
   const decimals = tokenInput ? (market?.collateralDecimals ?? 8) : 6;
+  const visibleDecimals = tokenInput ? 3 : 2;
+  let inputRaw: bigint | null = null;
+  try { inputRaw = parseAmount(amount, decimals); } catch { /* Incomplete input has no value. */ }
   const limit = app.correctNetwork ? inputLimit(action, sell, position) : null;
   const unit = tokenInput ? `${selected} tokens` : "USDC";
   const busy = [
@@ -194,6 +199,8 @@ export function TransactionForm({ action }: { action: FormAction }) {
                   m.collateralDecimals,
                 )}{" "}
                 in wallet
+                <br />
+                <StockValue position={app.positions.find((p) => p.market.marketId === m.marketId)} amount={app.positions.find((p) => p.market.marketId === m.marketId)?.walletCollateral} />
               </span>
             </span>
             {!m.enabled && (
@@ -253,6 +260,7 @@ export function TransactionForm({ action }: { action: FormAction }) {
             <p className="text-xs text-[var(--ink-muted)]">Collateral</p>
             <p className="font-semibold">
               {display(s?.collateralRaw, market?.collateralDecimals)} tokens
+              <br /><StockValue position={position} amount={s?.collateralRaw} />
             </p>
           </div>
           <div>
@@ -291,20 +299,23 @@ export function TransactionForm({ action }: { action: FormAction }) {
               inputMode="decimal"
               placeholder="0"
               className="mt-3 block w-full bg-transparent py-3 text-4xl font-semibold outline-none"
-              value={amount}
+              value={inputDisplay(amount, visibleDecimals)}
               disabled={busy}
               onChange={(e) => {
                 reset();
-                setAmount(e.target.value);
+                if (new RegExp(`^\\d*(?:\\.\\d{0,${visibleDecimals}})?$`).test(e.target.value)) setAmount(e.target.value);
               }}
             />
           </label>
         )}
+        {tokenInput && <StockValue position={position} amount={inputRaw} />}
+        {(amount.split(".")[1]?.length ?? 0) > visibleDecimals && <p className="text-xs text-[var(--ink-muted)]">Display truncated. The selected percentage uses the full token precision.</p>}
         <div className="space-y-3">
           <p className="text-sm text-[var(--ink-muted)]">
             Wallet balance:{" "}
             {display(position?.walletCollateral, market?.collateralDecimals)}{" "}
             {selected} · {display(position?.walletUsdc)} USDC
+            <br /><StockValue position={position} amount={position?.walletCollateral} />
           </p>
           <p className="text-sm text-[var(--ink-muted)]">
             {sell
@@ -313,6 +324,7 @@ export function TransactionForm({ action }: { action: FormAction }) {
             :{" "}
             <span className="font-semibold text-[var(--ink)]">
               {display(limit, decimals)} {unit}
+              {tokenInput && <><br /><StockValue position={position} amount={limit} /></>}
             </span>
           </p>
           <div className="flex gap-2">
@@ -333,7 +345,7 @@ export function TransactionForm({ action }: { action: FormAction }) {
                     s.debtAssetsRaw > 0n &&
                     limit === s.debtAssetsRaw;
                   if (action === "repay" && !sell) setAll(fullRepayment);
-                  setAmount(display(percentageAmount(limit, pct), decimals));
+                  setAmount(formatUnits(percentageAmount(limit, pct), decimals));
                 }}
               >
                 {pct === 100 ? "MAX" : `${pct}%`}
@@ -411,16 +423,18 @@ export function TransactionForm({ action }: { action: FormAction }) {
                   ? "You are repaying"
                   : "You are withdrawing"}{" "}
             <span className="font-semibold text-[var(--ink)]">
-              {all ? "all remaining debt" : `${amount} ${unit}`}
+              {all ? "all remaining debt" : `${display(inputRaw, decimals)} ${unit}`}
             </span>
             {selected ? ` · ${selected}` : ""}
           </p>
+          {tokenInput && <StockValue position={position} amount={inputRaw} />}
           {quote && (
             <div className="space-y-2 text-sm text-[var(--ink-muted)]">
               <p>
                 Tokens sold:{" "}
                 <span className="font-semibold text-[var(--ink)]">
                   {display(quote.request.collateralAssetsToSell, decimals)}
+                  <br /><StockValue position={position} amount={quote.request.collateralAssetsToSell} />
                 </span>
               </p>
               <p>
@@ -439,6 +453,7 @@ export function TransactionForm({ action }: { action: FormAction }) {
                 <p>
                   Remaining collateral:{" "}
                   {display(quote.collateralAfter, decimals)} tokens
+                  <br /><StockValue position={position} amount={quote.collateralAfter} />
                 </p>
                 <p>
                   Health after:{" "}

@@ -11,8 +11,33 @@ export function parseAmount(text: string, decimals: number): bigint {
   if (raw <= 0n) throw new Error("Amount must be positive.");
   return raw;
 }
-export function display(raw: bigint | null | undefined, decimals = 6) {
-  return raw == null ? "Unavailable" : formatUnits(raw, decimals);
+export function display(
+  raw: bigint | null | undefined,
+  decimals = 6,
+  places = decimals === 6 || decimals === 2 ? 2 : 3,
+) {
+  if (raw == null) return "Unavailable";
+  const precision = Math.min(decimals, places);
+  const truncated = raw / 10n ** BigInt(decimals - precision);
+  if (raw > 0n && truncated === 0n) return `<${formatUnits(1n, precision)}`;
+  return formatUnits(truncated, precision);
+}
+export function referenceUsd(
+  raw: bigint | null | undefined,
+  tokenDecimals: number,
+  price?: { answer: bigint; decimals: number } | null,
+) {
+  if (raw == null || !price || price.answer <= 0n) return null;
+  return (
+    (raw * price.answer * 1000000n) /
+    10n ** BigInt(tokenDecimals + price.decimals)
+  );
+}
+export function inputDisplay(text: string, places: number) {
+  const [whole, fraction] = text.split(".");
+  return fraction === undefined
+    ? whole
+    : `${whole}.${fraction.slice(0, places)}`;
 }
 export function marketParams(m: import("./types").MarketConfig) {
   return {

@@ -41,6 +41,7 @@ export type Snapshot = {
   oracleValid: boolean;
 };
 export type MarketPosition = {
+  referencePrice?: { answer: bigint; decimals: number; updatedAt: bigint } | null;
   market: MarketConfig;
   snapshot: Snapshot | null;
   walletCollateral: bigint | null;
