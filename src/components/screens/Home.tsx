@@ -80,20 +80,30 @@ export function Home() {
             Your stocks remain deposited while your loan is active.
           </p>
           <div className="flex gap-2">
-            <Button
-              className="flex-1"
-              disabled={!ready || available === 0n}
-              onClick={() => app.setView("borrow")}
-            >
-              {debt > 0n ? "Borrow more" : "Borrow"}
-            </Button>
-            {debt > 0n && (
+            {debt > 0n ? (
+              <>
+                <Button
+                  className="flex-1"
+                  onClick={() => app.setView("repay")}
+                >
+                  Repay your loan
+                </Button>
+                <Button
+                  className="flex-1"
+                  variant="secondary"
+                  disabled={!ready || available === 0n}
+                  onClick={() => app.setView("borrow")}
+                >
+                  Borrow more
+                </Button>
+              </>
+            ) : (
               <Button
-                className="flex-1"
-                variant="secondary"
-                onClick={() => app.setView("repay")}
+                className="w-full"
+                disabled={!ready || available === 0n}
+                onClick={() => app.setView("borrow")}
               >
-                Repay
+                Borrow
               </Button>
             )}
           </div>

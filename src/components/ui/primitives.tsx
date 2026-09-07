@@ -188,3 +188,72 @@ export function ChoiceRow({
     </motion.button>
   );
 }
+
+export function InlineAlert({ children }: { children: ReactNode }) {
+  return (
+    <p
+      role="alert"
+      className="rounded-[var(--radius-sm)] bg-[var(--danger-soft)] px-3 py-2 text-sm text-[var(--danger)]"
+    >
+      {children}
+    </p>
+  );
+}
+
+export function EnvPill({ children }: { children: ReactNode }) {
+  return (
+    <span className="status-pill inline-flex rounded-full bg-[var(--accent-soft)] px-2.5 py-1 text-[11px] font-medium text-[var(--accent)]">
+      {children}
+    </span>
+  );
+}
+
+export function ToggleRow({
+  checked,
+  disabled,
+  onChange,
+  title,
+  subtitle,
+}: {
+  checked: boolean;
+  disabled?: boolean;
+  onChange: (next: boolean) => void;
+  title: string;
+  subtitle?: string;
+}) {
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={() => onChange(!checked)}
+      className={cn(
+        "flex w-full items-center gap-3 rounded-xl border px-4 py-3 text-left",
+        checked
+          ? "border-[var(--accent)] bg-[var(--accent-soft)]"
+          : "border-[var(--border)] bg-[var(--bg)]",
+        disabled && "opacity-50"
+      )}
+    >
+      <span
+        className={cn(
+          "flex h-5 w-5 shrink-0 items-center justify-center rounded-md border",
+          checked
+            ? "border-[var(--accent)] bg-[var(--accent)] text-white"
+            : "border-[var(--border-strong)] bg-white"
+        )}
+      >
+        {checked ? "✓" : null}
+      </span>
+      <span className="min-w-0">
+        <span className="block text-sm font-semibold text-[var(--ink)]">
+          {title}
+        </span>
+        {subtitle ? (
+          <span className="mt-0.5 block text-xs text-[var(--ink-muted)]">
+            {subtitle}
+          </span>
+        ) : null}
+      </span>
+    </button>
+  );
+}

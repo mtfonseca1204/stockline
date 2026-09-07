@@ -1,10 +1,28 @@
 "use client";
 import { useState } from "react";
-import { Wallet } from "lucide-react";
-import { Sheet, ChoiceRow, Expandable } from "@/components/ui/primitives";
+import {
+  CoinbaseIcon,
+  MetaMaskIcon,
+  WalletConnectIcon,
+} from "@/components/brand/WalletIcons";
+import {
+  Sheet,
+  ChoiceRow,
+  Expandable,
+  InlineAlert,
+} from "@/components/ui/primitives";
 import { Button } from "@/components/ui/Button";
 import { useApp } from "@/context/AppContext";
 import { errorMessage } from "@/lib/chain/amounts";
+
+function walletMark(name: string) {
+  const n = name.toLowerCase();
+  if (n.includes("coinbase") || n.includes("base"))
+    return <CoinbaseIcon size={32} />;
+  if (n.includes("meta")) return <MetaMaskIcon size={32} />;
+  return <WalletConnectIcon size={32} />;
+}
+
 export function WalletModal({
   open,
   onClose,
@@ -24,7 +42,7 @@ export function WalletModal({
           <ChoiceRow
             key={c.uid}
             title={c.name}
-            leading={<Wallet size={32} className="text-[var(--accent)]" />}
+            leading={walletMark(c.name)}
             onClick={async () => {
               try {
                 await connectWallet(c);
@@ -41,10 +59,15 @@ export function WalletModal({
           <p>Your wallet holds your assets and approves each transaction.</p>
         </Expandable>
       </div>
-      {!connectors.length && <p>Install a browser wallet to connect.</p>}
-      {error && <p role="alert">{error}</p>}
+      {!connectors.length && (
+        <p className="text-sm text-[var(--ink-muted)]">
+          Install a browser wallet to connect.
+        </p>
+      )}
+      {error && <InlineAlert>{error}</InlineAlert>}
       <Button
         variant="ghost"
+        className="mt-3 w-full"
         onClick={() => {
           startApp();
           onClose();

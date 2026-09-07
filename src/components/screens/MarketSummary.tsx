@@ -7,21 +7,23 @@ export function MarketSummary() {
   if (!p) return <p>Market unavailable.</p>;
   const s = p.snapshot;
   return (
-    <div className="space-y-2 break-words">
+    <div className="space-y-2 break-words text-sm text-[var(--ink-muted)]">
       <p>
         Borrow APR:{" "}
-        {s ? display(s.borrowAprWad / 100000000000000n, 2) : "Unavailable"}%
+        <span className="font-semibold text-[var(--ink)]">
+          {s ? display(s.borrowAprWad / 100000000000000n, 2) : "Unavailable"}%
+        </span>
       </p>
       <p>
-        Liquidation LTV: {display(BigInt(p.market.lltv) * 100n, 18)}% ·
-        Suggested limit: 50%
+        Suggested borrow limit:{" "}
+        <span className="font-semibold text-[var(--ink)]">50%</span>
       </p>
       <p>
-        Oracle: {s?.oracleValid ? "Valid" : "Unavailable; borrowing blocked"}
+        Price status:{" "}
+        {s?.oracleValid ? "Available" : "Unavailable — borrowing paused"}
       </p>
-      <p>Snapshot block: {s?.snapshotBlock.toString() ?? "Unavailable"}</p>
-      <p>Positions are isolated. Another market cannot protect this loan.</p>
-      {p.error && <p role="alert">{p.error}</p>}
+      <p>Each loan is backed only by its own stock collateral.</p>
+      {p.error && <p className="text-[var(--danger)]">{p.error}</p>}
     </div>
   );
 }

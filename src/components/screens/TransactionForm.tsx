@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { useApp } from "@/context/AppContext";
 import { ComingSoonMarkets } from "./ComingSoonMarkets";
+import { Expandable, EnvPill, InlineAlert, ToggleRow } from "@/components/ui/primitives";
 import {
   deployment,
   networkName,
@@ -19,10 +20,16 @@ import { display, errorMessage, parseAmount } from "@/lib/chain/amounts";
 import { quoteSale } from "@/lib/chain/service";
 import type { Action, Quote } from "@/lib/chain/types";
 const names = {
-  deposit: "Deposit collateral",
-  borrow: "Borrow USDC",
-  repay: "Repay loan",
+  deposit: "Add Collateral",
+  borrow: "How much would you like to borrow?",
+  repay: "Repay your loan",
   withdraw: "Withdraw collateral",
+};
+const subtitles = {
+  deposit: "Select the stocks you want to use as collateral.",
+  borrow: "Access liquidity without selling your stocks.",
+  repay: "Use USDC, or sell part of your collateral to reduce your loan.",
+  withdraw: "Take deposited stocks back to your wallet.",
 };
 type FormAction = keyof typeof names;
 export function TransactionForm({ action }: { action: FormAction }) {
@@ -114,21 +121,39 @@ export function TransactionForm({ action }: { action: FormAction }) {
     return (
       <div className="page animate-fade-up relative text-center">
         <ConfettiBurst active />
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[var(--accent-soft)] text-[var(--accent)]">
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--accent-soft)] text-[var(--accent)]">
           <Check size={28} />
         </div>
-        <h1 className="text-2xl">Transaction confirmed</h1>
-        <Card>
-          <p>Confirmed onchain. Updated balances come from the network.</p>
-          <p className="break-all text-xs">{app.tx.hash}</p>
-        </Card>
+        <h1 className="display text-2xl text-[var(--ink)]">
+          Transaction confirmed
+        </h1>
+        <p className="mt-2 text-sm text-[var(--ink-muted)]">
+          Confirmed onchain. Updated balances come from the network.
+        </p>
+        {app.tx.hash ? (
+          <p className="mt-3 break-all text-xs text-[var(--ink-subtle)]">
+            {app.tx.hash}
+          </p>
+        ) : null}
         <Button
+          size="lg"
+          className="mt-6 w-full"
           onClick={() => {
             reset();
             app.setView("home");
           }}
         >
-          Back to portfolio
+          Back to Home
+        </Button>
+        <Button
+          variant="ghost"
+          className="w-full"
+          onClick={() => {
+            reset();
+            app.setView("portfolio");
+          }}
+        >
+          View Portfolio
         </Button>
       </div>
     );
@@ -142,8 +167,9 @@ export function TransactionForm({ action }: { action: FormAction }) {
       >
         <ChevronLeft size={16} /> Home
       </button>
-      <h1 className="text-2xl text-[var(--ink)]">{names[action]}</h1>
-      <p className="text-xs text-[var(--ink-subtle)]">{environmentLabel}</p>
+      <h1 className="display text-2xl text-[var(--ink)]">{names[action]}</h1>
+      <p className="text-sm text-[var(--ink-muted)]">{subtitles[action]}</p>
+      <EnvPill>{environmentLabel}</EnvPill>
       <div className="surface overflow-hidden">
         {deployment.markets.map((m, i) => (
           <button
@@ -204,14 +230,13 @@ export function TransactionForm({ action }: { action: FormAction }) {
         <Button onClick={app.switchNetwork}>Switch to {networkName}</Button>
       )}
       {!localEnabled && (
-        <Card quiet>
-          <p className="text-sm">
-            Credit is available only during Nasdaq regular sessions, with a
-            fresh session price. Closed sessions also block liquidations.
-            Emergency pause is controlled by the pilot administrator. Calendar
+        <Expandable label="When can I borrow?">
+          <p>
+            Credit is available during Nasdaq regular sessions, with a current
+            session price. Closed sessions also pause liquidations. Calendar
             valid through December 31, 2026.
           </p>
-        </Card>
+        </Expandable>
       )}
       <Card className="space-y-3">
         <div className="flex items-center gap-3">
@@ -236,32 +261,27 @@ export function TransactionForm({ action }: { action: FormAction }) {
           </div>
         </div>
         {action === "repay" && (
-          <>
-            <label className="block">
-              <input
-                type="checkbox"
-                checked={sell}
-                disabled={busy}
-                onChange={(e) => {
-                  reset();
-                  setSell(e.target.checked);
-                }}
-              />{" "}
-              Sell collateral to repay
-            </label>
-            <label className="block">
-              <input
-                type="checkbox"
-                checked={all}
-                disabled={busy}
-                onChange={(e) => {
-                  reset();
-                  setAll(e.target.checked);
-                }}
-              />{" "}
-              Repay all debt
-            </label>
-          </>
+          <div className="space-y-2">
+            <ToggleRow
+              checked={sell}
+              disabled={busy}
+              title="Sell collateral to repay"
+              subtitle="You keep fewer stocks after the sale."
+              onChange={(next) => {
+                reset();
+                setSell(next);
+              }}
+            />
+            <ToggleRow
+              checked={all}
+              disabled={busy}
+              title="Repay all debt"
+              onChange={(next) => {
+                reset();
+                setAll(next);
+              }}
+            />
+          </div>
         )}
         {!(all && !sell) && (
           <label className="block">
@@ -336,17 +356,13 @@ export function TransactionForm({ action }: { action: FormAction }) {
       </Card>
       {sell && (
         <Card className="space-y-3">
-          <p>
-            You will sell tokens and hold fewer stocks. No unrealized gain
-            becomes cash without a sale.
+          <p className="text-sm text-[var(--ink-muted)]">
+            Selling collateral reduces the number of stocks you hold. Ordinary
+            USDC repayment does not need this extra permission.
           </p>
-          <p>
-            Authorization lets this adapter manage your Morpho positions across
-            all markets. Approvals for ordinary USDC repayment do not grant this
-            permission.
-          </p>
-          <p className="break-all text-xs">Adapter: {deployment.adapter}</p>
           <Button
+            variant="soft"
+            className="w-full"
             disabled={busy || !app.correctNetwork}
             onClick={async () => {
               try {
@@ -359,10 +375,11 @@ export function TransactionForm({ action }: { action: FormAction }) {
               }
             }}
           >
-            Authorize adapter
+            Allow sale repayment
           </Button>
           <Button
             variant="ghost"
+            className="w-full"
             disabled={busy || !app.correctNetwork}
             onClick={async () => {
               try {
@@ -375,51 +392,74 @@ export function TransactionForm({ action }: { action: FormAction }) {
               }
             }}
           >
-            Revoke adapter
+            Remove permission
           </Button>
+          <Expandable label="Technical details">
+            <p className="break-all text-xs">Adapter: {deployment.adapter}</p>
+          </Expandable>
         </Card>
       )}
       {reviewing && (
-        <Card className="space-y-2">
-          <h2 className="text-lg">Review transaction</h2>
-          <p>
-            {names[action]} · {selected} ·{" "}
-            {all ? "All debt" : amount + " " + unit}
+        <Card className="space-y-3">
+          <h2 className="text-lg text-[var(--ink)]">Review your transaction</h2>
+          <p className="text-sm text-[var(--ink-muted)]">
+            {action === "deposit"
+              ? "You are depositing"
+              : action === "borrow"
+                ? "You are borrowing"
+                : action === "repay"
+                  ? "You are repaying"
+                  : "You are withdrawing"}{" "}
+            <span className="font-semibold text-[var(--ink)]">
+              {all ? "all remaining debt" : `${amount} ${unit}`}
+            </span>
+            {selected ? ` · ${selected}` : ""}
           </p>
           {quote && (
-            <>
+            <div className="space-y-2 text-sm text-[var(--ink-muted)]">
               <p>
                 Tokens sold:{" "}
-                {display(quote.request.collateralAssetsToSell, decimals)}
+                <span className="font-semibold text-[var(--ink)]">
+                  {display(quote.request.collateralAssetsToSell, decimals)}
+                </span>
               </p>
               <p>
-                Minimum received: {display(quote.request.minUsdcOut)} USDC ·
-                Slippage: 0.5%
-              </p>
-              <p>Debt after: {display(quote.debtAfter)} USDC</p>
-              <p>
-                Remaining collateral: {display(quote.collateralAfter, decimals)}{" "}
-                tokens
+                Minimum received:{" "}
+                <span className="font-semibold text-[var(--ink)]">
+                  {display(quote.request.minUsdcOut)} USDC
+                </span>
               </p>
               <p>
-                Health after:{" "}
-                {quote.healthAfter === null
-                  ? "No debt"
-                  : display(quote.healthAfter, 18)}
+                Loan after:{" "}
+                <span className="font-semibold text-[var(--ink)]">
+                  {display(quote.debtAfter)} USDC
+                </span>
               </p>
-              <p>
-                Quote expires:{" "}
-                {new Date(
-                  Number(quote.request.deadline) * 1000,
-                ).toLocaleTimeString()}
-              </p>
-              <p>
-                Gas estimate:{" "}
-                {quote.gasEstimate?.toString() ??
-                  "Authorize and request a new quote to estimate gas"}{" "}
-                gas units. The wallet displays the fee before signing.
-              </p>
-            </>
+              <Expandable label="More details">
+                <p>
+                  Remaining collateral:{" "}
+                  {display(quote.collateralAfter, decimals)} tokens
+                </p>
+                <p>
+                  Health after:{" "}
+                  {quote.healthAfter === null
+                    ? "No debt"
+                    : display(quote.healthAfter, 18)}
+                </p>
+                <p>
+                  Quote expires:{" "}
+                  {new Date(
+                    Number(quote.request.deadline) * 1000,
+                  ).toLocaleTimeString()}
+                </p>
+                <p>
+                  Gas estimate:{" "}
+                  {quote.gasEstimate?.toString() ??
+                    "Allow sale repayment, then request a new quote"}{" "}
+                  units. Your wallet shows the fee before you sign.
+                </p>
+              </Expandable>
+            </div>
           )}
           <Button
             size="lg"
@@ -446,7 +486,7 @@ export function TransactionForm({ action }: { action: FormAction }) {
       {busy && (
         <p
           role="status"
-          className="surface flex items-center gap-3 p-4 text-sm"
+          className="surface flex items-center gap-3 p-4 text-sm text-[var(--ink)]"
         >
           <Loader2 size={20} className="animate-spin text-[var(--accent)]" />
           {app.tx.phase === "approval-signature" && "Step 1: approve token access in your wallet. This does not deposit or repay yet."}
@@ -457,20 +497,14 @@ export function TransactionForm({ action }: { action: FormAction }) {
           {app.tx.phase === "review" && "Checking the operation and token allowance."}
         </p>
       )}
-      {app.tx.hash && <p className="break-all text-xs">{app.tx.hash}</p>}
-      {(error || app.tx.message) && (
-        <p role="alert">{error || app.tx.message}</p>
+      {app.tx.hash && (
+        <p className="break-all text-xs text-[var(--ink-subtle)]">
+          {app.tx.hash}
+        </p>
       )}
-      <Button
-        variant="ghost"
-        disabled={busy}
-        onClick={() => {
-          reset();
-          app.setView("home");
-        }}
-      >
-        Back
-      </Button>
+      {(error || app.tx.message) && (
+        <InlineAlert>{error || app.tx.message}</InlineAlert>
+      )}
     </div>
   );
 }

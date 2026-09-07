@@ -20,7 +20,7 @@ export function ComingSoonMarkets() {
           >
             <StockLogo ticker={asset.ticker.replace(/c$/, "")} size={40} />
             <span className="flex-1 font-semibold">{asset.ticker}</span>
-            <span className="rounded-full bg-[var(--border)] px-2.5 py-1 text-[11px] text-[var(--ink-muted)]">
+            <span className="shrink-0 rounded-full bg-[var(--border)] px-2.5 py-1 text-[11px] font-medium text-[var(--ink-muted)]">
               Coming soon
             </span>
           </div>
