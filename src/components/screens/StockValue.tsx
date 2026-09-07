@@ -11,7 +11,6 @@ export function StockValue({
 }) {
   const value = referenceUsd(
     amount,
-  prominent = false,
     position?.market.collateralDecimals ?? 8,
     position?.referencePrice,
   );
