@@ -6,17 +6,35 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "contracts:install": "node scripts/install-contracts.mjs",
+    "contracts:test": "cd contracts && forge test",
+    "contracts:deploy:local": "bash scripts/deploy-local.sh",
+    "contracts:export": "node scripts/export-contracts.mjs",
+    "preflight:base": "tsx scripts/preflight-mainnet.mts",
+    "test": "tsx --test src/lib/chain/*.test.ts",
+    "test:e2e": "playwright test",
+    "typecheck": "tsc --noEmit",
+    "dev:local": "NEXT_PUBLIC_CHAIN_ID=31337 next dev --port 3005",
+    "fork:start": "bash scripts/start-base-fork.sh",
+    "test:fork": "tsx scripts/test-base-fork.mts",
+    "test:release": "tsx scripts/check-release.mts",
+    "test:pilot": "tsx scripts/test-pilot-credit.mts",
+    "dev:mainnet": "NEXT_PUBLIC_CHAIN_ID=8453 next dev --port 3005"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.102.8",
     "clsx": "^2.1.1",
     "framer-motion": "^13.2.0",
     "lucide-react": "^1.41.0",
     "next": "16.3.4",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "viem": "^2.56.3",
+    "wagmi": "^3.7.7"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
@@ -24,6 +42,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.3.4",
     "tailwindcss": "^4",
+    "tsx": "^4.23.13",
     "typescript": "^5"
   }
 }

@@ -1,0 +1,49 @@
+{
+  "chainId": 31337,
+  "port": 8546,
+  "upstreamChainId": 8453,
+  "forkBlockNumber": 51007111,
+  "forkBlockHash": "0xe7537de3b8b66e29746ac56bc0314c2252b7681b4152791b6c5dbb2936bfded5",
+  "baseAnvilCommit": "98e7839c65f64aee9627b69a9b98b79afaeb1fae",
+  "morpho": "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb",
+  "usdc": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+  "irm": "0x46415998764C29aB2a25CbeA6254146D50D22687",
+  "registry": "0x3f3E8cf41cdd3b1D118c16471aB0113DfDDd5CaD",
+  "lltv": "770000000000000000",
+  "uiMaxLtvWad": "500000000000000000",
+  "equityMaxAgeSeconds": 3600,
+  "equityMaxAgeNote": "Conservative test assertion only. Production heartbeat/session policy is unresolved; do not deploy from this file.",
+  "markets": [
+    {
+      "ticker": "NVDAc",
+      "token": "0xb20000000000000000000078ee7ce2fE4908108C",
+      "decimals": 8,
+      "feed": "0x04689a41629776563E6822F76f2e57D148d28513",
+      "fee": 3000
+    },
+    {
+      "ticker": "AAPLc",
+      "token": "0xb200000000000000000000C2e324d24d7eEcd1fb",
+      "decimals": 8,
+      "feed": "0x787f13dEa48Db0897CbCDD985de77809D837F988",
+      "fee": 3000
+    },
+    {
+      "ticker": "MSFTc",
+      "token": "0xB200000000000000000000Ab99cFa739E253872B",
+      "decimals": 8,
+      "feed": "0xeB10A6c9aa7E537aEd766C08c35Dae35B321b18c",
+      "fee": 10000
+    },
+    {
+      "ticker": "METAc",
+      "token": "0xb2000000000000000000008bC8786B856E61707C",
+      "decimals": 8,
+      "feed": "0x6526aE6797A76123638b863AeE4dD27Ba4E4b27D",
+      "fee": 3000
+    }
+  ],
+  "usdcFeed": "0x7e860098F58bBFC8648a4311b374B1D669a2bc6B",
+  "sequencerFeed": "0xBCF85224fc0756B9Fa45aA7892530B47e10b6433",
+  "feedDirectory": "https://reference-data-directory.vercel.app/feeds-ethereum-mainnet-base-1.json"
+}

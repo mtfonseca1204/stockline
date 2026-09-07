@@ -1,0 +1,27 @@
+[
+  {
+    "name": "morpho-blue",
+    "repository": "morpho-org/morpho-blue",
+    "commit": "c3f327e49ddae623e2e3162f8468d58fbb79d1b8"
+  },
+  {
+    "name": "forge-std",
+    "repository": "foundry-rs/forge-std",
+    "commit": "886b4f8b63409ef474542de6394d25a9b5908ed3"
+  },
+  {
+    "name": "openzeppelin-contracts",
+    "repository": "OpenZeppelin/openzeppelin-contracts",
+    "commit": "c64a1edb67b6e3f4a15cca8909c9482ad33a02b0"
+  },
+  {
+    "name": "morpho-blue-irm",
+    "repository": "morpho-org/morpho-blue-irm",
+    "commit": "2a2d0e777f30a1ef4b6b05e953139c1cdad2ace5"
+  },
+  {
+    "name": "base-std",
+    "repository": "base/base-std",
+    "commit": "be6d0450890e20fc4a739aeaff5e839f234d12a6"
+  }
+]

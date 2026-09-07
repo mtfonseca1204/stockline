@@ -10,6 +10,7 @@ import { Home } from "@/components/screens/Home";
 import { LandingPage } from "@/components/screens/LandingPage";
 import { LoanDetail } from "@/components/screens/LoanDetail";
 import { Portfolio, StockDetail } from "@/components/screens/Portfolio";
+import { Withdraw } from "@/components/screens/Withdraw";
 import { Repay } from "@/components/screens/Repay";
 import { WalletModal } from "@/components/wallet/WalletModal";
 import { useApp } from "@/context/AppContext";
@@ -38,7 +39,7 @@ export function AppShell() {
   return (
     <div className="flex min-h-screen flex-col bg-[var(--bg)]">
       <TopBar onConnect={openWallet} />
-      <main className="flex-1">
+      <main className="flex-1 pb-28">
         {view === "landing" && (
           <LandingPage
             onConnect={openWallet}
@@ -52,6 +53,7 @@ export function AppShell() {
         {view === "activity" && <Activity />}
         {view === "deposit" && <Deposit />}
         {view === "repay" && <Repay />}
+        {view === "withdraw" && <Withdraw />}
         {view === "loan" && <LoanDetail />}
         {view === "stock" && <StockDetail />}
       </main>

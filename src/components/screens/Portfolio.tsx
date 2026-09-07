@@ -1,155 +1,152 @@
 "use client";
-
+import { ComingSoonMarkets } from "./ComingSoonMarkets";
+import { networkName, environmentLabel } from "@/lib/chain/config";
 import { StockLogo } from "@/components/brand/StockLogo";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { Expandable } from "@/components/ui/primitives";
 import { useApp } from "@/context/AppContext";
-import { formatUsd } from "@/lib/calculations";
-import { ChevronLeft } from "lucide-react";
+import { display } from "@/lib/chain/amounts";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { MarketSummary } from "./MarketSummary";
 
 export function Portfolio() {
-  const { holdings, collateral, openStock, setView } = useApp();
-
-  if (holdings.length === 0) {
-    return (
-      <div className="page animate-fade-up">
-        <h1 className="text-2xl text-[var(--ink)]">Your stocks</h1>
-        <Card className="space-y-3 text-center">
-          <p className="font-semibold text-[var(--ink)]">No collateral yet</p>
-          <p className="text-sm text-[var(--ink-muted)]">
-            Add tokenized stocks to unlock borrowing power.
-          </p>
-          <Button className="w-full" onClick={() => setView("deposit")}>
-            Add Collateral
-          </Button>
-        </Card>
-      </div>
-    );
-  }
-
+  const app = useApp();
   return (
     <div className="page animate-fade-up">
       <div>
         <h1 className="text-2xl text-[var(--ink)]">Your stocks</h1>
-        <p className="mt-2 text-3xl font-semibold text-[var(--ink)]">
-          {formatUsd(collateral)}
+        <p className="mt-2 text-sm text-[var(--ink-muted)]">
+          Your tokenized stocks and collateral positions.
         </p>
-        <p className="text-sm text-[var(--ink-muted)]">collateral value</p>
       </div>
-
+      <NetworkNotice />
       <div className="surface overflow-hidden">
-        {holdings.map((h, i) => {
-          const pct = collateral > 0 ? h.value / collateral : 0;
-          const gain = h.value - h.costBasis;
-          return (
-            <button
-              key={h.ticker}
-              type="button"
-              onClick={() => openStock(h.ticker)}
-              className={`interactive-row flex w-full items-center gap-3 px-4 py-3.5 text-left ${
-                i > 0 ? "border-t border-[var(--border)]" : ""
-              }`}
-            >
-              <StockLogo ticker={h.ticker} size={40} />
-              <div className="min-w-0 flex-1">
-                <p className="font-semibold text-[var(--ink)]">{h.ticker}</p>
-                <p className="truncate text-xs text-[var(--ink-muted)]">{h.name}</p>
-              </div>
-              <div className="text-right">
-                <p className="font-semibold text-[var(--ink)]">
-                  {formatUsd(h.value)}
-                </p>
-                <p
-                  className={`text-xs ${
-                    gain > 0
-                      ? "text-[var(--success)]"
-                      : "text-[var(--ink-subtle)]"
-                  }`}
-                >
-                  {gain > 0 ? `+${formatUsd(gain)}` : `${(pct * 100).toFixed(0)}%`}
-                </p>
-              </div>
-            </button>
-          );
-        })}
+        {app.positions.map((p, i) => (
+          <button
+            key={p.market.marketId}
+            type="button"
+            disabled={!p.market.enabled}
+            onClick={() => app.openStock(p.market.ticker)}
+            className={`interactive-row flex w-full items-center gap-3 px-4 py-3.5 text-left ${i > 0 ? "border-t border-[var(--border)]" : ""}`}
+          >
+            <StockLogo ticker={p.market.ticker.replace(/c$/, "")} size={40} />
+            <div className="min-w-0 flex-1">
+              <p className="font-semibold">{p.market.ticker}</p>
+              <p className="text-xs text-[var(--ink-muted)]">
+                {display(
+                  p.snapshot?.collateralRaw,
+                  p.market.collateralDecimals,
+                )}{" "}
+                deposited
+              </p>
+            </div>
+            {!p.market.enabled && (
+              <span className="shrink-0 rounded-full bg-[var(--border)] px-2.5 py-1 text-[11px] font-medium text-[var(--ink-muted)]">
+                Coming soon
+              </span>
+            )}
+            <div className="text-right">
+              <p className="font-semibold">
+                {p.snapshot?.oracleValid
+                  ? `$${display(p.snapshot.collateralValueUsdcRaw / 10000n, 2)}`
+                  : "Unavailable"}
+              </p>
+              <p className="text-xs text-[var(--ink-subtle)]">
+                collateral value
+              </p>
+            </div>
+            <ChevronRight size={16} className="text-[var(--ink-subtle)]" />
+          </button>
+        ))}
+        <ComingSoonMarkets />
       </div>
-
-      <Button variant="soft" className="w-full" onClick={() => setView("deposit")}>
+      <Button
+        variant="soft"
+        className="w-full"
+        onClick={() => app.setView("deposit")}
+      >
         Add Collateral
       </Button>
     </div>
   );
 }
-
+export function NetworkNotice() {
+  const app = useApp();
+  return (
+    <>
+      {!app.connected && (
+        <Card quiet>Connect your wallet to see your stocks.</Card>
+      )}
+      {app.connected && !app.correctNetwork && (
+        <Button onClick={app.switchNetwork}>Switch to {networkName}</Button>
+      )}
+      {app.loading && (
+        <p role="status" className="text-sm text-[var(--ink-muted)]">
+          Reading positions…
+        </p>
+      )}
+      {app.error && (
+        <p role="alert">Unable to read your positions. Please refresh.</p>
+      )}
+      <p className="text-xs text-[var(--ink-subtle)]">{environmentLabel}</p>
+    </>
+  );
+}
 export function StockDetail() {
-  const { holdings, selectedTicker, collateral, setView } = useApp();
-  const h = holdings.find((x) => x.ticker === selectedTicker);
-
-  if (!h) {
-    return (
-      <div className="page">
-        <Button variant="ghost" onClick={() => setView("portfolio")}>
-          Back
-        </Button>
-        <p className="text-sm text-[var(--ink-muted)]">Stock not found.</p>
-      </div>
-    );
-  }
-
-  const contrib = collateral > 0 ? h.value / collateral : 0;
-  const gain = h.value - h.costBasis;
-
+  const app = useApp();
+  const p = app.positions.find((p) => p.market.ticker === app.selectedTicker);
   return (
     <div className="page animate-fade-up">
       <button
-        type="button"
-        onClick={() => setView("portfolio")}
         className="inline-flex items-center gap-1 text-sm text-[var(--ink-muted)]"
+        onClick={() => app.setView("portfolio")}
       >
         <ChevronLeft size={16} /> Portfolio
       </button>
-
       <div className="flex items-center gap-3">
-        <StockLogo ticker={h.ticker} size={48} />
+        <StockLogo
+          ticker={(app.selectedTicker ?? "").replace(/c$/, "")}
+          size={48}
+        />
         <div>
-          <h1 className="text-2xl text-[var(--ink)]">{h.ticker}</h1>
-          <p className="text-sm text-[var(--ink-muted)]">{h.name}</p>
+          <h1 className="text-2xl">{app.selectedTicker}</h1>
+          <p className="text-sm text-[var(--ink-muted)]">Tokenized stock</p>
         </div>
       </div>
-
-      <div>
-        <p className="text-3xl font-semibold text-[var(--ink)]">
-          {formatUsd(h.value)}
-        </p>
-        {gain !== 0 ? (
-          <p
-            className={`mt-1 text-sm font-medium ${
-              gain > 0 ? "text-[var(--success)]" : "text-[var(--danger)]"
-            }`}
-          >
-            {gain > 0 ? "+" : ""}
-            {formatUsd(gain)} since deposit
-          </p>
-        ) : null}
-      </div>
-
+      <p className="text-3xl font-semibold">
+        {p?.snapshot?.oracleValid
+          ? `$${display(p.snapshot.collateralValueUsdcRaw / 10000n, 2)}`
+          : "Value unavailable"}
+      </p>
       <Card className="space-y-4">
         <Row
-          label="Portfolio contribution"
-          value={`${(contrib * 100).toFixed(0)}%`}
+          label="Deposited"
+          value={`${display(p?.snapshot?.collateralRaw, p?.market.collateralDecimals)} tokens`}
         />
-        <Row label="Used as collateral" value={formatUsd(h.value)} />
-        <Row label="Deposited at" value={formatUsd(h.costBasis)} />
+        <Row
+          label="Borrowed"
+          value={`${display(p?.snapshot?.debtAssetsRaw)} USDC`}
+        />
+        <Row label="Deposit reference / PnL" value="Unavailable" />
       </Card>
+      <div className="grid grid-cols-2 gap-2">
+        <Button onClick={() => app.setView("deposit")}>Add Collateral</Button>
+        <Button variant="secondary" onClick={() => app.setView("withdraw")}>
+          Withdraw
+        </Button>
+      </div>
+      <Expandable label="Market details">
+        <MarketSummary />
+      </Expandable>
     </div>
   );
 }
-
-function Row({ label, value }: { label: string; value: string }) {
+export function Row({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between gap-3 text-sm">
+    <div className="flex items-start justify-between gap-3 text-sm">
       <span className="text-[var(--ink-muted)]">{label}</span>
-      <span className="font-semibold text-[var(--ink)]">{value}</span>
+      <span className="text-right font-semibold break-words">{value}</span>
     </div>
   );
 }

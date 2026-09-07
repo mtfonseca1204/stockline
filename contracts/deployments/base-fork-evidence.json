@@ -1,0 +1,306 @@
+{
+  "oracleDependencies": {
+    "USDC/USD": {
+      "address": "0x7e860098F58bBFC8648a4311b374B1D669a2bc6B",
+      "round": [
+        "55340232221128654867",
+        "99988612",
+        "1788784802",
+        "1788784815",
+        "55340232221128654867"
+      ]
+    },
+    "Sequencer": {
+      "address": "0xBCF85224fc0756B9Fa45aA7892530B47e10b6433",
+      "round": [
+        "18446744073709551636",
+        "0",
+        "1782491507",
+        "1788800625",
+        "18446744073709551636"
+      ]
+    }
+  },
+  "coreParameters": {
+    "morpho": "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb",
+    "irm": "0x46415998764C29aB2a25CbeA6254146D50D22687",
+    "lltv": "770000000000000000"
+  },
+  "artifactHash": "0x4bf8d8b3cfb00909fdaf96fd6cbfcb6e317a0143f200dc77ce64737df5907d9a",
+  "testScope": "Real funding, token transfers and Uniswap settlement. Full Morpho credit/adapter liquidation gate remains blocked.",
+  "creditIntegrationPassed": false,
+  "creditBlockers": [
+    "Verified session source missing; no mock guard is allowed",
+    "Production oracle heartbeat/recovery policy unresolved"
+  ],
+  "schemaVersion": 1,
+  "mode": "base-mainnet-fork",
+  "productionReady": false,
+  "forkBlock": "51007111",
+  "forkHash": "0xe7537de3b8b66e29746ac56bc0314c2252b7681b4152791b6c5dbb2936bfded5",
+  "forkTimestamp": "1788803569",
+  "backend": "base",
+  "fixtures": [
+    "Anvil account ETH only; WETH deposited normally; USDC and stocks bought in existing Uniswap pools"
+  ],
+  "forbiddenMutations": [
+    "no setCode",
+    "no setStorageAt",
+    "no token mint",
+    "no impersonation",
+    "no feed or policy overrides"
+  ],
+  "transactions": [
+    {
+      "step": "wrap local ETH",
+      "hash": "0xa0e08ad38bcd40cd83be6896f35ad8f1f91692b853f2617ad98abf306904d3e2",
+      "block": "51007172"
+    },
+    {
+      "step": "buy real USDC approve",
+      "hash": "0x96a632e187f5fb2a11479dcd9c19866b3c10047e7d840d4b37f4c51574052ca8",
+      "block": "51007173"
+    },
+    {
+      "step": "buy real USDC",
+      "hash": "0x5505b6db971cfd33b0ea080d1ceb9139efef5986e5411a6957332dc427e41d47",
+      "block": "51007174"
+    },
+    {
+      "step": "deploy StocklineV3Swap",
+      "hash": "0xe9c637052c7b1eb718c54e743cb928ebb6e44e33c7b1de24d9e12656174d886a",
+      "block": "51007175"
+    },
+    {
+      "step": "buy NVDAc approve",
+      "hash": "0xf7a93bffc2ee55c2bf692b299d21c2bd1ebd3ce2de0343d868d2cdcc72099cde",
+      "block": "51007176"
+    },
+    {
+      "step": "buy NVDAc",
+      "hash": "0x07fe462b39457068eae47b720161ba874e64b680ddc74bc4ff7848bf2fd4988c",
+      "block": "51007177"
+    },
+    {
+      "step": "transfer NVDAc",
+      "hash": "0xd873b95ac9d69b06b3327fa669ea81656929de1fc797f5d1f47534915cae858f",
+      "block": "51007178"
+    },
+    {
+      "step": "return NVDAc",
+      "hash": "0xc8dbcd4657dcf566422fc341da9b7797955fd42e43077de393cc3489f44273f0",
+      "block": "51007179"
+    },
+    {
+      "step": "approve sale NVDAc",
+      "hash": "0x0591bd215337bb83185a3968ff75efdebf40aff668563d279965b1e845523b3f",
+      "block": "51007180"
+    },
+    {
+      "step": "sell NVDAc through StocklineV3Swap",
+      "hash": "0x7306096afa7788c89af724c25d225c3d3ff051999ad2f227ecd50b402e710d0c",
+      "block": "51007182"
+    },
+    {
+      "step": "buy AAPLc approve",
+      "hash": "0xb8c2715b27ef6db1f88ec8f2172b03d51c1f420f768ef00f854dded3c0eaa403",
+      "block": "51007183"
+    },
+    {
+      "step": "buy AAPLc",
+      "hash": "0x2afcff3e6de6c96310a5d60a22033f3fb7f4850ddcc50f26c1cbfe990b49b70c",
+      "block": "51007184"
+    },
+    {
+      "step": "transfer AAPLc",
+      "hash": "0xa375c8b1c11162cc98da6236ba790d1c8066a74142cde04c0da152a6bf5875bb",
+      "block": "51007185"
+    },
+    {
+      "step": "return AAPLc",
+      "hash": "0xcea7cba3a5c6d7a83fdf7640012c04dd04a51b5dea93e816e538b57b43afbeae",
+      "block": "51007186"
+    },
+    {
+      "step": "approve sale AAPLc",
+      "hash": "0xd863875604a2779a0a315d857e1b894f132826b3d8d2df68ce4ef480f06350ac",
+      "block": "51007187"
+    },
+    {
+      "step": "sell AAPLc through StocklineV3Swap",
+      "hash": "0x07b46a3d4b424acba1d17d9833254435a1cb42e529a12d1e7784f190af2b4901",
+      "block": "51007189"
+    },
+    {
+      "step": "buy MSFTc approve",
+      "hash": "0x8d1d8ee2b013858e9cf709b379bd5822be6b94ae238f85f0a4101bed895528b3",
+      "block": "51007190"
+    },
+    {
+      "step": "buy MSFTc",
+      "hash": "0x055c5d8b487a1a2a2963de1697bbbfb380cd6f9a368c617cdda966835d8c6c71",
+      "block": "51007191"
+    },
+    {
+      "step": "transfer MSFTc",
+      "hash": "0x49359892aecf0f8fa82916dac5a7ca147a7c5d0addaf6395cac72d7ed5dc46a6",
+      "block": "51007192"
+    },
+    {
+      "step": "return MSFTc",
+      "hash": "0x94709e05f5c368b88e194cd1ddcefef05db5e178a6608d4f992665605ebf71dd",
+      "block": "51007193"
+    },
+    {
+      "step": "approve sale MSFTc",
+      "hash": "0xbbd6963f63630a624e25fa5dcec9d6f5c537b5e4700f3aec5c261d833e6ea9a1",
+      "block": "51007194"
+    },
+    {
+      "step": "sell MSFTc through StocklineV3Swap",
+      "hash": "0x4b3cca12c8733b849e204d4cfe388879898907516d5a43e0762aa77e3071c827",
+      "block": "51007196"
+    },
+    {
+      "step": "buy METAc approve",
+      "hash": "0x2a52e212104c8fa5589b214c7d1bf6310c41af690a069ec0b104fe584bf2155b",
+      "block": "51007197"
+    },
+    {
+      "step": "buy METAc",
+      "hash": "0xc8990e1ba948c0a436047881e7a6cce5104a7337a956f2c3e51f04134c7bc0fd",
+      "block": "51007198"
+    },
+    {
+      "step": "transfer METAc",
+      "hash": "0xf8604e23acffea223571172068abc15b63d6897f946308a423a5a6f2b993efc0",
+      "block": "51007199"
+    },
+    {
+      "step": "return METAc",
+      "hash": "0x41041409a415001a6ea52671ba9131d3e2240150a801f649f3d2ecc90f62e390",
+      "block": "51007200"
+    },
+    {
+      "step": "approve sale METAc",
+      "hash": "0xde0f5da547494b2a0ff03e74867ed64aa4091d31d16cf2656a78ec4817271c71",
+      "block": "51007201"
+    },
+    {
+      "step": "sell METAc through StocklineV3Swap",
+      "hash": "0x27ebf6345cec6906b2728fa25af49d1dbbc0da1f261384c1cf17d1665e480a86",
+      "block": "51007203"
+    }
+  ],
+  "markets": [
+    {
+      "ticker": "NVDAc",
+      "token": "0xb20000000000000000000078ee7ce2fE4908108C",
+      "feed": "0x04689a41629776563E6822F76f2e57D148d28513",
+      "fee": 3000,
+      "swap": "0x7bab9e9ecc0a8121eac8b1887462c33362008663",
+      "complete": true,
+      "feedRound": [
+        "36893488147419103545",
+        "22995730000",
+        "1788545041",
+        "1788545055",
+        "36893488147419103545"
+      ],
+      "feedAgeSeconds": "259132",
+      "registry": {
+        "multiplier": "1000000000000000000",
+        "paused": false
+      },
+      "creditBlocked": true,
+      "creditBlockReason": "Session source not configured; no synthetic session or feed update permitted",
+      "acquired": "42786495",
+      "slippageRevertedHash": "0xad6cc65ecb9c06b1be80f7676b3283512fd5921f43fc6ef3afe3082950eb640c",
+      "slippageRollback": true,
+      "receivedUsdc": "99401276",
+      "minimumUsdc": "98904269"
+    },
+    {
+      "ticker": "AAPLc",
+      "token": "0xb200000000000000000000C2e324d24d7eEcd1fb",
+      "feed": "0x787f13dEa48Db0897CbCDD985de77809D837F988",
+      "fee": 3000,
+      "swap": "0x7bab9e9ecc0a8121eac8b1887462c33362008663",
+      "complete": true,
+      "feedRound": [
+        "36893488147419103373",
+        "32008000000",
+        "1788551901",
+        "1788551915",
+        "36893488147419103373"
+      ],
+      "feedAgeSeconds": "252277",
+      "registry": {
+        "multiplier": "1000000000000000000",
+        "paused": false
+      },
+      "creditBlocked": true,
+      "creditBlockReason": "Session source not configured; no synthetic session or feed update permitted",
+      "acquired": "31034315",
+      "slippageRevertedHash": "0x505acac786a5f2402df534f586c1ccf76cec51c1b7d3a9cba21ab4ac05d6f365",
+      "slippageRollback": true,
+      "receivedUsdc": "99401182",
+      "minimumUsdc": "98904176"
+    },
+    {
+      "ticker": "MSFTc",
+      "token": "0xB200000000000000000000Ab99cFa739E253872B",
+      "feed": "0xeB10A6c9aa7E537aEd766C08c35Dae35B321b18c",
+      "fee": 10000,
+      "swap": "0x7bab9e9ecc0a8121eac8b1887462c33362008663",
+      "complete": true,
+      "feedRound": [
+        "36893488147419103400",
+        "49977800000",
+        "1788536292",
+        "1788536305",
+        "36893488147419103400"
+      ],
+      "feedAgeSeconds": "267891",
+      "registry": {
+        "multiplier": "1000000000000000000",
+        "paused": false
+      },
+      "creditBlocked": true,
+      "creditBlockReason": "Session source not configured; no synthetic session or feed update permitted",
+      "acquired": "19489296",
+      "slippageRevertedHash": "0xee2ccd108a86d931fbe52f1b46fc6c302b0c7be663b74895cfe552659331c2c7",
+      "slippageRollback": true,
+      "receivedUsdc": "98010690",
+      "minimumUsdc": "97520636"
+    },
+    {
+      "ticker": "METAc",
+      "token": "0xb2000000000000000000008bC8786B856E61707C",
+      "feed": "0x6526aE6797A76123638b863AeE4dD27Ba4E4b27D",
+      "fee": 3000,
+      "swap": "0x7bab9e9ecc0a8121eac8b1887462c33362008663",
+      "complete": true,
+      "feedRound": [
+        "36893488147419103532",
+        "61523000000",
+        "1788548993",
+        "1788549007",
+        "36893488147419103532"
+      ],
+      "feedAgeSeconds": "255194",
+      "registry": {
+        "multiplier": "1000000000000000000",
+        "paused": false
+      },
+      "creditBlocked": true,
+      "creditBlockReason": "Session source not configured; no synthetic session or feed update permitted",
+      "acquired": "16179144",
+      "slippageRevertedHash": "0xbe1792af2cd30d8377ad07846d559a33b8708667eb7c77daac04386fa69dd159",
+      "slippageRollback": true,
+      "receivedUsdc": "99401788",
+      "minimumUsdc": "98904779"
+    }
+  ],
+  "errors": []
+}

@@ -1,0 +1,95 @@
+{
+  "chainId": 8453,
+  "blockNumber": "51007282",
+  "source": "https://developers.uniswap.org/docs/protocols/v3/deployments/v3-base-deployments",
+  "scope": "Uniswap V3 direct USDC pairs, fees 100/500/3000/10000. Other venues and multihop are not covered.",
+  "factory": "0x33128a8fC17869897dcE68Ed026d694621f6FDfD",
+  "quoter": "0x3d4e44Eb1374240CE5F1B871ab261CD16335B76a",
+  "results": [
+    {
+      "ticker": "NVDAc",
+      "routes": [
+        {
+          "fee": 500,
+          "error": "The contract function \"quoteExactInputSingle\" reverted with the following reason:"
+        },
+        {
+          "pool": "0x60661b315553EB81872deEA9a66d567Cf0CCd33B",
+          "fee": 3000,
+          "liquidity": "49263989194",
+          "amountIn": "100000000",
+          "amountOut": "230828847",
+          "gasEstimate": "110267",
+          "transferValidated": false
+        },
+        {
+          "fee": 10000,
+          "error": "The contract function \"quoteExactInputSingle\" reverted with the following reason:"
+        }
+      ],
+      "enabled": false
+    },
+    {
+      "ticker": "AAPLc",
+      "routes": [
+        {
+          "fee": 100,
+          "error": "The contract function \"quoteExactInputSingle\" reverted with the following reason:"
+        },
+        {
+          "pool": "0x97F35d1E92795327614BE000cd18cba1Be2c1931",
+          "fee": 3000,
+          "liquidity": "58546623570",
+          "amountIn": "100000000",
+          "amountOut": "319075123",
+          "gasEstimate": "110375",
+          "transferValidated": false
+        },
+        {
+          "pool": "0x7cB5eB63cef446168EB29f892e5759789B29bFD4",
+          "fee": 10000,
+          "liquidity": "18945178721",
+          "amountIn": "100000000",
+          "amountOut": "313910108",
+          "gasEstimate": "79174",
+          "transferValidated": false
+        }
+      ],
+      "enabled": false
+    },
+    {
+      "ticker": "MSFTc",
+      "routes": [
+        {
+          "pool": "0xD73cBeCC0F62C7C1704332ED119514d6d84DC607",
+          "fee": 10000,
+          "liquidity": "61942402157",
+          "amountIn": "100000000",
+          "amountOut": "500717658",
+          "gasEstimate": "79252",
+          "transferValidated": false
+        }
+      ],
+      "enabled": false
+    },
+    {
+      "ticker": "METAc",
+      "routes": [
+        {
+          "fee": 100,
+          "error": "The contract function \"quoteExactInputSingle\" reverted with the following reason:"
+        },
+        {
+          "pool": "0x583919ec1975a1238C50e1940911894ee6912476",
+          "fee": 3000,
+          "liquidity": "11796347884",
+          "amountIn": "100000000",
+          "amountOut": "551446230",
+          "gasEstimate": "258603",
+          "transferValidated": false
+        }
+      ],
+      "enabled": false
+    }
+  ]
+}

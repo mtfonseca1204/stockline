@@ -22,7 +22,7 @@ export function LandingPage({
           Access liquidity.
         </h1>
         <p className="mt-4 max-w-sm text-[15px] leading-relaxed text-[var(--ink-muted)]">
-          Your assets stay invested while helping repay your loan.
+          Borrow against your tokens. Repay with USDC or sell part of your collateral.
         </p>
       </div>
 
@@ -35,7 +35,7 @@ export function LandingPage({
         <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[calc(var(--radius)-4px)] bg-white">
           <Image
             src="/landing/product-loop.png"
-            alt="Stocks become cash without selling, then assets help repay your loan"
+            alt="Borrow USDC against stocks, then repay with USDC or a partial sale"
             fill
             sizes="(max-width: 448px) 100vw, 448px"
             className="object-contain object-center"

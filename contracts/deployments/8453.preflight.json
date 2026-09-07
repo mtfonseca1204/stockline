@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 1,
+  "chainId": 8453,
+  "blockNumber": "51007111",
+  "blockHash": "0xe7537de3b8b66e29746ac56bc0314c2252b7681b4152791b6c5dbb2936bfded5",
+  "timestamp": "1788803569",
+  "productionReady": false,
+  "morpho": "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb",
+  "usdc": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+  "irm": "0x46415998764C29aB2a25CbeA6254146D50D22687",
+  "registry": "0x3f3E8cf41cdd3b1D118c16471aB0113DfDDd5CaD",
+  "coreCodePresent": true,
+  "irmEnabled": true,
+  "lltv80Enabled": false,
+  "markets": [
+    {
+      "ticker": "NVDAc",
+      "token": "0xb20000000000000000000078ee7ce2fE4908108C",
+      "feed": "0x04689a41629776563E6822F76f2e57D148d28513",
+      "symbol": "NVDAc",
+      "decimals": 8,
+      "code": "0xef",
+      "feedDecimals": 8,
+      "round": [
+        "36893488147419103545",
+        "22995730000",
+        "1788545041",
+        "1788545055",
+        "36893488147419103545"
+      ],
+      "enabled": false,
+      "checks": {
+        "metadata": true,
+        "positivePrice": true,
+        "nonFutureTimestamp": true
+      },
+      "blockers": [
+        "Issuer transfer policies and custody paths not validated",
+        "Session source and oracle recovery policy not verified",
+        "Executable swap and liquidation route not verified",
+        "No production market or Stockline deployment",
+        "USDC seed amount and lender address pending"
+      ]
+    },
+    {
+      "ticker": "AAPLc",
+      "token": "0xb200000000000000000000C2e324d24d7eEcd1fb",
+      "feed": "0x787f13dEa48Db0897CbCDD985de77809D837F988",
+      "symbol": "AAPLc",
+      "decimals": 8,
+      "code": "0xef",
+      "feedDecimals": 8,
+      "round": [
+        "36893488147419103373",
+        "32008000000",
+        "1788551901",
+        "1788551915",
+        "36893488147419103373"
+      ],
+      "enabled": false,
+      "checks": {
+        "metadata": true,
+        "positivePrice": true,
+        "nonFutureTimestamp": true
+      },
+      "blockers": [
+        "Issuer transfer policies and custody paths not validated",
+        "Session source and oracle recovery policy not verified",
+        "Executable swap and liquidation route not verified",
+        "No production market or Stockline deployment",
+        "USDC seed amount and lender address pending"
+      ]
+    },
+    {
+      "ticker": "MSFTc",
+      "token": "0xB200000000000000000000Ab99cFa739E253872B",
+      "feed": "0xeB10A6c9aa7E537aEd766C08c35Dae35B321b18c",
+      "symbol": "MSFTc",
+      "decimals": 8,
+      "code": "0xef",
+      "feedDecimals": 8,
+      "round": [
+        "36893488147419103400",
+        "49977800000",
+        "1788536292",
+        "1788536305",
+        "36893488147419103400"
+      ],
+      "enabled": false,
+      "checks": {
+        "metadata": true,
+        "positivePrice": true,
+        "nonFutureTimestamp": true
+      },
+      "blockers": [
+        "Issuer transfer policies and custody paths not validated",
+        "Session source and oracle recovery policy not verified",
+        "Executable swap and liquidation route not verified",
+        "No production market or Stockline deployment",
+        "USDC seed amount and lender address pending"
+      ]
+    },
+    {
+      "ticker": "METAc",
+      "token": "0xb2000000000000000000008bC8786B856E61707C",
+      "feed": "0x6526aE6797A76123638b863AeE4dD27Ba4E4b27D",
+      "symbol": "METAc",
+      "decimals": 8,
+      "code": "0xef",
+      "feedDecimals": 8,
+      "round": [
+        "36893488147419103532",
+        "61523000000",
+        "1788548993",
+        "1788549007",
+        "36893488147419103532"
+      ],
+      "enabled": false,
+      "checks": {
+        "metadata": true,
+        "positivePrice": true,
+        "nonFutureTimestamp": true
+      },
+      "blockers": [
+        "Issuer transfer policies and custody paths not validated",
+        "Session source and oracle recovery policy not verified",
+        "Executable swap and liquidation route not verified",
+        "No production market or Stockline deployment",
+        "USDC seed amount and lender address pending"
+      ]
+    }
+  ]
+}

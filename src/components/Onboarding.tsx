@@ -5,42 +5,25 @@ import { Button } from "@/components/ui/Button";
 import { useApp } from "@/context/AppContext";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 
 const KEY = "kora-onboarded-v3";
 
+const subscribe = (callback: () => void) => {
+  window.addEventListener("storage", callback);
+  return () => window.removeEventListener("storage", callback);
+};
+const readOnboarding = () => {
+  try { return localStorage.getItem(KEY) !== "1"; } catch { return true; }
+};
 export function useNeedsOnboarding() {
-  const [ready, setReady] = useState(false);
-  const [needs, setNeeds] = useState(false);
-
-  useEffect(() => {
-    try {
-      setNeeds(localStorage.getItem(KEY) !== "1");
-    } catch {
-      setNeeds(true);
-    }
-    setReady(true);
-  }, []);
-
-  const clear = () => {
-    try {
-      localStorage.setItem(KEY, "1");
-    } catch {
-      /* ignore */
-    }
-    setNeeds(false);
+  const needs = useSyncExternalStore(subscribe, readOnboarding, () => true);
+  const ready = useSyncExternalStore(subscribe, () => true, () => false);
+  const update = (done: boolean) => {
+    try { if (done) localStorage.setItem(KEY, "1"); else localStorage.removeItem(KEY); } catch { /* Storage may be disabled. */ }
+    window.dispatchEvent(new Event("storage"));
   };
-
-  const reset = () => {
-    try {
-      localStorage.removeItem(KEY);
-    } catch {
-      /* ignore */
-    }
-    setNeeds(true);
-  };
-
-  return { ready, needs, clear, reset };
+  return { ready, needs, clear: () => update(true), reset: () => update(false) };
 }
 
 const steps = [
@@ -69,7 +52,7 @@ const steps = [
   {
     id: 3,
     headline: "Your assets can help repay the loan",
-    body: "When your productive assets generate money, Kora can automatically direct it toward your outstanding balance.",
+    body: "Repay with USDC, or approve a partial sale of collateral. Selling reduces the number of tokens you hold.",
     image: "/onboarding/repay-blue.png",
     alt: "People watching their loan shrink as assets generate value",
   },
@@ -78,7 +61,7 @@ const steps = [
     headline: "You're always in control",
     body: "You choose how much to borrow, how much goes toward repayment, and when to repay.",
     image: "/onboarding/control-blue.png",
-    alt: "Person adjusting borrow, auto-repay, and withdraw controls",
+    alt: "Person reviewing borrowing, repayment, and withdrawal",
   },
 ] as const;
 

@@ -1,17 +1,10 @@
 "use client";
-
-import { WalletIcon } from "@/components/brand/WalletIcons";
+import { useState } from "react";
+import { Wallet } from "lucide-react";
+import { Sheet, ChoiceRow, Expandable } from "@/components/ui/primitives";
 import { Button } from "@/components/ui/Button";
-import { ChoiceRow, Expandable, Sheet } from "@/components/ui/primitives";
 import { useApp } from "@/context/AppContext";
-import type { WalletProvider } from "@/lib/types";
-
-const OPTIONS: { id: WalletProvider; label: string; hint: string }[] = [
-  { id: "coinbase", label: "Coinbase Wallet", hint: "Recommended on Base" },
-  { id: "metamask", label: "MetaMask", hint: "Browser extension" },
-  { id: "walletconnect", label: "WalletConnect", hint: "Scan to connect" },
-];
-
+import { errorMessage } from "@/lib/chain/amounts";
 export function WalletModal({
   open,
   onClose,
@@ -19,48 +12,45 @@ export function WalletModal({
   open: boolean;
   onClose: () => void;
 }) {
-  const { connectWallet, startApp } = useApp();
-
-  const pick = (id: WalletProvider) => {
-    connectWallet(id);
-    onClose();
-  };
-
+  const { connectors, connectWallet, startApp } = useApp();
+  const [error, setError] = useState("");
   return (
     <Sheet open={open} onClose={onClose} title="Connect your wallet">
       <p className="mb-5 text-sm text-[var(--ink-muted)]">
-        Connect a wallet on Base to get started.
+        Your wallet signs transactions. Kora never asks for your private key.
       </p>
       <div className="space-y-2">
-        {OPTIONS.map((opt) => (
+        {connectors.map((c) => (
           <ChoiceRow
-            key={opt.id}
-            title={opt.label}
-            right={opt.hint}
-            leading={<WalletIcon id={opt.id} size={32} />}
-            onClick={() => pick(opt.id)}
+            key={c.uid}
+            title={c.name}
+            leading={<Wallet size={32} className="text-[var(--accent)]" />}
+            onClick={async () => {
+              try {
+                await connectWallet(c);
+                onClose();
+              } catch (e) {
+                setError(errorMessage(e));
+              }
+            }}
           />
         ))}
       </div>
-
-      <div className="mt-5">
+      <div className="my-5">
         <Expandable label="Why do I need a wallet?">
-          <p>
-            Your wallet is how Kora interacts with your onchain assets. Kora
-            never needs your private keys.
-          </p>
+          <p>Your wallet holds your assets and approves each transaction.</p>
         </Expandable>
       </div>
-
+      {!connectors.length && <p>Install a browser wallet to connect.</p>}
+      {error && <p role="alert">{error}</p>}
       <Button
         variant="ghost"
-        className="mt-4 w-full"
         onClick={() => {
           startApp();
           onClose();
         }}
       >
-        Continue without wallet
+        Browse without a wallet
       </Button>
     </Sheet>
   );

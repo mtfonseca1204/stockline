@@ -39,3 +39,14 @@ next-env.d.ts
 
 .vercel
 .env*
+
+# Foundry dependencies are installed from contracts/dependencies.lock.json.
+contracts/lib/
+contracts/cache/
+contracts/out/
+contracts/broadcast/
+playwright-report/
+test-results/
+
+# Local native Base runtime, never committed.
+.tools/

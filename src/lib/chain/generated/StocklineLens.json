@@ -1,0 +1,125 @@
+[
+  {
+    "type": "function",
+    "name": "snapshot",
+    "inputs": [
+      {
+        "name": "morpho",
+        "type": "address",
+        "internalType": "contract IMorpho"
+      },
+      {
+        "name": "mp",
+        "type": "tuple",
+        "internalType": "struct MarketParams",
+        "components": [
+          {
+            "name": "loanToken",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "collateralToken",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "oracle",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "irm",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "lltv",
+            "type": "uint256",
+            "internalType": "uint256"
+          }
+        ]
+      },
+      {
+        "name": "user",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "uiLtv",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "s",
+        "type": "tuple",
+        "internalType": "struct StocklineLens.Snapshot",
+        "components": [
+          {
+            "name": "collateralRaw",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "borrowShares",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "debtAssetsRaw",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "collateralValueUsdcRaw",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "availableBorrowRaw",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "liquidity",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "healthFactorWad",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "borrowAprWad",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "price",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "snapshotBlock",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "timestamp",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "oracleValid",
+            "type": "bool",
+            "internalType": "bool"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "view"
+  }
+]
