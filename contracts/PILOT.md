@@ -1,29 +1,34 @@
-# Base NVDAc pilot handoff
+# Current pilot: 24/7 NVDAc
 
-The Base pilot is deployed. Eight successful transaction receipts, contract addresses, market parameters and artifact hashes are recorded in `deployments/8453.json`. The market was seeded with 98 USDC. Other stocks remain Coming soon.
+The current deployment in `deployments/8453.json` is the 24/7 pilot. The former session-restricted deployment is preserved in `deployments/8453-session-pilot.json` and the web legacy manifest.
 
-## Frontend deployment
+## Policy
 
-Use the repository root, Node.js 22, `npm ci`, `npm run build`, and the Next.js preset in Vercel. Set `NEXT_PUBLIC_CHAIN_ID=8453` before building. Remove any old value of 31337. Optionally set `NEXT_PUBLIC_BASE_RPC_URL` to a browser-accessible Base RPC; the default is https://mainnet.base.org. Public environment variables must never contain secrets. No private key is needed to build or host the frontend.
+The user approved accepting the last published equity price without an age limit, including weekends and holidays. The equity oracle uses maximum uint256 as its age limit. Stockline still validates positive prices and round timestamps, Coinbase registry pauses, an administrator emergency pause, USDC freshness of 24 hours, and sequencer recovery of one hour. No trading calendar is consulted by the new guard. Therefore 24/7 means no scheduled closure; safety failures and lack of liquidity can still block an operation. Stale stock prices can affect borrowing and liquidation.
 
-`npm run dev:mainnet` serves the real-funds pilot on port 3005. `npm run dev:local` explicitly selects the mock environment. The native application is outside this delivery. Vercel publication is left to the project owner.
+LLTV remains 77%, with a 50% suggested UI limit. Morpho, token, IRM and Uniswap deployments are unchanged. New guard, oracle, swap adapter, repayment adapter and lens were deployed. Nine receipts record deployment and migration of the original 98 USDC lender supply.
 
-## Evidence and limitations
+## Existing positions
 
-- `npm test`: 9 tests passed.
-- `npm run contracts:test`: 25 tests passed, including 256 fuzz runs and 64 invariant runs with 2048 calls.
-- `npm run lint`: zero errors, five existing unused-handler warnings in Button.tsx.
-- `npm run build` and `npm run typecheck`: passed.
-- The earlier mock frontend E2E run passed four tests.
-- `deployments/pilot-credit-evidence.json` records 30 successful transactions on native Base Anvil at block 50877884 using existing assets, feeds, pools and Morpho, including interest, collateral sale repayment and liquidation.
-- Mainnet deployment and supply are confirmed; a complete real mainnet borrowing cycle has not been executed.
-- `scripts/check-pilot-ui.mts` is an unfinished read-only browser verification. Its last run failed during injected wallet connection with Provider not found. Do not describe production wallet UI verification as passed. After publication verify a real browser wallet, chain switching, balances, collateral link and transaction receipts before broad use.
-- Explorer source verification and an independent security audit have not been completed.
+No user collateral was moved. The app shows an old-market position separately, permits direct repayment and withdrawal, then the user can deposit into the new market. The old market remains immutable and session-restricted. The old lender supply was withdrawn only after verifying zero debt and the deployer's exact supply shares. Never overwrite the legacy manifest or hide its withdrawal interface while positions exist.
 
-## Session policy
+## Verification
 
-The administrator can pause the immutable Nasdaq session guard. Calendar coverage ends on 2026-12-31. Borrowing and liquidation require an open configured regular session, a current-session price, valid registry and sequencer checks. Closed sessions and unavailable prices block liquidation too. September 7 is a configured holiday. No feed timestamps are fabricated to enable borrowing.
+- `npm run contracts:test`: 26 tests, including the new old-price/pauses test.
+- `scripts/test-always-open.mts`: 30 successful transactions with native Base Anvil at block 50877884, with the full credit cycle executed after regular-session closing. Existing B20 assets, feeds, pools and Morpho; no feed/storage overrides.
+- `deployments/always-open-credit-evidence.json`: fork receipts and matching artifact hashes.
+- `deployments/8453-always-open-progress.json`: actual Base deployment and liquidity migration receipts.
+- `scripts/smoke-always-open-mainnet.mts`: bounded production cycle, 0.10 USDC stock purchase and 0.02 USDC borrow, full repayment and withdrawal. Eight mainnet transactions completed successfully; the borrower position ended with zero debt and zero collateral. Never rerun if progress exists.
 
-The market LLTV is 77%; the UI suggests at most 50%. These are different limits. The pilot designation does not imply production security certification.
+- `npm test`: 13 passed. `npm run test:e2e`: 5 passed. Build, TypeScript and lint passed, with five existing lint warnings.
+- `scripts/check-always-open-ui.mts`: read-only injected wallet verified the actual Base oracle, old collateral position, purchase link and Coming soon badges in a production build.
 
-Do not rerun the broadcast script: deployment is complete. Keep signing material outside Git and the frontend. Deployment receipts and artifacts contain public data only.
+## Frontend publication
+
+Publish the repository root as Next.js using Node.js 22, `npm ci`, `npm run build`, and `NEXT_PUBLIC_CHAIN_ID=8453`. Optional public Base RPC configuration must not contain private signing credentials. No key is needed by the frontend. Base view reads are grouped through Multicall to reduce public RPC bursts; a dedicated browser-accessible RPC remains preferable to the public rate-limited endpoint. The legacy warning is shown in all app views for wallets with old positions. Vercel publication remains with the project owner.
+
+No independent audit or explorer source verification has been completed. This is a controlled hackathon pilot.
+
+## Reproduce the native test
+
+Start the pinned Base Anvil binary from FORK.md with `--base --fork-url https://mainnet.base.org --fork-block-number 50877884 --chain-id 31337 --accounts 3 --host 127.0.0.1 --port 8549 --silent`, then run `npx tsx scripts/test-always-open.mts`. Use a fresh disposable node. The test changes that local node's timestamp.

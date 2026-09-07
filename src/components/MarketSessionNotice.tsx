@@ -58,6 +58,9 @@ export function MarketSessionNotice() {
       title = "Market paused";
       detail =
         "Emergency pause is active. Borrowing and liquidations are unavailable.";
+    } else if (deployment.alwaysOpen) {
+      title = data.valid ? "24/7 pilot · Market available" : "24/7 pilot · Oracle unavailable";
+      detail = "Uses the last published stock price, including weekends and holidays. Prices may be stale. Registry, USDC and sequencer checks still apply.";
     } else if (data.session.state === "closed") {
       title = "Market closed";
       detail = `Next opening: ${time} (Brasília, UTC−3). Borrowing and liquidations require a fresh price after opening.`;

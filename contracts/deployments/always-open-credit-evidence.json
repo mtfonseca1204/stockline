@@ -1,0 +1,632 @@
+{
+  "artifactHashes": {
+    "AlwaysOpenGuard": "0x45f601b79e48d8bd3c0f2dc5474cedd3c2ea7b1af9386dbae108996cecb15b81",
+    "StocklineOracle": "0x9332e92c44d6c61d47ead0d16cc86db6cd0581d97312b0638f36101f1f750b8f",
+    "StocklineV3Swap": "0x4bf8d8b3cfb00909fdaf96fd6cbfcb6e317a0143f200dc77ce64737df5907d9a",
+    "StocklineRepayAdapter": "0x82878b1be7c440c823391ca53b9cfc5db68bd5520a52e4f75571f6934a6f131a",
+    "StocklineLens": "0x0bc72a09d776913340ef45d3c7c393ef122c549b67b2dcde874fca3ef065a92a"
+  },
+  "calendarSource": "https://www.nasdaqtrader.com/trader.aspx?id=Calendar",
+  "calendarSessions": [
+    {
+      "date": "2026-09-01",
+      "open": 1788269400,
+      "close": 1788292800
+    },
+    {
+      "date": "2026-09-02",
+      "open": 1788355800,
+      "close": 1788379200
+    },
+    {
+      "date": "2026-09-03",
+      "open": 1788442200,
+      "close": 1788465600
+    },
+    {
+      "date": "2026-09-04",
+      "open": 1788528600,
+      "close": 1788552000
+    },
+    {
+      "date": "2026-09-08",
+      "open": 1788874200,
+      "close": 1788897600
+    },
+    {
+      "date": "2026-09-09",
+      "open": 1788960600,
+      "close": 1788984000
+    },
+    {
+      "date": "2026-09-10",
+      "open": 1789047000,
+      "close": 1789070400
+    },
+    {
+      "date": "2026-09-11",
+      "open": 1789133400,
+      "close": 1789156800
+    },
+    {
+      "date": "2026-09-14",
+      "open": 1789392600,
+      "close": 1789416000
+    },
+    {
+      "date": "2026-09-15",
+      "open": 1789479000,
+      "close": 1789502400
+    },
+    {
+      "date": "2026-09-16",
+      "open": 1789565400,
+      "close": 1789588800
+    },
+    {
+      "date": "2026-09-17",
+      "open": 1789651800,
+      "close": 1789675200
+    },
+    {
+      "date": "2026-09-18",
+      "open": 1789738200,
+      "close": 1789761600
+    },
+    {
+      "date": "2026-09-21",
+      "open": 1789997400,
+      "close": 1790020800
+    },
+    {
+      "date": "2026-09-22",
+      "open": 1790083800,
+      "close": 1790107200
+    },
+    {
+      "date": "2026-09-23",
+      "open": 1790170200,
+      "close": 1790193600
+    },
+    {
+      "date": "2026-09-24",
+      "open": 1790256600,
+      "close": 1790280000
+    },
+    {
+      "date": "2026-09-25",
+      "open": 1790343000,
+      "close": 1790366400
+    },
+    {
+      "date": "2026-09-28",
+      "open": 1790602200,
+      "close": 1790625600
+    },
+    {
+      "date": "2026-09-29",
+      "open": 1790688600,
+      "close": 1790712000
+    },
+    {
+      "date": "2026-09-30",
+      "open": 1790775000,
+      "close": 1790798400
+    },
+    {
+      "date": "2026-10-01",
+      "open": 1790861400,
+      "close": 1790884800
+    },
+    {
+      "date": "2026-10-02",
+      "open": 1790947800,
+      "close": 1790971200
+    },
+    {
+      "date": "2026-10-05",
+      "open": 1791207000,
+      "close": 1791230400
+    },
+    {
+      "date": "2026-10-06",
+      "open": 1791293400,
+      "close": 1791316800
+    },
+    {
+      "date": "2026-10-07",
+      "open": 1791379800,
+      "close": 1791403200
+    },
+    {
+      "date": "2026-10-08",
+      "open": 1791466200,
+      "close": 1791489600
+    },
+    {
+      "date": "2026-10-09",
+      "open": 1791552600,
+      "close": 1791576000
+    },
+    {
+      "date": "2026-10-12",
+      "open": 1791811800,
+      "close": 1791835200
+    },
+    {
+      "date": "2026-10-13",
+      "open": 1791898200,
+      "close": 1791921600
+    },
+    {
+      "date": "2026-10-14",
+      "open": 1791984600,
+      "close": 1792008000
+    },
+    {
+      "date": "2026-10-15",
+      "open": 1792071000,
+      "close": 1792094400
+    },
+    {
+      "date": "2026-10-16",
+      "open": 1792157400,
+      "close": 1792180800
+    },
+    {
+      "date": "2026-10-19",
+      "open": 1792416600,
+      "close": 1792440000
+    },
+    {
+      "date": "2026-10-20",
+      "open": 1792503000,
+      "close": 1792526400
+    },
+    {
+      "date": "2026-10-21",
+      "open": 1792589400,
+      "close": 1792612800
+    },
+    {
+      "date": "2026-10-22",
+      "open": 1792675800,
+      "close": 1792699200
+    },
+    {
+      "date": "2026-10-23",
+      "open": 1792762200,
+      "close": 1792785600
+    },
+    {
+      "date": "2026-10-26",
+      "open": 1793021400,
+      "close": 1793044800
+    },
+    {
+      "date": "2026-10-27",
+      "open": 1793107800,
+      "close": 1793131200
+    },
+    {
+      "date": "2026-10-28",
+      "open": 1793194200,
+      "close": 1793217600
+    },
+    {
+      "date": "2026-10-29",
+      "open": 1793280600,
+      "close": 1793304000
+    },
+    {
+      "date": "2026-10-30",
+      "open": 1793367000,
+      "close": 1793390400
+    },
+    {
+      "date": "2026-11-02",
+      "open": 1793629800,
+      "close": 1793653200
+    },
+    {
+      "date": "2026-11-03",
+      "open": 1793716200,
+      "close": 1793739600
+    },
+    {
+      "date": "2026-11-04",
+      "open": 1793802600,
+      "close": 1793826000
+    },
+    {
+      "date": "2026-11-05",
+      "open": 1793889000,
+      "close": 1793912400
+    },
+    {
+      "date": "2026-11-06",
+      "open": 1793975400,
+      "close": 1793998800
+    },
+    {
+      "date": "2026-11-09",
+      "open": 1794234600,
+      "close": 1794258000
+    },
+    {
+      "date": "2026-11-10",
+      "open": 1794321000,
+      "close": 1794344400
+    },
+    {
+      "date": "2026-11-11",
+      "open": 1794407400,
+      "close": 1794430800
+    },
+    {
+      "date": "2026-11-12",
+      "open": 1794493800,
+      "close": 1794517200
+    },
+    {
+      "date": "2026-11-13",
+      "open": 1794580200,
+      "close": 1794603600
+    },
+    {
+      "date": "2026-11-16",
+      "open": 1794839400,
+      "close": 1794862800
+    },
+    {
+      "date": "2026-11-17",
+      "open": 1794925800,
+      "close": 1794949200
+    },
+    {
+      "date": "2026-11-18",
+      "open": 1795012200,
+      "close": 1795035600
+    },
+    {
+      "date": "2026-11-19",
+      "open": 1795098600,
+      "close": 1795122000
+    },
+    {
+      "date": "2026-11-20",
+      "open": 1795185000,
+      "close": 1795208400
+    },
+    {
+      "date": "2026-11-23",
+      "open": 1795444200,
+      "close": 1795467600
+    },
+    {
+      "date": "2026-11-24",
+      "open": 1795530600,
+      "close": 1795554000
+    },
+    {
+      "date": "2026-11-25",
+      "open": 1795617000,
+      "close": 1795640400
+    },
+    {
+      "date": "2026-11-27",
+      "open": 1795789800,
+      "close": 1795802400
+    },
+    {
+      "date": "2026-11-30",
+      "open": 1796049000,
+      "close": 1796072400
+    },
+    {
+      "date": "2026-12-01",
+      "open": 1796135400,
+      "close": 1796158800
+    },
+    {
+      "date": "2026-12-02",
+      "open": 1796221800,
+      "close": 1796245200
+    },
+    {
+      "date": "2026-12-03",
+      "open": 1796308200,
+      "close": 1796331600
+    },
+    {
+      "date": "2026-12-04",
+      "open": 1796394600,
+      "close": 1796418000
+    },
+    {
+      "date": "2026-12-07",
+      "open": 1796653800,
+      "close": 1796677200
+    },
+    {
+      "date": "2026-12-08",
+      "open": 1796740200,
+      "close": 1796763600
+    },
+    {
+      "date": "2026-12-09",
+      "open": 1796826600,
+      "close": 1796850000
+    },
+    {
+      "date": "2026-12-10",
+      "open": 1796913000,
+      "close": 1796936400
+    },
+    {
+      "date": "2026-12-11",
+      "open": 1796999400,
+      "close": 1797022800
+    },
+    {
+      "date": "2026-12-14",
+      "open": 1797258600,
+      "close": 1797282000
+    },
+    {
+      "date": "2026-12-15",
+      "open": 1797345000,
+      "close": 1797368400
+    },
+    {
+      "date": "2026-12-16",
+      "open": 1797431400,
+      "close": 1797454800
+    },
+    {
+      "date": "2026-12-17",
+      "open": 1797517800,
+      "close": 1797541200
+    },
+    {
+      "date": "2026-12-18",
+      "open": 1797604200,
+      "close": 1797627600
+    },
+    {
+      "date": "2026-12-21",
+      "open": 1797863400,
+      "close": 1797886800
+    },
+    {
+      "date": "2026-12-22",
+      "open": 1797949800,
+      "close": 1797973200
+    },
+    {
+      "date": "2026-12-23",
+      "open": 1798036200,
+      "close": 1798059600
+    },
+    {
+      "date": "2026-12-24",
+      "open": 1798122600,
+      "close": 1798135200
+    },
+    {
+      "date": "2026-12-28",
+      "open": 1798468200,
+      "close": 1798491600
+    },
+    {
+      "date": "2026-12-29",
+      "open": 1798554600,
+      "close": 1798578000
+    },
+    {
+      "date": "2026-12-30",
+      "open": 1798641000,
+      "close": 1798664400
+    },
+    {
+      "date": "2026-12-31",
+      "open": 1798727400,
+      "close": 1798750800
+    }
+  ],
+  "forkBlock": 50877884,
+  "forkHash": "0x25ff2fbdcecde3a23cc1a699665f227592ceb4477ae5a764abd91863dc591d65",
+  "success": true,
+  "fixtures": [
+    "Local ETH funding only",
+    "Historical fork at open session",
+    "One hour time advance for interest/liquidation; feeds never modified"
+  ],
+  "transactions": [
+    {
+      "label": "Wrap ETH",
+      "hash": "0x6f91c59674de53f7f950655a8090ab0eaf7a6b5b2b5e3a05c449f3c3f2a58752",
+      "gasUsed": "44866"
+    },
+    {
+      "label": "Approve swap",
+      "hash": "0xfe0a62f7a37a5027e373591a1e9445aa12882139c754206b1a64be3da6413f01",
+      "gasUsed": "46031"
+    },
+    {
+      "label": "Buy real token",
+      "hash": "0xccb3a31f908bd4e660e4a2d51ebe0e07a9dfca78b937e692b648580ec0653cf4",
+      "gasUsed": "135473"
+    },
+    {
+      "label": "Approve swap",
+      "hash": "0x3e317bc637a3d909d1ffb3ba4ae19c5e82f77d1f4dc8f65be497541a1e0d7068",
+      "gasUsed": "55449"
+    },
+    {
+      "label": "Buy real token",
+      "hash": "0xd59db187bc1f6d701966f2f86f068baefa13219e9391211c60339d126b5b8fd3",
+      "gasUsed": "151653"
+    },
+    {
+      "label": "Fund borrower collateral",
+      "hash": "0x09ee8d7416e5c7552d13a7898d378a2b1ab1be43486d7f3a5e66af9ef2a8cc4f",
+      "gasUsed": "54182"
+    },
+    {
+      "label": "Fund liquidator USDC",
+      "hash": "0x7d21191439b8c67965fe696227e1563710888775cfb4d09a1e47eb84b522edc4",
+      "gasUsed": "45047"
+    },
+    {
+      "label": "Deploy AlwaysOpenGuard",
+      "hash": "0x3e2790615860838e75220360c166d0631a807c8442b07e316334afd3287468f6",
+      "gasUsed": "257694"
+    },
+    {
+      "label": "Deploy StocklineOracle",
+      "hash": "0xf635d18282ba33b6fa6d4dde4a6189e11d09da8884e830528108b212e7aef8df",
+      "gasUsed": "534141"
+    },
+    {
+      "label": "Create market in real Morpho",
+      "hash": "0xa29ba1c3c60394e184dab82035c00b4384e7555446d4391653d4fdd91b591b68",
+      "gasUsed": "197493"
+    },
+    {
+      "label": "Deploy StocklineV3Swap",
+      "hash": "0xa0f9917bcaa4e10d58828a2c5bd533fbb0d11bd34102d9389343d33856dee502",
+      "gasUsed": "751336"
+    },
+    {
+      "label": "Deploy StocklineRepayAdapter",
+      "hash": "0x49402a11e9a7aae57654d0560a48ca5e00a8a4d98472cb14b3b55a19a69177dd",
+      "gasUsed": "1737264"
+    },
+    {
+      "label": "Deploy StocklineLens",
+      "hash": "0x37b0ac364198bf3373dd686d0a68a72fddbeaa335013d7028675abf4fb5db592",
+      "gasUsed": "821439"
+    },
+    {
+      "label": "Approve lender",
+      "hash": "0x226398a865249ddfdb759a8140851e41826ec08603f262fd2a7f02d1288b7c68",
+      "gasUsed": "55449"
+    },
+    {
+      "label": "Supply 98 USDC",
+      "hash": "0x56d415b896a6cad5e5b97a253dc550c89afc2a95d3d51f3bb7a28e78df872994",
+      "gasUsed": "127677"
+    },
+    {
+      "label": "Approve borrower collateral",
+      "hash": "0x888ee3690ab631576a8e1ac083f636856ce2c55d6929adc3cc49ba86eda39618",
+      "gasUsed": "45582"
+    },
+    {
+      "label": "Deposit NVDAc",
+      "hash": "0xd4eaed7c8c2132c07aa2d658200c7a994858dde5ef02e551211a4f4902a3f26c",
+      "gasUsed": "88675"
+    },
+    {
+      "label": "Borrow 10 USDC",
+      "hash": "0x25bae7aa1c168a49054a606cb687503150835f62a168c591f3b64614549ea56b",
+      "gasUsed": "206431"
+    },
+    {
+      "label": "Authorize adapter",
+      "hash": "0xe9621e7037cbb1008906418a10f14520dbb4dd2432817fcf118f68bab6137fae",
+      "gasUsed": "47250"
+    },
+    {
+      "label": "Repay by real Uniswap sale",
+      "hash": "0xcfd40c78e90597f20842c1d9eb894550d7ff1f0abb05955fd4b08294ac46dcab",
+      "gasUsed": "484137"
+    },
+    {
+      "label": "Approve USDC repayment",
+      "hash": "0x0bb4f98d26faeb45329de5dacd929cf1372dd0f82fe93adb5d914c654dda28bf",
+      "gasUsed": "55413"
+    },
+    {
+      "label": "Repay remaining shares",
+      "hash": "0x48c1c54fa84ce191d5f015563d18b65dd3482e4c4857e231cb6b18a89b8745c1",
+      "gasUsed": "93692"
+    },
+    {
+      "label": "Withdraw all collateral",
+      "hash": "0x66b21985f59a25d1ae0525a2cfe75bc995601200573a68eab760f199fa8b6154",
+      "gasUsed": "68150"
+    },
+    {
+      "label": "Approve second deposit",
+      "hash": "0x470befec6226b0e9e3904e58be0d8f2a8f2c1e24f82849a86ea4b7fcc4e6b739",
+      "gasUsed": "45582"
+    },
+    {
+      "label": "Second deposit",
+      "hash": "0x1c692bb5ac57eda9cfad288d0cd9f62e1f5fed997664bdf49e68a7be2ce1bb11",
+      "gasUsed": "88675"
+    },
+    {
+      "label": "Borrow at liquidation threshold",
+      "hash": "0x376e35da1651cf788131d913d0667bd77b6e26eb2bcd0951e649bfe707e7a22b",
+      "gasUsed": "168399"
+    },
+    {
+      "label": "Liquidator approval",
+      "hash": "0x2b77970a39dcd08a3cfc50c06045e0b8db66dede4a3e154fff4ca6bf82237f4f",
+      "gasUsed": "55437"
+    },
+    {
+      "label": "Real Morpho liquidation",
+      "hash": "0x69bdfe15656770761f23ae4a0ce1a5a7544161678a6e9a3d322c848447d94132",
+      "gasUsed": "221208"
+    },
+    {
+      "label": "Close after liquidation",
+      "hash": "0x04e4174f58bf88a7859908b56d145c7337f8ee1be8cf59a948f8215b1a340733",
+      "gasUsed": "93704"
+    },
+    {
+      "label": "Recover remaining stocks",
+      "hash": "0xd22f99015db238f96961c9e42037a1c276b35a71aa888750d69a0773147c7183",
+      "gasUsed": "68150"
+    }
+  ],
+  "price": "2299573000000000000000000000000000000",
+  "guard": "0xbecb2748b09b1649013664fbc69081758193c9f9",
+  "oracle": "0xc32bc8269bf9e9bf171b88028811689089a11008",
+  "deployment": {
+    "chainId": 31337,
+    "mode": "base-mainnet-fork",
+    "productionReady": false,
+    "morpho": "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb",
+    "usdc": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+    "lens": "0xc9f609c202fbc8625593c6b8abba7421414ac6bc",
+    "adapter": "0x756b1980ebe69b8d01951b665b3e24326eb644eb",
+    "swap": "0x509bcb70fa0b18c27c4937ce0ff3f0c7924c81a1",
+    "guard": "0xbecb2748b09b1649013664fbc69081758193c9f9",
+    "indexFromBlock": 50877885,
+    "markets": [
+      {
+        "loanToken": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+        "collateralToken": "0xb20000000000000000000078ee7ce2fE4908108C",
+        "oracle": "0xc32bc8269bf9e9bf171b88028811689089a11008",
+        "irm": "0x46415998764C29aB2a25CbeA6254146D50D22687",
+        "lltv": "770000000000000000",
+        "ticker": "NVDAc",
+        "enabled": true,
+        "marketId": "0x962aefe9388b184622d9a3b71a8a7da6b696f5de33a694f1e579f0ecae03f562",
+        "collateralDecimals": 8,
+        "loanDecimals": 6,
+        "feed": "0x04689a41629776563E6822F76f2e57D148d28513",
+        "uiMaxLtvWad": "500000000000000000"
+      }
+    ]
+  },
+  "creditCycle": true,
+  "accruedInterest": "79",
+  "liquidation": true,
+  "afterHours": true
+}

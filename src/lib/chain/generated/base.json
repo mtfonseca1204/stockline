@@ -1,28 +1,29 @@
 {
   "schemaVersion": 1,
   "chainId": 8453,
-  "mode": "base-mainnet-pilot",
+  "mode": "base-mainnet-24h-pilot",
   "productionReady": false,
   "pilot": true,
   "morpho": "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb",
   "usdc": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-  "adapter": "0x31468d1c8d78ca82275031c6d30b3557846fb802",
-  "lens": "0xc9eb045834325734792e9f0670592a9545f6c429",
-  "swap": "0x352bc28b81a0342537472dfd4bd3a8ed247899fe",
-  "guard": "0x07276f5923e3487b6258ba628367e16af919c3ef",
-  "indexFromBlock": 51009011,
-  "calendarValidThrough": "2026-12-31",
-  "oraclePolicy": "Nasdaq regular sessions, official calendar, emergency admin pause, current-session price, 24h heartbeat, 1h sequencer recovery",
+  "adapter": "0xc6cf3aa08e04e774924b73455f27736a992aa60e",
+  "lens": "0x1416e875fee642c80b6dd028c613528de2e64495",
+  "swap": "0xf7a4f83527ddbffb8f7d9c81ead54f559e75e732",
+  "guard": "0x689fcddd59ca4d3fb0fb38bd8bb67dbdd2bf83d2",
+  "indexFromBlock": 51016547,
+  "alwaysOpen": true,
+  "legacyMarketId": "0x5c800e8607e95fb96196570e229aef9a8a66595d4233a58fc406373bfac675db",
+  "oraclePolicy": "Last published equity price without age limit; registry/admin pauses; USDC 24h heartbeat; sequencer 1h recovery",
   "markets": [
     {
       "loanToken": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
       "collateralToken": "0xb20000000000000000000078ee7ce2fE4908108C",
-      "oracle": "0x39712f36c013c09cf4d62d0f695dd74ebe67fd19",
+      "oracle": "0xe0ae3137a30393410b595e1c1d572a1449a969ea",
       "irm": "0x46415998764C29aB2a25CbeA6254146D50D22687",
       "lltv": "770000000000000000",
       "ticker": "NVDAc",
       "enabled": true,
-      "marketId": "0x5c800e8607e95fb96196570e229aef9a8a66595d4233a58fc406373bfac675db",
+      "marketId": "0x91360eea2686ef7ce4966b4e82cf6ff712af02baf0f7211459780d9f5af1612a",
       "feed": "0x04689a41629776563E6822F76f2e57D148d28513",
       "collateralDecimals": 8,
       "loanDecimals": 6,
@@ -31,64 +32,71 @@
   ],
   "transactions": [
     {
-      "label": "NasdaqSessionGuard",
-      "hash": "0xd985f5eadb56843d365dbf9beb394ae8cf40bc258a9a02e325b9f31f9a688e51",
+      "label": "AlwaysOpenGuard",
+      "hash": "0xa6955dbde0988e47769c54494ec4b17a89f643e05519b43c49709568178bab2d",
       "status": "success",
-      "blockNumber": "51009011",
-      "gasUsed": "2484884"
+      "blockNumber": "51016547",
+      "gasUsed": "257694"
     },
     {
       "label": "StocklineOracle",
-      "hash": "0x6fd0f1d63c78b67d18f113a1d06ab4599523b866d0ecc97583822137341fc51d",
+      "hash": "0x3d2757860f5b466ef44f091260940fe2a4beac2bff06b282224581d5053d2194",
       "status": "success",
-      "blockNumber": "51009013",
-      "gasUsed": "533793"
+      "blockNumber": "51016549",
+      "gasUsed": "534141"
     },
     {
       "label": "StocklineV3Swap",
-      "hash": "0x35496bd7d88e7f4cf977bf1e74cd28b2fef248c1746c777dcc458d9a0d062ccf",
+      "hash": "0x49fa2174494c9671289e58d4b3757078b0b45ee480da1601650a21533f964026",
       "status": "success",
-      "blockNumber": "51009016",
+      "blockNumber": "51016551",
       "gasUsed": "751336"
     },
     {
       "label": "Create NVDAc market",
-      "hash": "0x957705ec3c3e3cd559788790b88789efe94d1e76f4d0d819fc91e680fa1ca109",
+      "hash": "0x0fb1075f5ce131e2706f869db70459956316b53732285a72dcbcb267a7c1bbe6",
       "status": "success",
-      "blockNumber": "51009018",
+      "blockNumber": "51016554",
       "gasUsed": "197493"
     },
     {
       "label": "StocklineRepayAdapter",
-      "hash": "0xf6cc1af6541b2e97c2f3ad183ebcd0fcafa9a82feb77e327ad78505c981d2081",
+      "hash": "0xfe4d6c0f77a8cd82599369014a55042a5ace8f1394a86ed9602b40e4ded301ed",
       "status": "success",
-      "blockNumber": "51009020",
+      "blockNumber": "51016557",
       "gasUsed": "1737264"
     },
     {
       "label": "StocklineLens",
-      "hash": "0xd002441e38d412ac4a876fbe6e68fff3460921a9c44749611f3c907b2f256425",
+      "hash": "0xfac23994097a91201e894769e5303e84379ff435bf73de0a86c81228595d0ab5",
       "status": "success",
-      "blockNumber": "51009022",
+      "blockNumber": "51016560",
       "gasUsed": "821439"
     },
     {
-      "label": "Approve 98 USDC",
-      "hash": "0x223501c995a120d5184c3936fdd4473b33b57b6bf7eee16025a1cf312c87490e",
+      "label": "Move pilot liquidity out of old market",
+      "hash": "0x1c60e5e93849ac39b522a271318bdd55343d86ae78a12adc3c475145f5a46b3e",
       "status": "success",
-      "blockNumber": "51009025",
+      "blockNumber": "51016563",
+      "gasUsed": "83782"
+    },
+    {
+      "label": "Approve 98 USDC",
+      "hash": "0x63d52868f403ada810cba3b199fa4a18f66aabbd6f435ba8a8585e2602ddf417",
+      "status": "success",
+      "blockNumber": "51016566",
       "gasUsed": "55449"
     },
     {
       "label": "Supply 98 USDC",
-      "hash": "0x387912ac6e9f9aa591a9f56c81da3b96787cf74ebfdccc000c028a6b66b12d6e",
+      "hash": "0x98c7567f09aabcc587c0e72a6f73e4547c89d6ed28288dff1b3e2ddde9b612e1",
       "status": "success",
-      "blockNumber": "51009028",
+      "blockNumber": "51016569",
       "gasUsed": "127677"
     }
   ],
   "artifactHashes": {
-    "NasdaqSessionGuard": "0x98cee02664257ada55f917e9b77d518d9ee3df1e148ad0c9d01c32f4548fcbab",
+    "AlwaysOpenGuard": "0x45f601b79e48d8bd3c0f2dc5474cedd3c2ea7b1af9386dbae108996cecb15b81",
     "StocklineOracle": "0x9332e92c44d6c61d47ead0d16cc86db6cd0581d97312b0638f36101f1f750b8f",
     "StocklineV3Swap": "0x4bf8d8b3cfb00909fdaf96fd6cbfcb6e317a0143f200dc77ce64737df5907d9a",
     "StocklineRepayAdapter": "0x82878b1be7c440c823391ca53b9cfc5db68bd5520a52e4f75571f6934a6f131a",

@@ -17,6 +17,7 @@ import {
 } from "viem";
 import { getAccount, getWalletClient } from "wagmi/actions";
 import { config, deployment, publicClient } from "./config";
+import legacy from "./generated/legacy-base.json";
 import coreJson from "./generated/Morpho.json";
 import lensJson from "./generated/StocklineLens.json";
 import adapterJson from "./generated/StocklineRepayAdapter.json";
@@ -82,11 +83,11 @@ export function requireDeployment() {
   }
   return deployment;
 }
-export async function readPositions(owner: Address): Promise<MarketPosition[]> {
+export async function readPositions(owner: Address, markets: MarketConfig[] = deployment.markets): Promise<MarketPosition[]> {
   const d = requireDeployment();
   const blockNumber = await publicClient.getBlockNumber({ cacheTime: 0 });
   return Promise.all(
-    d.markets.map(async (market) => {
+    markets.map(async (market) => {
       try {
         const [snapshot, walletCollateral, walletUsdc, referencePrice] = await Promise.all([
           publicClient.readContract({
@@ -249,7 +250,9 @@ export async function execute(
       "The previous transaction has settled. Refresh the position and review again.",
     );
   }
-  if (!market.enabled) throw new Error("This market is blocked.");
+  const currentMarket = d.markets.some(m => m.marketId === market.marketId);
+  const legacyExit = d.chainId === 8453 && legacy.markets.some(m => m.marketId === market.marketId) && ["withdraw", "repay", "repayAll"].includes(action);
+  if (!market.enabled || (!currentMarket && !legacyExit)) throw new Error("This market only permits legacy repayment and withdrawal.");
   const checkContext = () => {
     const current = getAccount(config);
     if (
@@ -357,7 +360,7 @@ export async function execute(
       quote.request,
     ]);
   } else {
-    const p = (await readPositions(owner)).find(
+    const p = (await readPositions(owner, [market])).find(
       (p) => p.market.marketId === market.marketId,
     );
     if (!p?.snapshot) throw new Error("Could not read the current position.");

@@ -1,35 +1,5 @@
 {
-  "schemaVersion": 1,
   "chainId": 8453,
-  "mode": "base-mainnet-24h-pilot",
-  "productionReady": false,
-  "pilot": true,
-  "morpho": "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb",
-  "usdc": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-  "adapter": "0xc6cf3aa08e04e774924b73455f27736a992aa60e",
-  "lens": "0x1416e875fee642c80b6dd028c613528de2e64495",
-  "swap": "0xf7a4f83527ddbffb8f7d9c81ead54f559e75e732",
-  "guard": "0x689fcddd59ca4d3fb0fb38bd8bb67dbdd2bf83d2",
-  "indexFromBlock": 51016547,
-  "alwaysOpen": true,
-  "legacyMarketId": "0x5c800e8607e95fb96196570e229aef9a8a66595d4233a58fc406373bfac675db",
-  "oraclePolicy": "Last published equity price without age limit; registry/admin pauses; USDC 24h heartbeat; sequencer 1h recovery",
-  "markets": [
-    {
-      "loanToken": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-      "collateralToken": "0xb20000000000000000000078ee7ce2fE4908108C",
-      "oracle": "0xe0ae3137a30393410b595e1c1d572a1449a969ea",
-      "irm": "0x46415998764C29aB2a25CbeA6254146D50D22687",
-      "lltv": "770000000000000000",
-      "ticker": "NVDAc",
-      "enabled": true,
-      "marketId": "0x91360eea2686ef7ce4966b4e82cf6ff712af02baf0f7211459780d9f5af1612a",
-      "feed": "0x04689a41629776563E6822F76f2e57D148d28513",
-      "collateralDecimals": 8,
-      "loanDecimals": 6,
-      "uiMaxLtvWad": "500000000000000000"
-    }
-  ],
   "transactions": [
     {
       "label": "AlwaysOpenGuard",
@@ -95,11 +65,5 @@
       "gasUsed": "127677"
     }
   ],
-  "artifactHashes": {
-    "AlwaysOpenGuard": "0x45f601b79e48d8bd3c0f2dc5474cedd3c2ea7b1af9386dbae108996cecb15b81",
-    "StocklineOracle": "0x9332e92c44d6c61d47ead0d16cc86db6cd0581d97312b0638f36101f1f750b8f",
-    "StocklineV3Swap": "0x4bf8d8b3cfb00909fdaf96fd6cbfcb6e317a0143f200dc77ce64737df5907d9a",
-    "StocklineRepayAdapter": "0x82878b1be7c440c823391ca53b9cfc5db68bd5520a52e4f75571f6934a6f131a",
-    "StocklineLens": "0x0bc72a09d776913340ef45d3c7c393ef122c549b67b2dcde874fca3ef065a92a"
-  }
+  "complete": true
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { LegacyPosition } from "@/components/screens/LegacyPosition";
 import { MarketSessionNotice } from "@/components/MarketSessionNotice";
 import { AlertStack } from "@/components/alerts/AlertStack";
 import { BottomNav, TopBar } from "@/components/layout/Nav";
@@ -43,6 +44,7 @@ export function AppShell() {
       <TopBar onConnect={openWallet} />
       <MarketSessionNotice />
       <main className="flex-1 pb-28">
+        <LegacyPosition />
         {view === "landing" && (
           <LandingPage
             onConnect={openWallet}

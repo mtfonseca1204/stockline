@@ -30,6 +30,7 @@ export const config = createConfig({
   transports: { [anvil.id]: http(localRpc), [base.id]: http(baseRpc) },
 });
 export const publicClient = createPublicClient({
+  batch: localEnabled ? undefined : { multicall: { wait: 50 } },
   chain: localEnabled ? anvil : base,
   transport: http(localEnabled ? localRpc : baseRpc),
 });

@@ -1,0 +1,61 @@
+{
+  "success": true,
+  "marketId": "0x91360eea2686ef7ce4966b4e82cf6ff712af02baf0f7211459780d9f5af1612a",
+  "transactions": [
+    {
+      "label": "Approve stock purchase",
+      "hash": "0x023f99c496e68e01ae5dd0389dbdd52b403f2c7427f9deefa6f984ed41fc6acc",
+      "status": "success",
+      "blockNumber": "51016588"
+    },
+    {
+      "label": "Buy NVDAc for 0.10 USDC",
+      "hash": "0x82b14a917c0d6673ed67fb0614feb5fef721d582e91131a8824a31fe60900a56",
+      "status": "success",
+      "blockNumber": "51016590"
+    },
+    {
+      "label": "Approve collateral",
+      "hash": "0x4aa14f54ca1893a800e92411c11f1dd72b067c326ed0a312ab7fc3083261cd61",
+      "status": "success",
+      "blockNumber": "51016592"
+    },
+    {
+      "label": "Deposit real NVDAc",
+      "hash": "0x1d3dd2af74a2c74a98811e07125769b8847111b48082623ac1e73d96a384ea63",
+      "status": "success",
+      "blockNumber": "51016595"
+    },
+    {
+      "label": "Borrow outside market hours",
+      "hash": "0x1acd94b83d7b49477bfbb2793ca0a1e9abc4c36ccce4a70b95dcf2c4c14e9c62",
+      "status": "success",
+      "blockNumber": "51016598"
+    },
+    {
+      "label": "Approve repayment",
+      "hash": "0x836cf829c3f51e0774fa71c4f7f269b981cd8a58dd8e491282ace67294d2d308",
+      "status": "success",
+      "blockNumber": "51016601"
+    },
+    {
+      "label": "Repay all shares",
+      "hash": "0x99caebbbe2c126dd343c0b44af15f3f735761d77d994e448a037af412e59edac",
+      "status": "success",
+      "blockNumber": "51016603"
+    },
+    {
+      "label": "Withdraw real NVDAc",
+      "hash": "0x025b1d2568843b03f4ce21ba2ee9637b2f44970d602526abd0ddd79dfab2c45e",
+      "status": "success",
+      "blockNumber": "51016605"
+    }
+  ],
+  "borrowedUsdc": "0.02",
+  "stockSpendUsdc": "0.10",
+  "finalPosition": [
+    "98000000000000",
+    "0",
+    "0"
+  ]
+}

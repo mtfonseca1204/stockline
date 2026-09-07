@@ -239,9 +239,9 @@ export function TransactionForm({ action }: { action: FormAction }) {
       {!localEnabled && (
         <Expandable label="When can I borrow?">
           <p>
-            Credit is available during Nasdaq regular sessions, with a current
-            session price. Closed sessions also pause liquidations. Calendar
-            valid through December 31, 2026.
+            {deployment.alwaysOpen
+              ? "This 24/7 pilot accepts the last published stock price, including weekends and holidays. Borrowing and liquidation can use a stale price. Oracle safety checks and available liquidity still apply."
+              : "Credit is available during Nasdaq regular sessions with a current-session price. Closed sessions also pause liquidations."}
           </p>
         </Expandable>
       )}

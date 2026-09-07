@@ -14,6 +14,7 @@ export type MarketConfig = {
   marketId: Hex;
 };
 export type Deployment = {
+  alwaysOpen?: boolean;
   schemaVersion: number;
   chainId: number;
   mode: string;
