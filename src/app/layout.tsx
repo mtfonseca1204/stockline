@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { AppProvider } from "@/context/AppContext";
 import { Manrope, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 
@@ -36,7 +37,7 @@ export default function RootLayout({
       lang="en"
       className={`${display.variable} ${sans.variable} h-full`}
     >
-      <body className="relative min-h-full antialiased">{children}</body>
+      <body className="relative min-h-full antialiased"><AppProvider>{children}</AppProvider></body>
     </html>
   );
 }

@@ -20,6 +20,7 @@ import {
 } from "@tanstack/react-query";
 import { config, deployment } from "@/lib/chain/config";
 import { getAccount } from "wagmi/actions";
+import { usePathname, useRouter } from "next/navigation";
 import { execute, readHistory, readPositions } from "@/lib/chain/service";
 import { errorMessage } from "@/lib/chain/amounts";
 import type { Action, MarketConfig, Quote, TxState } from "@/lib/chain/types";
@@ -29,7 +30,14 @@ function useAppState() {
   const connection = useConnect();
   const disconnect = useDisconnect();
   const switching = useSwitchChain();
-  const [view, setView] = useState<AppView>("landing");
+  const router = useRouter();
+  const pathname = usePathname();
+  const [appView, setView] = useState<AppView>("home");
+  const view = pathname === "/" ? "landing" : appView;
+  const startApp = () => {
+    setView("home");
+    router.push("/app");
+  };
   const [selectedTicker, setSelectedTicker] = useState<string | null>(null);
   const [tx, setTx] = useState<TxState>({ phase: "idle" });
   const [alerts, setAlerts] = useState<AlertItem[]>([]);
@@ -98,17 +106,18 @@ function useAppState() {
       connector: (typeof connection.connectors)[number],
     ) => {
       await connection.connectAsync({ connector });
-      setView("home");
+      startApp();
     },
     connectors: connection.connectors,
     connectionError: connection.error,
     disconnectWallet: () => {
       disconnect.disconnect();
-      setView("landing");
+      setView("home");
+      router.push("/");
     },
     switchNetwork: () =>
       switching.switchChain({ chainId: deployment?.chainId ?? 8453 }),
-    startApp: () => setView("home"),
+    startApp,
     positions: positions.data ?? [],
     loading: positions.isLoading,
     error: positions.error,

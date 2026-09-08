@@ -12,10 +12,10 @@
 }
 .hero {
   display: grid;
-  grid-template-columns: 1.12fr 1fr;
-  gap: 56px;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
   align-items: center;
-  padding: 84px 0 78px;
+  padding: 78px 0 70px;
 }
 .heroCopy .eyebrow {
   display: flex;
@@ -31,7 +31,7 @@
   box-shadow: 0 0 0 4px #0052ff0c;
 }
 .hero h1 {
-  font-size: clamp(45px, 5.3vw, 70px);
+  font-size: clamp(44px, 4.7vw, 66px);
   line-height: 1.04;
   letter-spacing: -0.065em;
   margin: 24px 0;
@@ -97,82 +97,6 @@
 .separator {
   margin: 0 7px;
   color: #c5cbd5;
-}
-.heroArt {
-  position: relative;
-  padding: 25px;
-  border: 1px solid #dce5f7;
-  border-radius: 24px;
-  background: linear-gradient(145deg, #f0f5ff, #fff 65%);
-  min-width: 0;
-}
-.artTop {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  color: #607292;
-  font-size: 10px;
-  letter-spacing: 0.14em;
-}
-.illustration {
-  position: relative;
-  aspect-ratio: 1.13;
-  margin: 4px -15px;
-}
-.productImage {
-  object-fit: contain;
-  mix-blend-mode: multiply;
-}
-.assetTicket {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  border: 1px solid #e5eaf1;
-  padding: 16px;
-  border-radius: 14px;
-  background: #ffffffed;
-  box-shadow: 0 12px 35px #153e7a08;
-}
-.assetTicket > div:nth-child(2) {
-  flex: 1;
-}
-.assetTicket strong,
-.assetTicket span {
-  display: block;
-  font-size: 12px;
-}
-.assetTicket span {
-  color: #7b879a;
-  font-size: 11px;
-  margin-top: 4px;
-}
-.assetTicket > svg {
-  color: #0052ff;
-}
-.artBottom {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 22px 4px 0;
-  font-size: 11px;
-  letter-spacing: 0.1em;
-  color: #667a98;
-}
-.routeLine {
-  height: 1px;
-  background: #d3ddeb;
-  flex: 1;
-  position: relative;
-}
-.routeLine::after {
-  content: "";
-  height: 5px;
-  width: 5px;
-  background: #0052ff;
-  position: absolute;
-  right: 0;
-  top: -2px;
-  border-radius: 50%;
 }
 .marketStrip {
   border-top: 1px solid #e1e5ec;
@@ -451,11 +375,6 @@
   .heroCopy > p {
     font-size: 15px;
   }
-  .heroArt {
-    max-width: 500px;
-    width: 100%;
-    justify-self: center;
-  }
   .actions {
     gap: 20px;
   }
@@ -545,3 +464,42 @@
     transition: none !important;
   }
 }
+
+.creditScene { position: relative; height: 610px; isolation: isolate; border-radius: 30px; background: #eaf0ff; overflow: hidden; }
+.sceneGrid { position: absolute; inset: 0; z-index: -2; background-image: linear-gradient(#0052ff08 1px, transparent 1px), linear-gradient(90deg, #0052ff08 1px, transparent 1px); background-size: 32px 32px; mask-image: linear-gradient(black, transparent); }
+.sceneOrbit { position: absolute; z-index: -1; width: 400px; height: 400px; border: 1px solid #0052ff20; border-radius: 50%; top: 85px; left: 70px; box-shadow: 0 0 0 40px #0052ff05, 0 0 0 80px #0052ff04; }
+.sceneHeader { position: absolute; top: 25px; left: 25px; right: 25px; display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 9px; letter-spacing: .09em; color: #506587; }
+.sceneHeader button { cursor: pointer; font-size: 10px; letter-spacing: 0; text-decoration: underline; text-underline-offset: 3px; }
+.collateralCard, .borrowCard { position: absolute; width: 76%; padding: 25px; border-radius: 20px; animation: creditFloat 7s ease-in-out infinite; }
+.collateralCard { top: 85px; left: 7%; background: white; border: 1px solid #dce5f8; box-shadow: 0 20px 45px #18357412; transform: rotate(-5deg); }
+.cardLabel { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 9px; font-weight: 600; letter-spacing: .1em; color: #64748b; }
+.stockIdentity { display: flex; align-items: center; gap: 14px; padding: 24px 0; }
+.stockIdentity strong { display: block; font-size: 25px; letter-spacing: -.05em; }
+.stockIdentity span { display: block; font-size: 10px; color: #69768b; margin-top: 5px; }
+.cardBottom { border-top: 1px solid #e8ecf3; padding-top: 16px; display: flex; justify-content: space-between; align-items: center; font-size: 10px; gap: 8px; }
+.cardBottom strong { color: #187657; font-size: 10px; }
+.borrowCard { bottom: 66px; right: 5%; width: 69%; color: white; background: #0052ff; box-shadow: 0 24px 40px #0052ff30; animation-delay: -3.5s; }
+.borrowCard .cardLabel { color: #c7d8ff; }
+.usdcIdentity { display: flex; align-items: center; gap: 14px; margin: 24px 0 10px; }
+.usdcIdentity strong { font-size: 42px; font-weight: 500; letter-spacing: -.06em; }
+
+.borrowCard p { font-size: 13px; color: #d6e4ff; margin-bottom: 22px; }
+.borrowCard .cardBottom { border-color: #ffffff30; color: #d6e4ff; }
+.creditBridge { position: absolute; top: 318px; left: 13%; color: #0052ff; display: flex; align-items: center; }
+
+.sceneCaption { position: absolute; bottom: 23px; width: 100%; display: flex; justify-content: center; align-items: center; gap: 8px; color: #4f6487; font-size: 11px; }
+.heroCopy { animation: heroReveal .7s ease-out both; }
+.heroCopy h1 span { display: inline-block; animation: heroReveal .9s .1s ease-out both; }
+.creditScene[data-paused="true"] * { animation-play-state: paused; }
+@keyframes creditFloat { 0%, 100% { translate: 0 0; } 50% { translate: 0 -12px; } }
+@keyframes heroReveal { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 760px) { .creditScene { height: 570px; width: 100%; max-width: 500px; justify-self: center; } .collateralCard, .borrowCard { padding: 20px; } .sceneHeader { left: 18px; right: 18px; font-size: 8px; } .stockIdentity strong { font-size: 23px; } .stockIdentity span { font-size: 9px; } .borrowCard { bottom: 58px; } .collateralCard { top: 78px; width: 82%; } .cardLabel { font-size: 8px; } }
+@media (prefers-reduced-motion: reduce) { .landing *, .landing *::before, .landing *::after { animation: none !important; } }
+
+.morphoBadge { display: inline-flex; align-items: center; margin-left: 12px; }
+.morphoBadge img { width: 126px; height: auto; }
+.liveRate { max-width: 390px; margin-top: 24px; border-top: 1px solid #dfe5ef; padding-top: 18px; }
+.liveRate > div { display: flex; justify-content: space-between; align-items: center; gap: 15px; }
+.liveRate span { font-size: 12px; color: #526078; }
+.liveRate strong { font-size: 24px; letter-spacing: -.04em; color: #0052ff; }
+.liveRate p { font-size: 10px; color: #6b778b; margin-top: 5px; }

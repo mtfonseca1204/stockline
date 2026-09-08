@@ -164,7 +164,6 @@ for (const ticker of ["NVDAc"]) {
     await page.getByRole("button", { name: "Back to Home" }).click();
     await assertFinancialPrecision(page);
     await page.reload();
-    await page.getByRole("button", { name: "Open app", exact: true }).first().click();
     await page.getByRole("button", { name: "Activity", exact: true }).click();
     await expect(
       page.getByText(`RepayWithCollateral`, { exact: true }).first(),

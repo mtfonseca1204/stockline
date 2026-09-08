@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
+import { LandingBorrowRate } from "./LandingBorrowRate";
 import {
   ArrowUpRight,
   ArrowRight,
@@ -40,26 +42,26 @@ export function LandingPage({
   onDemo: () => void;
   onReplayOnboarding?: () => void;
 }) {
+  const [paused, setPaused] = useState(false);
   return (
     <div className={styles.landing}>
       <section className={styles.hero}>
         <div className={styles.heroCopy}>
           <div className={styles.eyebrow}>
-            <span className={styles.liveDot} /> STOCK-BACKED LIQUIDITY. ON BASE.
+            <span className={styles.liveDot} /> COINBASE TOKENIZED STOCKS. NEW POSSIBILITIES.
           </div>
           <h1>
-            Your stocks.
+            Your stocks as collateral.
             <br />
-            <span>More possibilities.</span>
+            <span>USDC to do more.</span>
           </h1>
           <p>
-            You chose your stocks for a reason.
-            <br className={styles.desktopBreak} /> Access USDC without giving up
-            your position.
+            Use Coinbase tokenized stocks as collateral to borrow USDC on Base.
+            Start with NVIDIA (NVDAc), keep your stock exposure, and repay on your terms.
           </p>
           <div className={styles.actions}>
             <button className={styles.primary} onClick={onDemo}>
-              Open app <ArrowUpRight size={20} />
+              Borrow USDC <ArrowUpRight size={20} />
             </button>
             <a className={styles.textLink} href="#how-it-works">
               See how it works <ArrowRight size={17} />
@@ -67,37 +69,35 @@ export function LandingPage({
           </div>
           <div className={styles.heroFoot}>
             <span className={styles.baseMark} /> Built on Base{" "}
-            <span className={styles.separator}>/</span> Powered by Morpho
+            <a href="https://morpho.org" target="_blank" rel="noreferrer" className={styles.morphoBadge}><Image src="/brand/powered-by-morpho.svg" alt="Powered by Morpho" width={265} height={38} /></a>
           </div>
+          <LandingBorrowRate />
         </div>
-        <div className={styles.heroArt}>
-          <div className={styles.artTop}>
-            <span>YOUR NEXT MOVE STARTS HERE</span>
-            <ArrowUpRight size={22} />
+        <div className={styles.creditScene} data-paused={paused}>
+          <div className={styles.sceneGrid} aria-hidden="true" />
+          <div className={styles.sceneOrbit} aria-hidden="true" />
+          <div className={styles.sceneHeader}>
+            <span>YOUR STOCKS → YOUR NEXT MOVE</span>
+            <button onClick={() => setPaused(!paused)} aria-pressed={paused}>
+              {paused ? "Play animation" : "Pause animation"}
+            </button>
           </div>
-          <div className={styles.illustration}>
-            <Image
-              src="/landing/product-loop.png"
-              alt="Tokenized stocks become collateral for USDC liquidity, with a path to repay and withdraw"
-              fill
-              sizes="(max-width: 760px) 100vw, 560px"
-              priority
-              className={styles.productImage}
-            />
-          </div>
-          <div className={styles.assetTicket}>
-            <StockLogo ticker="NVDA" size={42} />
-            <div>
-              <strong>Keep the exposure.</strong>
-              <span>Unlock the liquidity.</span>
+          <div className={styles.collateralCard}>
+            <div className={styles.cardLabel}><span>01 / DEPOSIT COLLATERAL</span><LockKeyhole size={16} /></div>
+            <div className={styles.stockIdentity}>
+              <StockLogo ticker="NVDA" size={56} />
+              <div><strong>NVIDIA</strong><span>NVDAc · Coinbase tokenized stock</span></div>
             </div>
-            <ArrowUpRight size={20} />
+            <div className={styles.cardBottom}><span>Your stock exposure</span><strong>Still yours</strong></div>
           </div>
-          <div className={styles.artBottom}>
-            <span>NVDAc</span>
-            <span className={styles.routeLine} />
-            <span>USDC</span>
+          <div className={styles.creditBridge} aria-hidden="true"><svg width="54" height="54" viewBox="0 0 54 54"><path d="M8 6v24c0 8 4 12 12 12h24m-10-10 10 10-10 10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg></div>
+          <div className={styles.borrowCard}>
+            <div className={styles.cardLabel}><span>02 / BORROW USDC</span><ArrowUpRight size={19} /></div>
+            <div className={styles.usdcIdentity}><Image src="/brand/usdc.svg" alt="USDC" width={48} height={48} /><strong>USDC</strong></div>
+            <p>Liquidity in your wallet.</p>
+            <div className={styles.cardBottom}><span>Backed by your collateral</span><Wallet size={18} /></div>
           </div>
+          <div className={styles.sceneCaption}><Repeat2 size={16} /> Repay USDC. Withdraw your stocks.</div>
         </div>
       </section>
 
@@ -222,7 +222,7 @@ export function LandingPage({
           {[
             [
               "What am I depositing?",
-              "NVDAc, a tokenized stock on Base, is the collateral supported by the current pilot. It is not a traditional brokerage position. You can find a purchase link inside the app.",
+              "NVDAc, Coinbase’s tokenized NVIDIA stock on Base, is the collateral supported by the current pilot. It is not a traditional brokerage position. You can find a purchase link inside the app.",
             ],
             [
               "How much can I borrow?",

@@ -45,9 +45,9 @@ export function AppShell() {
   return (
     <div className="flex min-h-screen flex-col bg-[var(--bg)]">
       <TopBar onConnect={openWallet} wide={view === "landing"} />
-      <MarketSessionNotice />
+      {view !== "landing" && <MarketSessionNotice />}
       <main className="flex-1 pb-28">
-        <LegacyPosition />
+        {view !== "landing" && <LegacyPosition />}
         {view === "landing" && (
           <LandingPage
             onConnect={openWallet}

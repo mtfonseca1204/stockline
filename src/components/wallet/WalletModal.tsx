@@ -1,10 +1,6 @@
 "use client";
 import { useState } from "react";
-import {
-  CoinbaseIcon,
-  MetaMaskIcon,
-  WalletConnectIcon,
-} from "@/components/brand/WalletIcons";
+import { Wallet } from "lucide-react";
 import {
   Sheet,
   ChoiceRow,
@@ -15,12 +11,23 @@ import { Button } from "@/components/ui/Button";
 import { useApp } from "@/context/AppContext";
 import { errorMessage } from "@/lib/chain/amounts";
 
-function walletMark(name: string) {
-  const n = name.toLowerCase();
-  if (n.includes("coinbase") || n.includes("base"))
-    return <CoinbaseIcon size={32} />;
-  if (n.includes("meta")) return <MetaMaskIcon size={32} />;
-  return <WalletConnectIcon size={32} />;
+function WalletMark({ icon }: { icon?: string }) {
+  const [failed, setFailed] = useState(false);
+  if (!icon || failed) {
+    return <Wallet size={32} aria-hidden className="shrink-0 text-[var(--ink-muted)]" />;
+  }
+  return (
+    // Wallet extensions supply their own EIP-6963 icons, including SVG data URIs.
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={icon}
+      alt=""
+      width={32}
+      height={32}
+      className="h-8 w-8 shrink-0 rounded-lg object-contain"
+      onError={() => setFailed(true)}
+    />
+  );
 }
 
 export function WalletModal({
@@ -42,7 +49,7 @@ export function WalletModal({
           <ChoiceRow
             key={c.uid}
             title={c.name}
-            leading={walletMark(c.name)}
+            leading={<WalletMark key={c.icon ?? c.uid} icon={c.icon} />}
             onClick={async () => {
               try {
                 await connectWallet(c);
