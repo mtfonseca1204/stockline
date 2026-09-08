@@ -23,13 +23,16 @@ export function AppShell() {
   const [walletOpen, setWalletOpen] = useState(false);
   const { ready, needs, clear, reset } = useNeedsOnboarding();
 
-  const openWallet = () => setWalletOpen(true);
+  const openWallet = () => {
+    if (view === "landing") clear();
+    setWalletOpen(true);
+  };
 
   if (!ready) {
     return <div className="min-h-screen bg-[var(--bg)]" />;
   }
 
-  if (needs) {
+  if (needs && view !== "landing") {
     return (
       <div className="min-h-screen bg-[var(--bg)]">
         <MarketSessionNotice />
@@ -41,15 +44,15 @@ export function AppShell() {
 
   return (
     <div className="flex min-h-screen flex-col bg-[var(--bg)]">
-      <TopBar onConnect={openWallet} />
+      <TopBar onConnect={openWallet} wide={view === "landing"} />
       <MarketSessionNotice />
       <main className="flex-1 pb-28">
         <LegacyPosition />
         {view === "landing" && (
           <LandingPage
             onConnect={openWallet}
-            onDemo={startApp}
-            onReplayOnboarding={reset}
+            onDemo={() => { clear(); startApp(); }}
+            onReplayOnboarding={() => { reset(); startApp(); }}
           />
         )}
         {view === "home" && <Home />}

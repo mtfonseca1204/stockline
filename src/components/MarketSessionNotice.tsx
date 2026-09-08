@@ -39,7 +39,9 @@ export function MarketSessionNotice() {
   });
   if (localEnabled) return null;
   let title = "Checking market status";
-  let detail = "Borrowing requires an open Nasdaq session and a valid price.";
+  let detail = deployment.alwaysOpen
+    ? "24/7 pilot using the last published stock price. Checking oracle availability."
+    : "Borrowing requires an open Nasdaq session and a valid price.";
   const data = status.data;
   if (status.isError) {
     title = "Market status unavailable";

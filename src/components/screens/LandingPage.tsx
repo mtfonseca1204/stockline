@@ -1,8 +1,35 @@
 "use client";
 
-import { Button } from "@/components/ui/Button";
-import { motion } from "framer-motion";
 import Image from "next/image";
+import {
+  ArrowUpRight,
+  ArrowRight,
+  Plus,
+  Wallet,
+  Layers3,
+  Repeat2,
+  LockKeyhole,
+} from "lucide-react";
+import { StockLogo } from "@/components/brand/StockLogo";
+import styles from "./LandingPage.module.css";
+
+const steps = [
+  {
+    icon: Wallet,
+    title: "Bring your stocks.",
+    text: "Connect your wallet and deposit NVDAc as collateral. Your position stays in your wallet’s name.",
+  },
+  {
+    icon: Layers3,
+    title: "Make room for more.",
+    text: "Borrow USDC against your collateral. Keep your stock exposure while accessing liquidity.",
+  },
+  {
+    icon: Repeat2,
+    title: "Repay your way.",
+    text: "Repay with USDC or sell part of your collateral. Withdraw the remaining stocks when your position allows.",
+  },
+];
 
 export function LandingPage({
   onConnect,
@@ -14,50 +41,244 @@ export function LandingPage({
   onReplayOnboarding?: () => void;
 }) {
   return (
-    <div className="page animate-fade-up !pb-10">
-      <div className="pt-10">
-        <h1 className="display text-[2.15rem] text-[var(--ink)] sm:text-[2.4rem]">
-          Keep your stocks.
-          <br />
-          Access liquidity.
-        </h1>
-        <p className="mt-4 max-w-sm text-[15px] leading-relaxed text-[var(--ink-muted)]">
-          Borrow against your tokens. Repay with USDC or sell part of your collateral.
-        </p>
-      </div>
-
-      <motion.div
-        className="surface mt-4 overflow-hidden p-2 sm:p-3"
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.15 }}
-      >
-        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[calc(var(--radius)-4px)] bg-white">
-          <Image
-            src="/landing/product-loop.png"
-            alt="Borrow USDC against stocks, then repay with USDC or a partial sale"
-            fill
-            sizes="(max-width: 448px) 100vw, 448px"
-            className="object-contain object-center"
-            priority
-            unoptimized
-          />
+    <div className={styles.landing}>
+      <section className={styles.hero}>
+        <div className={styles.heroCopy}>
+          <div className={styles.eyebrow}>
+            <span className={styles.liveDot} /> STOCK-BACKED LIQUIDITY. ON BASE.
+          </div>
+          <h1>
+            Your stocks.
+            <br />
+            <span>More possibilities.</span>
+          </h1>
+          <p>
+            You chose your stocks for a reason.
+            <br className={styles.desktopBreak} /> Access USDC without giving up
+            your position.
+          </p>
+          <div className={styles.actions}>
+            <button className={styles.primary} onClick={onDemo}>
+              Open app <ArrowUpRight size={20} />
+            </button>
+            <a className={styles.textLink} href="#how-it-works">
+              See how it works <ArrowRight size={17} />
+            </a>
+          </div>
+          <div className={styles.heroFoot}>
+            <span className={styles.baseMark} /> Built on Base{" "}
+            <span className={styles.separator}>/</span> Powered by Morpho
+          </div>
         </div>
-      </motion.div>
+        <div className={styles.heroArt}>
+          <div className={styles.artTop}>
+            <span>YOUR NEXT MOVE STARTS HERE</span>
+            <ArrowUpRight size={22} />
+          </div>
+          <div className={styles.illustration}>
+            <Image
+              src="/landing/product-loop.png"
+              alt="Tokenized stocks become collateral for USDC liquidity, with a path to repay and withdraw"
+              fill
+              sizes="(max-width: 760px) 100vw, 560px"
+              priority
+              className={styles.productImage}
+            />
+          </div>
+          <div className={styles.assetTicket}>
+            <StockLogo ticker="NVDA" size={42} />
+            <div>
+              <strong>Keep the exposure.</strong>
+              <span>Unlock the liquidity.</span>
+            </div>
+            <ArrowUpRight size={20} />
+          </div>
+          <div className={styles.artBottom}>
+            <span>NVDAc</span>
+            <span className={styles.routeLine} />
+            <span>USDC</span>
+          </div>
+        </div>
+      </section>
 
-      <div className="mt-auto space-y-3 pt-8">
-        <Button size="lg" className="w-full" onClick={onConnect}>
-          Get started
-        </Button>
-        <Button size="lg" variant="secondary" className="w-full" onClick={onDemo}>
-          Open app
-        </Button>
-        {onReplayOnboarding ? (
-          <Button variant="ghost" className="w-full" onClick={onReplayOnboarding}>
-            Replay onboarding
-          </Button>
-        ) : null}
-      </div>
+      <section className={styles.marketStrip} aria-label="Supported markets">
+        <div>
+          <span className={styles.eyebrow}>
+            STARTING WITH THE STOCKS YOU KNOW
+          </span>
+          <p>One market today. More possibilities ahead.</p>
+        </div>
+        <div className={styles.markets}>
+          {[
+            { ticker: "NVDA", label: "NVDAc", live: true },
+            { ticker: "AAPL", label: "AAPLc", live: false },
+            { ticker: "MSFT", label: "MSFTc", live: false },
+            { ticker: "META", label: "METAc", live: false },
+          ].map((asset) => (
+            <div className={styles.market} key={asset.ticker}>
+              <StockLogo ticker={asset.ticker} size={32} />
+              <div>
+                <strong>{asset.label}</strong>
+                <span>{asset.live ? "Pilot available" : "Coming soon"}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className={styles.how} id="how-it-works">
+        <div className={styles.sectionHeading}>
+          <span className={styles.eyebrow}>01 / THE IDEA IS SIMPLE</span>
+          <h2>
+            Hold your conviction.
+            <br />
+            <span>Give yourself options.</span>
+          </h2>
+          <p>
+            A stock position doesn’t have to mean sitting still. Put it to work
+            as collateral in three steps.
+          </p>
+        </div>
+        <div className={styles.steps}>
+          {steps.map(({ icon: Icon, title, text }, index) => (
+            <article className={styles.step} key={title}>
+              <div className={styles.stepTop}>
+                <Icon size={25} strokeWidth={1.5} />
+                <span>0{index + 1}</span>
+              </div>
+              <h3>{title}</h3>
+              <p>{text}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className={styles.feature}>
+        <div className={styles.featureCopy}>
+          <span className={styles.eyebrow}>
+            02 / BUILT AROUND YOUR POSITION
+          </span>
+          <h2>
+            Liquidity that
+            <br />
+            fits your next move.
+          </h2>
+          <p>
+            Choose how much to borrow and how to repay. See your collateral,
+            debt and available credit before you make a move.
+          </p>
+          <button className={styles.lightButton} onClick={onConnect}>
+            Connect your wallet <ArrowUpRight size={20} />
+          </button>
+        </div>
+        <div className={styles.featureGrid}>
+          <article>
+            <span className={styles.featureNumber}>24/7</span>
+            <h3>No scheduled closing bell.</h3>
+            <p>
+              The pilot uses the last published stock price outside market
+              hours. Prices may be stale; oracle checks and liquidity still
+              apply.
+            </p>
+          </article>
+          <article>
+            <LockKeyhole size={32} strokeWidth={1.4} />
+            <h3>Your wallet. Your approvals.</h3>
+            <p>
+              You sign each operation. Collateral is held in Morpho while
+              deposited, with the position recorded in your name.
+            </p>
+          </article>
+          <article>
+            <span className={styles.featureNumber}>USDC</span>
+            <h3>A familiar way to borrow.</h3>
+            <p>
+              Debt and repayments are denominated in USDC. Interest is variable
+              and accrues while you have a loan.
+            </p>
+          </article>
+          <article>
+            <Repeat2 size={32} strokeWidth={1.4} />
+            <h3>Two ways back.</h3>
+            <p>
+              Pay with USDC or sell part of the collateral to repay. You choose
+              how much stock exposure to keep.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section className={styles.faq}>
+        <div>
+          <span className={styles.eyebrow}>03 / A LITTLE CLARITY</span>
+          <h2>
+            Good questions.
+            <br />
+            <span>Straight answers.</span>
+          </h2>
+          <p>Understand your position before opening one.</p>
+        </div>
+        <div className={styles.questions}>
+          {[
+            [
+              "What am I depositing?",
+              "NVDAc, a tokenized stock on Base, is the collateral supported by the current pilot. It is not a traditional brokerage position. You can find a purchase link inside the app.",
+            ],
+            [
+              "How much can I borrow?",
+              "The app suggests a maximum of 50% of your collateral value, subject to available USDC liquidity and valid oracle checks. The market’s liquidation threshold is 77% loan-to-value. These are different limits.",
+            ],
+            [
+              "Can my collateral be liquidated?",
+              "Yes. A falling stock price or accumulating interest can make your position eligible for liquidation. Borrowing against stocks carries risk, and the pilot’s use of stale prices outside market hours adds risk.",
+            ],
+            [
+              "Does 24/7 mean a live stock price?",
+              "No. The market can accept the last published equity price during weekends, holidays and other gaps in updates. Registry or administrator pauses, invalid prices and sequencer checks can still block borrowing and liquidation.",
+            ],
+            [
+              "Is this a finished financial product?",
+              "This is a controlled hackathon pilot with real assets and real funds. The custom contracts have not undergone an independent security audit. Start by understanding the mechanics and the risks.",
+            ],
+          ].map(([question, answer]) => (
+            <details key={question}>
+              <summary>
+                {question}
+                <Plus size={19} />
+              </summary>
+              <p>{answer}</p>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <section className={styles.finalCta}>
+        <span className={styles.eyebrow}>
+          KEEP YOUR STOCKS. EXPLORE WHAT’S NEXT.
+        </span>
+        <h2>
+          Your portfolio.
+          <br />
+          With room to move.
+        </h2>
+        <button className={styles.primary} onClick={onDemo}>
+          Open app <ArrowUpRight size={20} />
+        </button>
+        <p>NVDAc pilot on Base · Real assets, real funds.</p>
+      </section>
+      <footer className={styles.footer}>
+        <span>
+          Kora{" "}
+          <span className={styles.footerTag}>A new angle on your stocks.</span>
+        </span>
+        <div>
+          <a href="#how-it-works">How it works</a>
+          {onReplayOnboarding && (
+            <button onClick={onReplayOnboarding}>Product walkthrough</button>
+          )}
+          <span>Built on Base</span>
+        </div>
+      </footer>
     </div>
   );
 }

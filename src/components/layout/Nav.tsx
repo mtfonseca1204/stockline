@@ -25,13 +25,13 @@ const TABS: {
   { id: "activity", label: "Activity", Icon: IconActivity },
 ];
 
-export function TopBar({ onConnect }: { onConnect: () => void }) {
+export function TopBar({ onConnect, wide = false }: { onConnect: () => void; wide?: boolean }) {
   const { connected, walletAddress, disconnectWallet } = useApp();
   const reduce = useReducedMotion();
 
   return (
     <header className="sticky top-0 z-30 border-b border-[var(--border)] bg-[var(--bg)]/90 backdrop-blur-md">
-      <div className="mx-auto flex h-12 max-w-md items-center justify-between px-5">
+      <div className={cn("mx-auto flex items-center justify-between px-5", wide ? "h-16 max-w-[1200px] md:px-10" : "h-12 max-w-md")}>
         <BrandLogo size="xs" className="max-h-5" />
         {connected && walletAddress ? (
           <motion.button
