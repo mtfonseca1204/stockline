@@ -1,9 +1,10 @@
 "use client";
 
+import { Info } from "lucide-react";
 import { cn } from "@/lib/cn";
-import { X } from "lucide-react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import type { ReactNode } from "react";
+import { motion, useReducedMotion } from "framer-motion";
+import { useState, type ReactNode } from "react";
+import { BottomSheet } from "./BottomSheet";
 
 export function Sheet({
   open,
@@ -16,79 +17,23 @@ export function Sheet({
   title?: string;
   children: ReactNode;
 }) {
-  const reduce = useReducedMotion();
-
-  return (
-    <AnimatePresence>
-      {open ? (
-        <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center">
-          <motion.button
-            type="button"
-            aria-label="Close"
-            className="absolute inset-0 bg-black/30"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onClose}
-          />
-          <motion.div
-            role="dialog"
-            aria-modal
-            className="relative z-10 w-full max-w-md rounded-t-2xl border border-[var(--border)] bg-[var(--bg-elevated)] p-5 shadow-xl sm:rounded-2xl"
-            initial={reduce ? { opacity: 0 } : { y: 40, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={reduce ? { opacity: 0 } : { y: 24, opacity: 0 }}
-            transition={{ type: "spring", stiffness: 380, damping: 32 }}
-          >
-            <div className="mb-4 flex items-start justify-between gap-3">
-              {title ? (
-                <h2 className="text-lg font-semibold text-[var(--ink)]">
-                  {title}
-                </h2>
-              ) : (
-                <span />
-              )}
-              <motion.button
-                type="button"
-                onClick={onClose}
-                whileHover={reduce ? undefined : { scale: 1.08, rotate: 90 }}
-                whileTap={reduce ? undefined : { scale: 0.9 }}
-                className="pressable rounded-lg p-1.5 text-[var(--ink-muted)] hover:bg-black/[0.04] hover:text-[var(--ink)]"
-              >
-                <X size={18} />
-              </motion.button>
-            </div>
-            {children}
-          </motion.div>
-        </div>
-      ) : null}
-    </AnimatePresence>
-  );
+  return open ? <BottomSheet title={title ?? "Details"} onClose={onClose}>{children}</BottomSheet> : null;
 }
 
-export function Expandable({
-  label,
-  children,
-  className,
-}: {
+export function Expandable({ label, children, className, iconOnly = false }: {
   label: string;
   children: ReactNode;
   className?: string;
+  iconOnly?: boolean;
 }) {
+  const [open, setOpen] = useState(false);
   return (
-    <details className={cn("group", className)}>
-      <summary className="expand-summary cursor-pointer list-none text-sm font-medium text-[var(--brand-ink)] underline decoration-[var(--brand)] decoration-2 underline-offset-4 marker:content-none [&::-webkit-details-marker]:hidden">
-        <span className="inline-flex items-center gap-1">
-          {label}
-          <span className="inline-block text-[var(--ink-subtle)] transition-transform duration-300 ease-[cubic-bezier(0.34,1.4,0.64,1)] group-open:rotate-180">
-            ▾
-          </span>
-        </span>
-      </summary>
-      <div className="mt-3 animate-fade-up space-y-2 text-sm text-[var(--ink-muted)]">
-        {children}
-      </div>
-    </details>
+    <div className={className}>
+      <button type="button" aria-label={label} aria-haspopup="dialog" onClick={() => setOpen(true)} className={iconOnly ? "rounded-full p-2 text-[var(--ink-muted)] hover:bg-[var(--accent-soft)] focus-visible:outline-2 focus-visible:outline-[var(--accent)]" : "text-sm font-medium text-[var(--brand-ink)] underline decoration-[var(--brand)] decoration-2 underline-offset-4"}>
+        {iconOnly ? <Info size={18} aria-hidden="true" /> : label}
+      </button>
+      {open && <BottomSheet title={label} onClose={() => setOpen(false)}><div className="space-y-2 text-sm text-[var(--ink-muted)]">{children}</div></BottomSheet>}
+    </div>
   );
 }
 

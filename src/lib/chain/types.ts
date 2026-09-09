@@ -95,6 +95,10 @@ export type TxState = {
   context?: string;
 };
 export type Activity = {
+  chainId?: number;
+  amount?: bigint;
+  amountDecimals?: number;
+  asset?: string;
   id: string;
   hash: Hex;
   block: bigint;

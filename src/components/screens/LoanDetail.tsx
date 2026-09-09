@@ -12,7 +12,7 @@ export function LoanDetail() {
     (p) => (p.snapshot?.borrowShares ?? 0n) > 0n,
   );
   return (
-    <div className="page animate-fade-up">
+    <div className="space-y-4">
       <h1 className="display text-2xl text-[var(--ink)]">Your loan</h1>
       <NetworkNotice />
       {!loans.length && (
@@ -54,8 +54,7 @@ export function LoanDetail() {
           <Button
             className="w-full"
             onClick={() => {
-              app.openStock(p.market.ticker);
-              app.setView("repay");
+              app.openAction("repay", p.market.ticker);
             }}
           >
             Repay loan

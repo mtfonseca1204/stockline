@@ -1,7 +1,7 @@
 "use client";
 
+import { BottomSheet } from "@/components/ui/BottomSheet";
 import { LegacyPosition } from "@/components/screens/LegacyPosition";
-import { MarketSessionNotice } from "@/components/MarketSessionNotice";
 import { AlertStack } from "@/components/alerts/AlertStack";
 import { BottomNav, TopBar } from "@/components/layout/Nav";
 import { Onboarding, useNeedsOnboarding } from "@/components/Onboarding";
@@ -19,7 +19,7 @@ import { useApp } from "@/context/AppContext";
 import { useState } from "react";
 
 export function AppShell() {
-  const { view, startApp } = useApp();
+  const { view, startApp, setView } = useApp();
   const [walletOpen, setWalletOpen] = useState(false);
   const { ready, needs, clear, reset } = useNeedsOnboarding();
 
@@ -35,7 +35,6 @@ export function AppShell() {
   if (needs && view !== "landing") {
     return (
       <div className="min-h-screen bg-[var(--bg)]">
-        <MarketSessionNotice />
         <Onboarding onDone={clear} onConnect={openWallet} />
         <WalletModal open={walletOpen} onClose={() => setWalletOpen(false)} />
       </div>
@@ -45,7 +44,6 @@ export function AppShell() {
   return (
     <div className="flex min-h-screen flex-col bg-[var(--bg)]">
       <TopBar onConnect={openWallet} wide={view === "landing"} />
-      {view !== "landing" && <MarketSessionNotice />}
       <main className="flex-1 pb-28">
         {view !== "landing" && <LegacyPosition />}
         {view === "landing" && (
@@ -62,8 +60,22 @@ export function AppShell() {
         {view === "deposit" && <Deposit />}
         {view === "repay" && <Repay />}
         {view === "withdraw" && <Withdraw />}
-        {view === "loan" && <LoanDetail />}
-        {view === "stock" && <StockDetail />}
+        {view === "loan" && (
+          <>
+            <Home />
+            <BottomSheet title="Your loan" onClose={() => setView("home")}>
+              <LoanDetail />
+            </BottomSheet>
+          </>
+        )}
+        {view === "stock" && (
+          <>
+            <Portfolio />
+            <BottomSheet title="Stock details" onClose={() => setView("portfolio")}>
+              <StockDetail />
+            </BottomSheet>
+          </>
+        )}
       </main>
       {view !== "landing" ? <BottomNav /> : null}
       <WalletModal open={walletOpen} onClose={() => setWalletOpen(false)} />

@@ -176,6 +176,7 @@ test("rejected signature and context changes cannot confirm", async ({
   await page
     .getByRole("button", { name: "Add Collateral", exact: true })
     .click();
+  await page.getByRole("button", { name: "Select NVDAc market", exact: true }).click();
   await page.getByLabel("Amount").fill("1");
   await page.getByRole("button", { name: "Review", exact: true }).click();
   await page.evaluate(() => {
@@ -239,8 +240,10 @@ test("original portfolio layout and stock selection at mobile and desktop widths
       path: `/tmp/stockline-deposit-${width}.png`,
       fullPage: true,
     });
+    await page.getByRole("button", { name: "Select NVDAc market", exact: true }).click();
+    await expect(page.getByRole("dialog")).toBeVisible();
     await expect(page.getByText(/Wallet balance:/)).toBeVisible();
-    await expect(page.getByText(/last published price/).first()).toBeVisible();
+    await expect(page.getByRole("dialog").getByText(/last published price/)).toHaveCount(0);
     await page.getByLabel("Amount").fill("1.234");
     await expect(page.getByLabel("Amount")).toHaveValue("1.234");
     await page.getByLabel("Amount").press("5");
@@ -254,6 +257,7 @@ test("original portfolio layout and stock selection at mobile and desktop widths
         () => document.documentElement.scrollWidth <= window.innerWidth,
       ),
     ).toBe(true);
+    await page.getByRole("button", { name: "Close action", exact: true }).click();
     await page
       .getByRole("button", { name: "Home", exact: true })
       .first()
@@ -276,6 +280,7 @@ test("only NVDAc is selectable for the initial market", async ({ page }) => {
     await expect(option).toBeDisabled();
     await expect(option).toContainText("Coming soon");
   }
+  await page.getByRole("button", { name: "Select NVDAc market", exact: true }).click();
   await expect(
     page.getByRole("link", { name: "Buy NVDAc on Uniswap", exact: false }),
   ).toBeVisible();
@@ -307,4 +312,39 @@ test("deposit simulation uses the confirmed approval block when latest RPC state
   await page.getByRole('button',{name:'Confirm transaction'}).click();
   await expect(page.getByRole('heading',{name:'Transaction confirmed'})).toBeVisible();
   expect(pinnedCalls).toBeGreaterThanOrEqual(2);
+});
+
+test("stock, market, activity and borrowing actions use sheets", async ({ page }) => {
+  await page.getByRole("button", { name: "Portfolio", exact: true }).click();
+  await page.getByRole("button", { name: /NVDAc.*deposited/ }).click();
+  const stock = page.getByRole("dialog", { name: "Stock details", exact: true });
+  await expect(stock).toBeVisible();
+  await stock.getByRole("button", { name: "Market details", exact: true }).click();
+  const details = page.getByRole("dialog", { name: "Market details", exact: true });
+  await expect(details).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(details).toHaveCount(0);
+  await expect(stock).toBeVisible();
+  await stock.getByRole("button", { name: "Withdraw", exact: true }).click();
+  let sheet = page.getByRole("dialog", { name: "Withdraw collateral · NVDAc" });
+  await expect(sheet).toBeVisible();
+  await sheet.getByLabel("Amount").fill("0.1");
+  await sheet.getByRole("button", { name: "Close action" }).click();
+  await page.getByRole("button", { name: "Borrow", exact: true }).click();
+  await page.getByRole("button", { name: "Select NVDAc market", exact: true }).click();
+  sheet = page.getByRole("dialog", { name: "How much would you like to borrow? · NVDAc" });
+  await expect(sheet.getByLabel("Amount")).toHaveValue("");
+  await sheet.getByLabel("Amount").fill("0.01");
+  await sheet.getByRole("button", { name: "Review", exact: true }).click();
+  await expect(sheet.getByRole("button", { name: "Confirm transaction" })).toBeInViewport();
+  await sheet.getByRole("button", { name: "Edit amount" }).click();
+  await expect(sheet.getByLabel("Amount")).toHaveValue("0.01");
+  await sheet.getByRole("button", { name: "Close action" }).click();
+  await page.getByRole("button", { name: "Activity", exact: true }).click();
+  const entries = page.locator("main .interactive-row");
+  await expect(entries.first()).toBeVisible();
+  await entries.first().click();
+  await expect(page.getByRole("dialog", { name: "Activity details" })).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog")).toHaveCount(0);
 });

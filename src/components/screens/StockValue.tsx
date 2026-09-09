@@ -4,8 +4,12 @@ export function StockValue({
   position,
   amount,
   prominent = false,
+  hideUnavailable = false,
+  parenthesized = false,
 }: {
   prominent?: boolean;
+  hideUnavailable?: boolean;
+  parenthesized?: boolean;
   position?: MarketPosition;
   amount: bigint | null | undefined;
 }) {
@@ -14,18 +18,14 @@ export function StockValue({
     position?.market.collateralDecimals ?? 8,
     position?.referencePrice,
   );
-  const updated = position?.referencePrice?.updatedAt;
+  if (value === null && hideUnavailable) return null;
+  let text = "USD value unavailable";
+  if (value !== null) text = parenthesized ? `($${display(value)})` : `≈ $${display(value)}`;
   return (
     <span
       className={prominent ? "text-inherit" : "text-xs font-normal text-[var(--ink-muted)]"}
-      title={
-        updated
-          ? `Reference price published ${new Date(Number(updated) * 1000).toLocaleString()}`
-          : undefined
-      }
     >
-      {value === null ? "USD value unavailable" : `≈ $${display(value)}`}
-      {value !== null && <span className="text-xs font-normal text-[var(--ink-muted)]"> · last published price</span>}
+      {text}
     </span>
   );
 }

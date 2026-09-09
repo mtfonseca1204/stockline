@@ -22,6 +22,7 @@ import coreJson from "./generated/Morpho.json";
 import lensJson from "./generated/StocklineLens.json";
 import adapterJson from "./generated/StocklineRepayAdapter.json";
 import swapJson from "./generated/StocklineV3Swap.json";
+import { activityAsset } from "./activity";
 import { marketParams, errorMessage } from "./amounts";
 import type {
   Action,
@@ -479,6 +480,8 @@ export async function readHistory(owner: Address): Promise<Activity[]> {
         label: log.eventName,
         detail: market.ticker,
         timestamp: block.timestamp,
+        chainId: d.chainId,
+        ...activityAsset(log.eventName, args, market),
       });
     }
   }

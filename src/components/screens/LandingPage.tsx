@@ -176,9 +176,8 @@ export function LandingPage({
             <span className={styles.featureNumber}>24/7</span>
             <h3>No scheduled closing bell.</h3>
             <p>
-              The pilot uses the last published stock price outside market
-              hours. Prices may be stale; oracle checks and liquidity still
-              apply.
+              The pilot operates outside market hours. Prices may be stale;
+              safety checks and liquidity still apply.
             </p>
           </article>
           <article>
@@ -234,7 +233,7 @@ export function LandingPage({
             ],
             [
               "Does 24/7 mean a live stock price?",
-              "No. The market can accept the last published equity price during weekends, holidays and other gaps in updates. Registry or administrator pauses, invalid prices and sequencer checks can still block borrowing and liquidation.",
+              "No. Prices can be stale during weekends, holidays and other gaps in updates. Pauses, invalid prices and safety checks can still block borrowing and liquidation.",
             ],
             [
               "Is this a finished financial product?",

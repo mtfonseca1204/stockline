@@ -1,4 +1,5 @@
 "use client";
+import { InfoTooltip } from "@/components/ui/InfoTooltip";
 import { StockLogo } from "@/components/brand/StockLogo";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -23,6 +24,9 @@ export function Home() {
     (sum, p) => sum + (p.snapshot?.availableBorrowRaw ?? 0n),
     0n,
   );
+  const depositedPositions = app.positions.filter(
+    (p) => (p.snapshot?.collateralRaw ?? 0n) > 0n,
+  );
   const usd = (raw: bigint) =>
     ready ? `$${display(raw)}` : "Unavailable";
   return (
@@ -35,20 +39,39 @@ export function Home() {
         <p className="mt-2 text-sm text-[var(--ink-muted)]">
           Keep your stocks. Unlock their value.
         </p>
+        {depositedPositions.length > 0 && (
+          <div className="mt-4 flex flex-wrap gap-2" aria-label="Deposited collateral assets">
+            {depositedPositions.map((p) => (
+              <button
+                key={p.market.marketId}
+                onClick={() => app.openStock(p.market.ticker)}
+                className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-white px-2.5 py-1.5 text-xs"
+              >
+                <StockLogo ticker={p.market.ticker.replace(/c$/, "")} size={20} />
+                <span className="font-semibold">{p.market.ticker}</span>
+                <span className="text-[var(--ink-muted)]">Deposited</span>
+                <span className="text-[var(--ink-muted)]">
+                  {usd(p.snapshot?.collateralValueUsdcRaw ?? 0n)}
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
-      <NetworkNotice />
-      <div className="grid grid-cols-3 gap-2">
+      <NetworkNotice showEnvironment={false} />
+      <div className="relative grid grid-cols-3 gap-2">
         {[
-          ["Collateral", collateral],
-          ["Borrowed", debt],
-          ["Available", available],
-        ].map(([label, value]) => (
+          ["Collateral", collateral, "Value of the stocks you have deposited as collateral, using the protocol oracle price."],
+          ["Borrowed", debt, "Your outstanding USDC debt, including accrued interest."],
+          ["Available", available, "Additional USDC you can borrow based on deposited collateral, the current borrowing limit, existing debt and market liquidity. This is not cash in your wallet and can change with prices, interest and liquidity."],
+        ].map(([label, value, description]) => (
           <div
             key={String(label)}
             className="surface-quiet flex flex-col gap-1 p-3"
           >
-            <span className="text-[11px] text-[var(--ink-subtle)]">
+            <span className="flex items-center gap-1 text-[11px] text-[var(--ink-subtle)]">
               {label}
+              <InfoTooltip label={String(label)}>{String(description)}</InfoTooltip>
             </span>
             <span className="text-sm font-semibold">
               {usd(value as bigint)}
@@ -136,23 +159,6 @@ export function Home() {
       >
         View portfolio
       </button>
-      <div className="flex flex-wrap gap-2 pt-1">
-        {app.positions
-          .filter((p) => (p.snapshot?.collateralRaw ?? 0n) > 0n)
-          .map((p) => (
-            <button
-              key={p.market.marketId}
-              onClick={() => app.openStock(p.market.ticker)}
-              className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-white px-2.5 py-1.5 text-xs"
-            >
-              <StockLogo ticker={p.market.ticker.replace(/c$/, "")} size={20} />
-              <span className="font-semibold">{p.market.ticker}</span>
-              <span className="text-[var(--ink-muted)]">
-                {usd(p.snapshot?.collateralValueUsdcRaw ?? 0n)}
-              </span>
-            </button>
-          ))}
-      </div>
     </div>
   );
 }

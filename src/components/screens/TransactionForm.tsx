@@ -2,6 +2,7 @@
 import { formatUnits } from "viem";
 import { StockValue } from "./StockValue";
 import { useState } from "react";
+import { BottomSheet } from "@/components/ui/BottomSheet";
 import { stockBuyLink } from "@/lib/chain/buy-link";
 import { inputLimit, percentageAmount } from "@/lib/chain/input-limits";
 import { StockLogo } from "@/components/brand/StockLogo";
@@ -36,13 +37,84 @@ const subtitles = {
 type FormAction = keyof typeof names;
 export function TransactionForm({ action }: { action: FormAction }) {
   const app = useApp();
-  const [selected, setSelected] = useState(
-    deployment?.markets.find(
-      (m) => m.enabled && m.ticker === app.selectedTicker,
-    )?.ticker ??
-      deployment?.markets.find((m) => m.enabled)?.ticker ??
-      "",
+  const [selected, setSelected] = useState<string | null>(
+    deployment?.markets.find((market) => market.enabled && market.ticker === app.actionTicker)?.ticker ?? null,
   );
+  const busy = ["review", "approval-signature", "approval-pending", "approval-confirmed", "signature", "pending"].includes(app.tx.phase);
+  if (!deployment) return <div className="page">Mainnet transactions are not enabled.</div>;
+  return (
+    <div className="page animate-fade-up">
+      <button type="button" className="inline-flex items-center gap-1 text-sm text-[var(--ink-muted)]" onClick={() => app.setView("home")}>
+        <ChevronLeft size={16} /> Home
+      </button>
+      <h1 className="display text-2xl text-[var(--ink)]">{names[action]}</h1>
+      <p className="text-sm text-[var(--ink-muted)]">{subtitles[action]}</p>
+      {action !== "borrow" && <EnvPill>{environmentLabel}</EnvPill>}
+      <div className="surface overflow-hidden">
+        {deployment.markets.map((m, i) => (
+          <button
+            type="button"
+            aria-label={`Select ${m.ticker} market`}
+            aria-pressed={selected === m.ticker}
+            key={m.marketId}
+            disabled={!m.enabled}
+            onClick={() => {
+              app.resetTx();
+              setSelected(m.ticker);
+            }}
+            className={`interactive-row flex w-full items-center gap-3 px-4 py-3.5 text-left ${i ? "border-t border-[var(--border)]" : ""} ${selected === m.ticker ? "bg-[var(--accent-soft)]" : ""}`}
+          >
+            <StockLogo ticker={m.ticker.replace(/c$/, "")} size={40} />
+            <span className="flex-1 font-semibold">
+              {m.ticker}
+              <span className="block text-xs font-normal text-[var(--ink-muted)]">
+                {display(
+                  app.positions.find((p) => p.market.marketId === m.marketId)
+                    ?.walletCollateral,
+                  m.collateralDecimals,
+                )}{" "}
+                in wallet
+                <br />
+                <StockValue position={app.positions.find((p) => p.market.marketId === m.marketId)} amount={app.positions.find((p) => p.market.marketId === m.marketId)?.walletCollateral} />
+              </span>
+            </span>
+            {!m.enabled && (
+              <span className="shrink-0 rounded-full bg-[var(--border)] px-2.5 py-1 text-[11px] font-medium text-[var(--ink-muted)]">
+                Coming soon
+              </span>
+            )}
+            {selected === m.ticker && (
+              <Check size={18} className="text-[var(--accent)]" />
+            )}
+          </button>
+        ))}
+        <ComingSoonMarkets />
+      </div>
+
+      {selected && (
+        <BottomSheet
+          title={`${names[action]} · ${selected}`}
+          dismissible={!busy}
+          onClose={() => setSelected(null)}
+          headerAction={!localEnabled && (
+            <Expandable label="When can I borrow?" iconOnly>
+              <p>
+                {deployment.alwaysOpen
+                  ? "This pilot supports borrowing around the clock, including weekends and holidays. Borrowing and liquidation can use a stale price. Safety checks and available liquidity still apply."
+                  : "Credit is available during Nasdaq regular sessions with a current-session price. Closed sessions also pause liquidations."}
+              </p>
+            </Expandable>
+          )}
+        >
+          <TransactionFields key={`${action}:${selected}:${app.walletAddress}:${app.correctNetwork}`} action={action} selected={selected} />
+        </BottomSheet>
+      )}
+    </div>
+  );
+}
+
+function TransactionFields({ action, selected }: { action: FormAction; selected: string }) {
+  const app = useApp();
   const [amount, setAmount] = useState("");
   const [sell, setSell] = useState(false);
   const [all, setAll] = useState(false);
@@ -52,6 +124,9 @@ export function TransactionForm({ action }: { action: FormAction }) {
   const [quoting, setQuoting] = useState(false);
   const market = deployment?.markets.find((m) => m.ticker === selected);
   const buyLink = stockBuyLink(selected);
+  const isDeposit = action === "deposit";
+  const isBorrow = action === "borrow";
+  const stockValueProps = { hideUnavailable: isDeposit };
   const position = app.positions.find((p) => p.market.ticker === selected);
   const s = position?.snapshot;
   const tokenInput = action === "deposit" || action === "withdraw" || sell;
@@ -124,7 +199,7 @@ export function TransactionForm({ action }: { action: FormAction }) {
     );
   if (app.tx.phase === "confirmed")
     return (
-      <div className="page animate-fade-up relative text-center">
+      <div className="relative space-y-4 text-center">
         <ConfettiBurst active />
         <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--accent-soft)] text-[var(--accent)]">
           <Check size={28} />
@@ -163,89 +238,9 @@ export function TransactionForm({ action }: { action: FormAction }) {
       </div>
     );
   return (
-    <div className="page animate-fade-up">
-      <button
-        type="button"
-        className="inline-flex items-center gap-1 text-sm text-[var(--ink-muted)]"
-        disabled={busy}
-        onClick={() => app.setView("home")}
-      >
-        <ChevronLeft size={16} /> Home
-      </button>
-      <h1 className="display text-2xl text-[var(--ink)]">{names[action]}</h1>
-      <p className="text-sm text-[var(--ink-muted)]">{subtitles[action]}</p>
-      <EnvPill>{environmentLabel}</EnvPill>
-      <div className="surface overflow-hidden">
-        {deployment.markets.map((m, i) => (
-          <button
-            type="button"
-            aria-label={`Select ${m.ticker} market`}
-            aria-pressed={selected === m.ticker}
-            key={m.marketId}
-            disabled={busy || !m.enabled}
-            onClick={() => {
-              reset();
-              setSelected(m.ticker);
-            }}
-            className={`interactive-row flex w-full items-center gap-3 px-4 py-3.5 text-left ${i ? "border-t border-[var(--border)]" : ""} ${selected === m.ticker ? "bg-[var(--accent-soft)]" : ""}`}
-          >
-            <StockLogo ticker={m.ticker.replace(/c$/, "")} size={40} />
-            <span className="flex-1 font-semibold">
-              {m.ticker}
-              <span className="block text-xs font-normal text-[var(--ink-muted)]">
-                {display(
-                  app.positions.find((p) => p.market.marketId === m.marketId)
-                    ?.walletCollateral,
-                  m.collateralDecimals,
-                )}{" "}
-                in wallet
-                <br />
-                <StockValue position={app.positions.find((p) => p.market.marketId === m.marketId)} amount={app.positions.find((p) => p.market.marketId === m.marketId)?.walletCollateral} />
-              </span>
-            </span>
-            {!m.enabled && (
-              <span className="shrink-0 rounded-full bg-[var(--border)] px-2.5 py-1 text-[11px] font-medium text-[var(--ink-muted)]">
-                Coming soon
-              </span>
-            )}
-            {selected === m.ticker && (
-              <Check size={18} className="text-[var(--accent)]" />
-            )}
-          </button>
-        ))}
-        <ComingSoonMarkets />
-      </div>
-      {action === "deposit" && buyLink && (
-        <Card quiet className="space-y-2">
-          <p className="text-sm text-[var(--ink-muted)]">
-            Need more {selected}?
-          </p>
-          <a
-            href={buyLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex text-sm font-semibold text-[var(--accent)] underline underline-offset-4"
-          >
-            Buy {selected} on Uniswap ↗
-          </a>
-          <p className="text-xs text-[var(--ink-muted)]">
-            Opens Uniswap on Base mainnet. Purchases use real funds. {localEnabled && "They do not appear in this local demo."}
-          </p>
-        </Card>
-      )}
-      {!app.correctNetwork && app.connected && (
-        <Button onClick={app.switchNetwork}>Switch to {networkName}</Button>
-      )}
-      {!localEnabled && (
-        <Expandable label="When can I borrow?">
-          <p>
-            {deployment.alwaysOpen
-              ? "This 24/7 pilot accepts the last published stock price, including weekends and holidays. Borrowing and liquidation can use a stale price. Oracle safety checks and available liquidity still apply."
-              : "Credit is available during Nasdaq regular sessions with a current-session price. Closed sessions also pause liquidations."}
-          </p>
-        </Expandable>
-      )}
-      <Card className="space-y-3">
+    <div className="space-y-4">
+      {!reviewing && <Card className="space-y-3">
+        {!isBorrow && <>
         <div className="flex items-center gap-3">
           <StockLogo ticker={selected.replace(/c$/, "")} size={48} />
           <div>
@@ -260,7 +255,7 @@ export function TransactionForm({ action }: { action: FormAction }) {
             <p className="text-xs text-[var(--ink-muted)]">Collateral</p>
             <p className="font-semibold">
               {display(s?.collateralRaw, market?.collateralDecimals)} tokens
-              <br /><StockValue position={position} amount={s?.collateralRaw} />
+              <br /><StockValue {...stockValueProps} position={position} amount={s?.collateralRaw} />
             </p>
           </div>
           <div>
@@ -268,6 +263,17 @@ export function TransactionForm({ action }: { action: FormAction }) {
             <p className="font-semibold">{display(s?.debtAssetsRaw)} USDC</p>
           </div>
         </div>
+        </>}
+        {isDeposit && buyLink && (
+          <a
+            href={buyLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex text-sm font-semibold text-[var(--accent)] underline underline-offset-4"
+          >
+            Buy {selected} on Uniswap ↗
+          </a>
+        )}
         {action === "repay" && (
           <div className="space-y-2">
             <ToggleRow
@@ -277,6 +283,7 @@ export function TransactionForm({ action }: { action: FormAction }) {
               subtitle="You keep fewer stocks after the sale."
               onChange={(next) => {
                 reset();
+                setAmount("");
                 setSell(next);
               }}
             />
@@ -286,6 +293,7 @@ export function TransactionForm({ action }: { action: FormAction }) {
               title="Repay all debt"
               onChange={(next) => {
                 reset();
+                setAmount("");
                 setAll(next);
               }}
             />
@@ -308,25 +316,47 @@ export function TransactionForm({ action }: { action: FormAction }) {
             />
           </label>
         )}
-        {tokenInput && <StockValue position={position} amount={inputRaw} />}
+        {tokenInput && <StockValue {...stockValueProps} position={position} amount={inputRaw} />}
         {(amount.split(".")[1]?.length ?? 0) > visibleDecimals && <p className="text-xs text-[var(--ink-muted)]">Display truncated. The selected percentage uses the full token precision.</p>}
         <div className="space-y-3">
-          <p className="text-sm text-[var(--ink-muted)]">
-            Wallet balance:{" "}
-            {display(position?.walletCollateral, market?.collateralDecimals)}{" "}
-            {selected} · {display(position?.walletUsdc)} USDC
-            <br /><StockValue position={position} amount={position?.walletCollateral} />
-          </p>
-          <p className="text-sm text-[var(--ink-muted)]">
-            {sell
-              ? "Collateral available to sell"
-              : "Available for this operation"}
-            :{" "}
-            <span className="font-semibold text-[var(--ink)]">
-              {display(limit, decimals)} {unit}
-              {tokenInput && <><br /><StockValue position={position} amount={limit} /></>}
-            </span>
-          </p>
+          {isDeposit && (
+            <>
+              <p className="text-sm text-[var(--ink-muted)]">
+                Wallet balance:{" "}
+                <span className="whitespace-nowrap">
+                  {display(position?.walletCollateral, market?.collateralDecimals)} {selected}{" "}
+                  <StockValue {...stockValueProps} parenthesized position={position} amount={position?.walletCollateral} />
+                </span>
+              </p>
+              <p className="text-sm text-[var(--ink-muted)]">
+                Available for this operation:{" "}
+                <span className="whitespace-nowrap">
+                  {display(limit, decimals)} {selected}{" "}
+                  <StockValue {...stockValueProps} parenthesized position={position} amount={limit} />
+                </span>
+              </p>
+            </>
+          )}
+          {isBorrow && (
+            <p className="text-sm text-[var(--ink-muted)]">
+              Available for this operation: <span className="font-semibold text-[var(--ink)]">{display(limit, decimals)} USDC</span>
+            </p>
+          )}
+          {!isDeposit && !isBorrow && (
+            <>
+              <p className="text-sm text-[var(--ink-muted)]">
+                Wallet balance: {display(position?.walletCollateral, market?.collateralDecimals)} {selected} · {display(position?.walletUsdc)} USDC
+                <br /><StockValue position={position} amount={position?.walletCollateral} />
+              </p>
+              <p className="text-sm text-[var(--ink-muted)]">
+                {sell ? "Collateral available to sell" : "Available for this operation"}:{" "}
+                <span className="font-semibold text-[var(--ink)]">
+                  {display(limit, decimals)} {unit}
+                  {tokenInput && <><br /><StockValue position={position} amount={limit} /></>}
+                </span>
+              </p>
+            </>
+          )}
           <div className="flex gap-2">
             {([25, 50, 75, 100] as const).map((pct) => (
               <button
@@ -365,8 +395,8 @@ export function TransactionForm({ action }: { action: FormAction }) {
             wallet simulation checks the requested amount.
           </p>
         )}
-      </Card>
-      {sell && (
+      </Card>}
+      {sell && !reviewing && (
         <Card className="space-y-3">
           <p className="text-sm text-[var(--ink-muted)]">
             Selling collateral reduces the number of stocks you hold. Ordinary
@@ -427,14 +457,14 @@ export function TransactionForm({ action }: { action: FormAction }) {
             </span>
             {selected ? ` · ${selected}` : ""}
           </p>
-          {tokenInput && <StockValue position={position} amount={inputRaw} />}
+          {tokenInput && <StockValue {...stockValueProps} position={position} amount={inputRaw} />}
           {quote && (
             <div className="space-y-2 text-sm text-[var(--ink-muted)]">
               <p>
                 Tokens sold:{" "}
                 <span className="font-semibold text-[var(--ink)]">
                   {display(quote.request.collateralAssetsToSell, decimals)}
-                  <br /><StockValue position={position} amount={quote.request.collateralAssetsToSell} />
+                  <br /><StockValue {...stockValueProps} position={position} amount={quote.request.collateralAssetsToSell} />
                 </span>
               </p>
               <p>
@@ -453,7 +483,7 @@ export function TransactionForm({ action }: { action: FormAction }) {
                 <p>
                   Remaining collateral:{" "}
                   {display(quote.collateralAfter, decimals)} tokens
-                  <br /><StockValue position={position} amount={quote.collateralAfter} />
+                  <br /><StockValue {...stockValueProps} position={position} amount={quote.collateralAfter} />
                 </p>
                 <p>
                   Health after:{" "}
@@ -476,6 +506,7 @@ export function TransactionForm({ action }: { action: FormAction }) {
               </Expandable>
             </div>
           )}
+          <Button variant="ghost" className="w-full" disabled={busy} onClick={reset}>Edit amount</Button>
           <Button
             size="lg"
             className="w-full"
@@ -516,6 +547,9 @@ export function TransactionForm({ action }: { action: FormAction }) {
         <p className="break-all text-xs text-[var(--ink-subtle)]">
           {app.tx.hash}
         </p>
+      )}
+      {!app.correctNetwork && app.connected && (
+        <Button onClick={app.switchNetwork}>Switch to {networkName}</Button>
       )}
       {(error || app.tx.message) && (
         <InlineAlert>{error || app.tx.message}</InlineAlert>

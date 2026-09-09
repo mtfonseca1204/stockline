@@ -1,4 +1,5 @@
 "use client";
+import { NvdaReferenceChart } from "./NvdaReferenceChart";
 import { StockValue } from "./StockValue";
 import { ComingSoonMarkets } from "./ComingSoonMarkets";
 import { networkName, environmentLabel } from "@/lib/chain/config";
@@ -21,7 +22,7 @@ export function Portfolio() {
           Your tokenized stocks and collateral positions.
         </p>
       </div>
-      <NetworkNotice />
+      <NetworkNotice showEnvironment={false} />
       <div className="surface overflow-hidden">
         {app.positions.map((p, i) => (
           <button
@@ -69,7 +70,7 @@ export function Portfolio() {
     </div>
   );
 }
-export function NetworkNotice() {
+export function NetworkNotice({ showEnvironment = true }: { showEnvironment?: boolean }) {
   const app = useApp();
   return (
     <>
@@ -87,7 +88,7 @@ export function NetworkNotice() {
       {app.error && (
         <InlineAlert>Unable to read your positions. Please refresh.</InlineAlert>
       )}
-      <EnvPill>{environmentLabel}</EnvPill>
+      {showEnvironment && <EnvPill>{environmentLabel}</EnvPill>}
     </>
   );
 }
@@ -95,7 +96,7 @@ export function StockDetail() {
   const app = useApp();
   const p = app.positions.find((p) => p.market.ticker === app.selectedTicker);
   return (
-    <div className="page animate-fade-up">
+    <div className="space-y-4">
       <button
         className="inline-flex items-center gap-1 text-sm text-[var(--ink-muted)]"
         onClick={() => app.setView("portfolio")}
@@ -110,11 +111,15 @@ export function StockDetail() {
         <div>
           <h1 className="text-2xl">{app.selectedTicker}</h1>
           <p className="text-sm text-[var(--ink-muted)]">Tokenized stock</p>
+          <Expandable label="Market details" className="mt-1">
+            <MarketSummary />
+          </Expandable>
         </div>
       </div>
       <p className="text-3xl font-semibold">
         <StockValue prominent position={p} amount={p?.snapshot?.collateralRaw} />
       </p>
+      {app.selectedTicker === "NVDAc" && <NvdaReferenceChart />}
       <Card className="space-y-4">
         <Row
           label="Deposited"
@@ -127,14 +132,11 @@ export function StockDetail() {
         <Row label="Deposit reference / PnL" value="Unavailable" />
       </Card>
       <div className="grid grid-cols-2 gap-2">
-        <Button onClick={() => app.setView("deposit")}>Add Collateral</Button>
-        <Button variant="secondary" onClick={() => app.setView("withdraw")}>
+        <Button onClick={() => app.openAction("deposit", app.selectedTicker!)}>Add Collateral</Button>
+        <Button variant="secondary" onClick={() => app.openAction("withdraw", app.selectedTicker!)}>
           Withdraw
         </Button>
       </div>
-      <Expandable label="Market details">
-        <MarketSummary />
-      </Expandable>
     </div>
   );
 }

@@ -38,6 +38,7 @@ function useAppState() {
     setView("home");
     router.push("/app");
   };
+  const [actionTicker, setActionTicker] = useState<string | null>(null);
   const [selectedTicker, setSelectedTicker] = useState<string | null>(null);
   const [tx, setTx] = useState<TxState>({ phase: "idle" });
   const [alerts, setAlerts] = useState<AlertItem[]>([]);
@@ -93,7 +94,16 @@ function useAppState() {
   };
   return {
     view,
-    setView,
+    setView: (next: AppView) => {
+      setActionTicker(null);
+      setView(next);
+    },
+    actionTicker,
+    openAction: (action: "deposit" | "borrow" | "repay" | "withdraw", ticker: string) => {
+      setTx({ phase: "idle" });
+      setActionTicker(ticker);
+      setView(action);
+    },
     selectedTicker,
     openStock: (ticker: string) => {
       setSelectedTicker(ticker);

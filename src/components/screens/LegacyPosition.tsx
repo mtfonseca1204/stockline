@@ -8,10 +8,12 @@ import legacy from "@/lib/chain/generated/legacy-base.json";
 import { readPositions } from "@/lib/chain/service";
 import { display, errorMessage } from "@/lib/chain/amounts";
 import type { MarketConfig } from "@/lib/chain/types";
+import { BottomSheet } from "@/components/ui/BottomSheet";
 import { Button } from "@/components/ui/Button";
 const market = legacy.markets[0] as MarketConfig;
 export function LegacyPosition() {
   const app = useApp();
+  const [open, setOpen] = useState(false);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const enabled =
@@ -68,14 +70,21 @@ export function LegacyPosition() {
         wallet, then deposit into the new 24/7 market. Your collateral is not
         moved automatically.
       </p>
-      <Button disabled={busy} onClick={exit}>
-        {busy
-          ? "Waiting for confirmation…"
-          : s.borrowShares
-            ? "Repay old market debt"
-            : "Withdraw old collateral"}
+      <Button onClick={() => setOpen(true)}>
+        {s.borrowShares ? "Repay old market debt" : "Withdraw old collateral"}
       </Button>
-      {error && <p role="alert">{error}</p>}
+      {open && (
+        <BottomSheet title="Old market position" dismissible={!busy} onClose={() => setOpen(false)}>
+          <div className="space-y-4">
+            <p>{display(s.collateralRaw, 8)} NVDAc · {display(s.debtAssetsRaw)} USDC debt</p>
+            <p>{s.borrowShares ? "Repay the remaining debt with USDC from your wallet." : "Withdraw your old collateral to your wallet."}</p>
+            <Button disabled={busy} onClick={exit}>
+              {busy ? "Waiting for confirmation…" : "Confirm in wallet"}
+            </Button>
+            {error && <p role="alert">{error}</p>}
+          </div>
+        </BottomSheet>
+      )}
     </div>
   );
 }

@@ -40,7 +40,7 @@ export function MarketSessionNotice() {
   if (localEnabled) return null;
   let title = "Checking market status";
   let detail = deployment.alwaysOpen
-    ? "24/7 pilot using the last published stock price. Checking oracle availability."
+    ? "24/7 pilot. Checking borrowing availability."
     : "Borrowing requires an open Nasdaq session and a valid price.";
   const data = status.data;
   if (status.isError) {
@@ -62,7 +62,7 @@ export function MarketSessionNotice() {
         "Emergency pause is active. Borrowing and liquidations are unavailable.";
     } else if (deployment.alwaysOpen) {
       title = data.valid ? "24/7 pilot · Market available" : "24/7 pilot · Oracle unavailable";
-      detail = "Uses the last published stock price, including weekends and holidays. Prices may be stale. Registry, USDC and sequencer checks still apply.";
+      detail = "Available on weekends and holidays. Prices may be stale. Safety checks still apply.";
     } else if (data.session.state === "closed") {
       title = "Market closed";
       detail = `Next opening: ${time} (Brasília, UTC−3). Borrowing and liquidations require a fresh price after opening.`;
