@@ -23,6 +23,7 @@ import lensJson from "./generated/StocklineLens.json";
 import adapterJson from "./generated/StocklineRepayAdapter.json";
 import swapJson from "./generated/StocklineV3Swap.json";
 import { activityAsset } from "./activity";
+import { withBuilderAttribution } from "./attribution";
 import { marketParams, errorMessage } from "./amounts";
 import type {
   Action,
@@ -272,7 +273,9 @@ export async function execute(
   ) => {
     checkContext();
     const wallet = await getWalletClient(config);
-    const data = encodeFunctionData({ abi, functionName: fn, args });
+    const data = withBuilderAttribution(
+      encodeFunctionData({ abi, functionName: fn, args }),
+    );
     await publicClient.call({ account: owner, to, data, blockNumber: approvalBlock });
     const estimate = await publicClient.estimateGas({
       account: owner,
