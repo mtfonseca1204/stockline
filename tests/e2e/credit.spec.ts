@@ -118,7 +118,7 @@ for (const ticker of ["NVDAc"]) {
     await page
       .getByRole("button", { name: `Select ${ticker} market`, exact: true })
       .click();
-    await page.getByRole("button", { name: "Sell collateral to repay" }).click();
+    await page.getByRole("button", { name: "Sell collateral", exact: true }).click();
     await page
       .getByRole("button", { name: "Allow sale repayment", exact: true })
       .click();

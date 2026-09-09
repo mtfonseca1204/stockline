@@ -31,7 +31,7 @@ const names = {
 const subtitles = {
   deposit: "Select the stocks you want to use as collateral.",
   borrow: "Access liquidity without selling your stocks.",
-  repay: "Use USDC, or sell part of your collateral to reduce your loan.",
+  repay: "Pay with USDC from your wallet, or sell some collateral.",
   withdraw: "Take deposited stocks back to your wallet.",
 };
 type FormAction = keyof typeof names;
@@ -96,7 +96,7 @@ export function TransactionForm({ action }: { action: FormAction }) {
           title={`${names[action]} · ${selected}`}
           dismissible={!busy}
           onClose={() => setSelected(null)}
-          headerAction={!localEnabled && (
+          headerAction={!localEnabled && action !== "repay" && (
             <Expandable label="When can I borrow?" iconOnly>
               <p>
                 {deployment.alwaysOpen
@@ -246,7 +246,9 @@ function TransactionFields({ action, selected }: { action: FormAction; selected:
           <div>
             <h2 className="text-xl">{selected}</h2>
             <p className="text-sm text-[var(--ink-muted)]">
-              Available to borrow: {display(s?.availableBorrowRaw)} USDC
+              {action === "repay"
+                ? `Current loan: ${display(s?.debtAssetsRaw)} USDC`
+                : `Available to borrow: ${display(s?.availableBorrowRaw)} USDC`}
             </p>
           </div>
         </div>
@@ -259,8 +261,14 @@ function TransactionFields({ action, selected }: { action: FormAction; selected:
             </p>
           </div>
           <div>
-            <p className="text-xs text-[var(--ink-muted)]">Borrowed</p>
-            <p className="font-semibold">{display(s?.debtAssetsRaw)} USDC</p>
+            <p className="text-xs text-[var(--ink-muted)]">
+              {action === "repay" ? "Wallet USDC" : "Borrowed"}
+            </p>
+            <p className="font-semibold">
+              {action === "repay"
+                ? `${display(position?.walletUsdc)} USDC`
+                : `${display(s?.debtAssetsRaw)} USDC`}
+            </p>
           </div>
         </div>
         </>}
@@ -275,28 +283,83 @@ function TransactionFields({ action, selected }: { action: FormAction; selected:
           </a>
         )}
         {action === "repay" && (
-          <div className="space-y-2">
-            <ToggleRow
-              checked={sell}
-              disabled={busy}
-              title="Sell collateral to repay"
-              subtitle="You keep fewer stocks after the sale."
-              onChange={(next) => {
-                reset();
-                setAmount("");
-                setSell(next);
-              }}
-            />
-            <ToggleRow
-              checked={all}
-              disabled={busy}
-              title="Repay all debt"
-              onChange={(next) => {
-                reset();
-                setAmount("");
-                setAll(next);
-              }}
-            />
+          <div className="space-y-3">
+            <div
+              className="grid grid-cols-2 gap-2"
+              role="group"
+              aria-label="Repayment method"
+            >
+              <button
+                type="button"
+                disabled={busy}
+                aria-pressed={!sell}
+                onClick={() => {
+                  if (!sell) return;
+                  reset();
+                  setAmount("");
+                  setAll(false);
+                  setSell(false);
+                }}
+                className={`rounded-xl border px-3 py-3 text-left text-sm font-semibold transition-colors ${
+                  !sell
+                    ? "border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent)]"
+                    : "border-[var(--border)] bg-[var(--bg)] text-[var(--ink-muted)]"
+                }`}
+              >
+                Pay with USDC
+                <span className="mt-0.5 block text-xs font-normal opacity-80">
+                  Keep your stocks
+                </span>
+              </button>
+              <button
+                type="button"
+                disabled={busy}
+                aria-pressed={sell}
+                onClick={() => {
+                  if (sell) return;
+                  reset();
+                  setAmount("");
+                  setAll(false);
+                  setSell(true);
+                }}
+                className={`rounded-xl border px-3 py-3 text-left text-sm font-semibold transition-colors ${
+                  sell
+                    ? "border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent)]"
+                    : "border-[var(--border)] bg-[var(--bg)] text-[var(--ink-muted)]"
+                }`}
+              >
+                Sell collateral
+                <span className="mt-0.5 block text-xs font-normal opacity-80">
+                  You keep fewer stocks
+                </span>
+              </button>
+            </div>
+            {!sell && (
+              <ToggleRow
+                checked={all}
+                disabled={busy}
+                title="Repay all debt"
+                subtitle="Use your wallet USDC to clear the full loan."
+                onChange={(next) => {
+                  reset();
+                  setAmount("");
+                  setAll(next);
+                }}
+              />
+            )}
+            {sell && (
+              <ToggleRow
+                checked={all}
+                disabled={busy}
+                title="Clear entire loan"
+                subtitle="Sell enough collateral to cover the full debt."
+                onChange={(next) => {
+                  reset();
+                  setAmount("");
+                  setAll(next);
+                }}
+              />
+            )}
           </div>
         )}
         {!(all && !sell) && (
@@ -399,11 +462,10 @@ function TransactionFields({ action, selected }: { action: FormAction; selected:
       {sell && !reviewing && (
         <Card className="space-y-3">
           <p className="text-sm text-[var(--ink-muted)]">
-            Selling collateral reduces the number of stocks you hold. Ordinary
-            USDC repayment does not need this extra permission.
+            One-time permission lets Kora sell collateral to repay your loan.
+            Paying with USDC does not need this.
           </p>
           <Button
-            variant="soft"
             className="w-full"
             disabled={busy || !app.correctNetwork}
             onClick={async () => {
@@ -419,52 +481,80 @@ function TransactionFields({ action, selected }: { action: FormAction; selected:
           >
             Allow sale repayment
           </Button>
-          <Button
-            variant="ghost"
-            className="w-full"
-            disabled={busy || !app.correctNetwork}
-            onClick={async () => {
-              try {
-                if (market) {
-                  await app.run("revoke", market);
-                  app.resetTx();
+          <Expandable label="Advanced">
+            <Button
+              variant="ghost"
+              className="w-full"
+              disabled={busy || !app.correctNetwork}
+              onClick={async () => {
+                try {
+                  if (market) {
+                    await app.run("revoke", market);
+                    app.resetTx();
+                  }
+                } catch (e) {
+                  setError(errorMessage(e));
                 }
-              } catch (e) {
-                setError(errorMessage(e));
-              }
-            }}
-          >
-            Remove permission
-          </Button>
-          <Expandable label="Technical details">
-            <p className="break-all text-xs">Adapter: {deployment.adapter}</p>
+              }}
+            >
+              Remove permission
+            </Button>
+            <p className="mt-2 break-all text-xs text-[var(--ink-subtle)]">
+              Adapter: {deployment.adapter}
+            </p>
           </Expandable>
         </Card>
       )}
       {reviewing && (
         <Card className="space-y-3">
           <h2 className="text-lg text-[var(--ink)]">Review your transaction</h2>
-          <p className="text-sm text-[var(--ink-muted)]">
-            {action === "deposit"
-              ? "You are depositing"
-              : action === "borrow"
-                ? "You are borrowing"
-                : action === "repay"
-                  ? "You are repaying"
-                  : "You are withdrawing"}{" "}
-            <span className="font-semibold text-[var(--ink)]">
-              {all ? "all remaining debt" : `${display(inputRaw, decimals)} ${unit}`}
-            </span>
-            {selected ? ` · ${selected}` : ""}
-          </p>
-          {tokenInput && <StockValue {...stockValueProps} position={position} amount={inputRaw} />}
+          {sell ? (
+            <p className="text-sm text-[var(--ink-muted)]">
+              You are selling{" "}
+              <span className="font-semibold text-[var(--ink)]">
+                {all
+                  ? "enough collateral"
+                  : `${display(inputRaw, decimals)} ${selected}`}
+              </span>{" "}
+              to repay your loan in USDC.
+            </p>
+          ) : (
+            <p className="text-sm text-[var(--ink-muted)]">
+              {action === "deposit"
+                ? "You are depositing"
+                : action === "borrow"
+                  ? "You are borrowing"
+                  : action === "repay"
+                    ? "You are repaying"
+                    : "You are withdrawing"}{" "}
+              <span className="font-semibold text-[var(--ink)]">
+                {all
+                  ? "all remaining debt"
+                  : `${display(inputRaw, decimals)} ${unit}`}
+              </span>
+              {selected && action !== "repay" ? ` · ${selected}` : ""}
+              {action === "repay" ? " with USDC from your wallet." : ""}
+            </p>
+          )}
+          {tokenInput && !sell && (
+            <StockValue
+              {...stockValueProps}
+              position={position}
+              amount={inputRaw}
+            />
+          )}
           {quote && (
             <div className="space-y-2 text-sm text-[var(--ink-muted)]">
               <p>
                 Tokens sold:{" "}
                 <span className="font-semibold text-[var(--ink)]">
                   {display(quote.request.collateralAssetsToSell, decimals)}
-                  <br /><StockValue {...stockValueProps} position={position} amount={quote.request.collateralAssetsToSell} />
+                  <br />
+                  <StockValue
+                    {...stockValueProps}
+                    position={position}
+                    amount={quote.request.collateralAssetsToSell}
+                  />
                 </span>
               </p>
               <p>
@@ -483,7 +573,12 @@ function TransactionFields({ action, selected }: { action: FormAction; selected:
                 <p>
                   Remaining collateral:{" "}
                   {display(quote.collateralAfter, decimals)} tokens
-                  <br /><StockValue {...stockValueProps} position={position} amount={quote.collateralAfter} />
+                  <br />
+                  <StockValue
+                    {...stockValueProps}
+                    position={position}
+                    amount={quote.collateralAfter}
+                  />
                 </p>
                 <p>
                   Health after:{" "}
@@ -506,7 +601,14 @@ function TransactionFields({ action, selected }: { action: FormAction; selected:
               </Expandable>
             </div>
           )}
-          <Button variant="ghost" className="w-full" disabled={busy} onClick={reset}>Edit amount</Button>
+          <Button
+            variant="ghost"
+            className="w-full"
+            disabled={busy}
+            onClick={reset}
+          >
+            Edit amount
+          </Button>
           <Button
             size="lg"
             className="w-full"
@@ -522,11 +624,22 @@ function TransactionFields({ action, selected }: { action: FormAction; selected:
           size="lg"
           className="w-full"
           disabled={
-            !app.connected || !app.correctNetwork || !s || busy || quoting || (action === "borrow" && !s?.oracleValid)
+            !app.connected ||
+            !app.correctNetwork ||
+            !s ||
+            busy ||
+            quoting ||
+            (action === "borrow" && !s?.oracleValid)
           }
           onClick={prepare}
         >
-          {quoting ? "Requesting quote…" : "Review"}
+          {quoting
+            ? "Requesting quote…"
+            : sell
+              ? "Review sale"
+              : action === "repay"
+                ? "Review repayment"
+                : "Review"}
         </Button>
       )}
       {busy && (

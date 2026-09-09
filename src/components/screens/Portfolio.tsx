@@ -132,11 +132,34 @@ export function StockDetail() {
         <Row label="Deposit reference / PnL" value="Unavailable" />
       </Card>
       <div className="grid grid-cols-2 gap-2">
-        <Button onClick={() => app.openAction("deposit", app.selectedTicker!)}>Add Collateral</Button>
-        <Button variant="secondary" onClick={() => app.openAction("withdraw", app.selectedTicker!)}>
+        <Button onClick={() => app.openAction("deposit", app.selectedTicker!)}>
+          Add Collateral
+        </Button>
+        {(p?.snapshot?.debtAssetsRaw ?? 0n) > 0n ? (
+          <Button
+            variant="secondary"
+            onClick={() => app.openAction("repay", app.selectedTicker!)}
+          >
+            Repay
+          </Button>
+        ) : (
+          <Button
+            variant="secondary"
+            onClick={() => app.openAction("withdraw", app.selectedTicker!)}
+          >
+            Withdraw
+          </Button>
+        )}
+      </div>
+      {(p?.snapshot?.debtAssetsRaw ?? 0n) > 0n && (
+        <Button
+          variant="ghost"
+          className="w-full"
+          onClick={() => app.openAction("withdraw", app.selectedTicker!)}
+        >
           Withdraw
         </Button>
-      </div>
+      )}
     </div>
   );
 }

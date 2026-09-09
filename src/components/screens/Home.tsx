@@ -107,7 +107,13 @@ export function Home() {
               <>
                 <Button
                   className="flex-1"
-                  onClick={() => app.setView("repay")}
+                  onClick={() => {
+                    const loan = app.positions.find(
+                      (p) => (p.snapshot?.debtAssetsRaw ?? 0n) > 0n,
+                    );
+                    if (loan) app.openAction("repay", loan.market.ticker);
+                    else app.setView("repay");
+                  }}
                 >
                   Repay your loan
                 </Button>
